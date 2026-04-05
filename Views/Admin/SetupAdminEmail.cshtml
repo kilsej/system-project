@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["Title"] = "Setup Admin Email";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Setup Admin Email - Carlton Residences</title>
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/startbootstrap-sb-admin-2@4.1.4/css/sb-admin-2.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f36f21;
+        }
+
+        .btn-primary-custom {
+            background-color: #f36f21;
+            border-color: #f36f21;
+            color: white;
+        }
+
+            .btn-primary-custom:hover {
+                background-color: #d65a10;
+                color: white;
+            }</style>
+</head>
+<body style="background-color: #f36f21;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-6 col-lg-7 col-md-9">
+                <div class="card o-hidden border-0 shadow-lg my-5">
+                    <div class="card-body p-0">
+                        <div class="p-5">
+                            <div class="text-center">
+                                <h1 class="h4 text-gray-900 mb-2">Welcome, Admin!</h1>
+                                <p class="mb-4">It looks like this is your first time logging in. Please enter your email address to enable security features like OTP and Password Reset.</p>
+                            </div>
+                            @if (ViewBag.Error != null)
+                            {
+                                <div class="alert alert-danger">@ViewBag.Error</div>
+                            }
+                            <form class="user" method="post" action="@Url.Action("SetupAdminEmail", "Admin")">
+                                <div class="form-group">
+                                    <input type="email" name="Email" class="form-control form-control-user" placeholder="Enter Email Address..." required>
+                                </div>
+                                <button type="submit" class="btn btn-primary-custom btn-user btn-block">Send Verification Code</button>
+                            </form>
+                            <hr>
+                            <div class="text-center"><a class="small" href="@Url.Action("Login", "Admin")">Cancel</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

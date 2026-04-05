@@ -1,0 +1,247 @@
+﻿@model ResidentDashboardViewModel
+
+@{
+    Layout = "~/Views/Shared/_ResidentLayout.cshtml";
+    ViewData["PageTitle"] = "Resident Dashboard";
+}
+
+<style>
+    .sidebar {
+        z-index: 2000 !important;
+    }
+
+    .welcome-card {
+        z-index: 1;
+        position: relative;
+    }
+
+    /* === Layout === */
+    .chart-container {
+        width: 100%;
+        height: 280px;
+        position: relative;
+    }
+
+    /* === Cards === */
+    .summary-card,
+    .status-card,
+    .pie_card {
+        background-color: #ECECEC;
+        border-radius: 16px;
+        box-shadow: 0 10px 10px rgba(0,0,0,0.12);
+    }
+
+    .summary-card, .status-card {
+        min-height: 150px;
+    }
+
+    .pie_card {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100% !important;
+        padding: 10px;
+    }
+
+    .status-circle {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+    }
+
+    .status-green {
+        background-color: #4CAF50;
+    }
+
+    .status-amber {
+        background-color: #FFC107;
+    }
+
+    .status-red {
+        background-color: #F44336;
+    }
+
+    .status-label {
+        margin-top: 16px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .welcome-section {
+        background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('/NewFolder/carltonimg.jpg');
+        background-size: cover;
+        background-position: center;
+        height: 250px;
+        display: flex;
+        align-items: flex-end;
+        padding: 0 40px 20px 40px;
+        border-radius: 15px;
+    }
+
+    .welcome-card {
+        background: white;
+        padding: 20px 40px;
+        border-radius: 10px;
+        border-bottom: 4px solid #F8863A;
+        transform: translateY(40px);
+        z-index: 10;
+    }
+
+
+    /* mobile responsiveness*/
+
+    @@media (max-width: 768px) {
+        .welcome-section {
+            height: 180px;
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .welcome-card {
+            transform: translateY(0);
+            width: 100%;
+            text-align: center;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+            .welcome-card h1 {
+                font-size: 1.5rem;
+            }
+
+        .chart-container {
+            height: 250px;
+        }
+
+        .status-circle {
+            width: 100px;
+            height: 100px;
+        }
+        /* Add spacing between stacked cards */
+        .col-12 {
+            margin-bottom: 15px;
+        }
+    }
+</style>
+
+<div class="welcome-section mb-5">
+    <div class="welcome-card shadow-sm">
+        <h1 class="display-5 fw-bold">Welcome! @Model.FullName</h1>
+    </div>
+</div>
+
+<div class="container-fluid px-0">
+    <div class="d-flex flex-column align-items-center text-center mt-5 mt-md-0">
+        <h3 class="mb-1"><b>Overview</b></h3>
+        <h4 class="mb-4">Resident Billing Summary</h4>
+
+        <div class="row g-4 justify-content-center w-100">
+            <div class="col-12 col-md-3">
+                <div class="card summary-card h-100 mx-auto">
+                    <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                        <h6>Total Amount Due</h6>
+                        <h3>₱ @Model.TotalAmountDues.ToString("N2")</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-5">
+                <div class="card summary-card h-100 mx-auto">
+                    <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                        <h6>Total Amount Paid</h6>
+                        <h3>₱ @Model.PaymentsReceived.ToString("N2")</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <br /><br />
+
+        <h4 class="mb-4">Community Financial Snapshot</h4>
+
+        <div class="row g-4 justify-content-center w-100 mb-5">
+            <div class="col-12 col-md-3">
+                <div class="card status-card h-100 mx-auto">
+                    <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                        <h5>Your Account is:</h5>
+                        <div class="status-circle @(Model.FinancialStatus == "Green" ? "status-green" : Model.FinancialStatus == "Amber" ? "status-amber" : "status-red")"></div>
+                        <div class="status-label">
+                            @(Model.FinancialStatus == "Green" ? "Updated!" : Model.FinancialStatus == "Amber" ? "With Balance" : "Delinquent")
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-5 d-flex justify-content-center align-items-center">
+                <div class="card pie_card h-100 w-100 mx-auto">
+                    <div class="card-body d-flex justify-content-center align-items-center w-100">
+                        <div class="chart-container">
+                            <canvas id="financeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let updated = @Model.UpdatedResidents;
+        let delinquent = @Model.DelinquentResidents;
+
+        // If no data yet, show placeholder slice
+        let isEmpty = false;
+        if (updated === 0 && delinquent === 0) {
+            updated = 1;
+            delinquent = 0;
+            isEmpty = true;
+        }
+
+        const total = updated + delinquent;
+
+        const chartLabels = isEmpty
+            ? ['No records yet']
+            : ['Updated', 'Delinquent'];
+
+        const pieChart = new Chart(document.getElementById('financeChart'), {
+            type: 'pie',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    data: [updated, delinquent],
+                    backgroundColor: isEmpty ? ['#CED4DA'] : ['#28a745', '#dc3545'],
+                    radius: '80%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: { top: 10, bottom: 10, left: 10, right: 40 }
+                },
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        align: 'center',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 10,
+                            font: { size: 13 },
+                            generateLabels: chart => chart.data.labels.map((label, i) => ({
+                                text: isEmpty
+                                    ? 'No records yet'
+                                    : `${label}: ${chart.data.datasets[0].data[i]} (${((chart.data.datasets[0].data[i] / total) * 100).toFixed(1)}%)`,
+                                fillStyle: chart.data.datasets[0].backgroundColor[i],
+                                index: i
+                            }))
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

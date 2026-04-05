@@ -1,0 +1,594 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    Layout = null;
+    ViewData["Title"] = "";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"]Carlton Residences</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #fff;
+        }
+
+        .login-container {
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .login-left {
+            padding: 60px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            background: #fff;
+        }
+
+        .brand-logo {
+            position: absolute;
+            top: 40px;
+            left: 60px;
+            font-size: 24px;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .login-content {
+            max-width: 450px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .welcome-header {
+            font-size: 32px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 5px;
+        }
+
+        .welcome-sub {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 40px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .input-group .form-control {
+            height: 48px; /* your input height */
+        }
+
+        .input-group-text.eye-box {
+            height: 48px; /* force same height */
+            padding: 0 12px;
+        }
+
+
+        .eye-box {
+            cursor: pointer;
+            background: #e9f2ff; /* same as input color */
+            border: 1px solid #ced4da;
+            border-left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+        }
+
+            .eye-box i {
+                font-size: 18px;
+            }
+
+
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid #e1e1e1;
+            padding: 12px 15px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            background-color: #fcfcfc;
+        }
+
+            .form-control:focus {
+                box-shadow: none;
+                border-color: #f36f21;
+            }
+
+        .options-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            font-size: 13px;
+        }
+
+        .form-check-input:checked {
+            background-color: #f36f21;
+            border-color: #f36f21;
+        }
+
+        .forgot-link {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+            .forgot-link:hover {
+                color: #f36f21;
+                text-decoration: underline;
+            }
+
+        .btn-login {
+            background-color: #f36f21;
+            border: none;
+            color: white;
+            padding: 14px;
+            width: 100%;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+            .btn-login:hover {
+                background-color: #d65a10;
+            }
+
+        .login-right {
+            background: url('/NewFolder/carltonimg.jpg') no-repeat center center;
+            background-size: cover;
+            position: relative;
+        }
+
+            .login-right::after {
+                content: "";
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 40%;
+                background: linear-gradient(to top, rgba(243, 111, 33, 0.9), transparent);
+            }
+        @@media (max-width: 768px) {
+            .login-right {
+                display: none;
+            }
+
+            .login-left {
+                padding: 40px;
+            }
+
+            .brand-logo {
+                left: 40px;
+            }
+        }
+
+        .modal-header {
+            border-bottom: none;
+        }
+
+        .modal-footer {
+            border-top: none;
+        }
+
+        .btn-primary-custom {
+            background-color: #f36f21;
+            border-color: #f36f21;
+            color: white;
+        }
+
+            .btn-primary-custom:hover {
+                background-color: #d65a10;
+                border-color: #d65a10;
+                color: white;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="container-fluid login-container">
+        <div class="row h-100">
+            <div class="col-md-6 login-left">
+                <div class="brand-logo">Carlton Residences</div>
+                <div class="login-content">
+                    <h1 class="welcome-header">Welcome</h1>
+                    <p class="welcome-sub">Please enter your details.</p>
+                    @if (TempData["LoginError"] != null)
+                    {
+                        <div class="alert alert-success shadow-sm text-center"
+                             style="z-index: 1050; min-width: 300px; border-radius: 10px;">
+                            <i class="fas fa-check-circle me-2"></i> @TempData["LoginError"]
+                        </div>
+                    }
+                    <form method="post" action="@Url.Action("Login", "Admin")">
+                        <div class="mb-1"><label class="form-label">Username</label><input type="text" name="Username" class="form-control" placeholder="" required></div>
+                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+                        
+                        <div class="mb-3">
+    <label class="form-label">Password</label>
+
+    <div class="input-group">
+        <input type="password"
+               class="form-control"
+               id="passwordInput"
+               name="Password"
+               placeholder=""
+               required>
+
+        <span class="input-group-text eye-box" id="togglePasswordBtn">
+            <i class="fas fa-eye"></i>
+        </span>
+    </div>
+</div>
+
+
+                        <div class="options-row">
+                            
+                            <a class="forgot-link" onclick="new bootstrap.Modal(document.getElementById('forgotPasswordModal')).show();">Forgot password?</a>
+                        </div>
+                        <button type="submit" class="btn btn-login">Sign In</button>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-6 login-right"></div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="setupEmailModal" data-bs-backdrop="static" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header pb-0"><h5 class="modal-title fw-bold" style="color: #eb7d16;">Setup Admin Email</h5></div>
+                <form method="post" action="@Url.Action("AdminSendSetupOtp", "Admin")">
+                    <div class="modal-body"><p class="text-muted small">Please provide an email address to secure your account.</p><input type="email" name="Email" class="form-control" required placeholder="name@example.com">@if (ViewBag.SetupError != null) {
+                    <div class="text-danger small mt-2">@ViewBag.SetupError</div>
+                                        }
+</div>
+                    <div class="modal-footer pt-0"><button type="submit" class="btn btn-login" style="padding: 10px;">Send Code</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="verifySetupModal" data-bs-backdrop="static" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header pb-0"><h5 class="modal-title fw-bold" style="color: #eb7d16;">Verify Email</h5></div>
+                <form method="post" action="@Url.Action("AdminVerifySetupOtp", "Admin")">
+                    <div class="modal-body text-center"><p class="text-muted small mb-3">Enter the code sent to your email.</p><input type="text" name="Code" class="form-control text-center mx-auto" maxlength="4" required style="font-size:24px; letter-spacing:5px; width:150px;">@if (ViewBag.VerifySetupError != null) {
+                    <div class="text-danger small mt-2">@ViewBag.VerifySetupError</div>
+                                        }
+</div>
+                    <div class="modal-footer pt-0"><button type="submit" class="btn btn-login w-100">Verify & Login</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="loginOtpModal" data-bs-backdrop="static" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header pb-0"><h5 class="modal-title fw-bold" style="color: #eb7d16;">Security Verification</h5></div>
+                <form method="post" action="@Url.Action("AdminVerifyLoginOtp", "Admin")">
+                    <div class="modal-body text-center"><p class="text-muted small mb-3">Please enter the OTP sent to your registered email.</p><input type="text" name="Code" class="form-control text-center mx-auto" maxlength="4" required style="font-size:24px; letter-spacing:5px; width:150px;">@if (ViewBag.VerifyLoginError != null) {
+                    <div class="text-danger small mt-2">@ViewBag.VerifyLoginError</div>
+                                        }
+</div>
+                    <div class="modal-footer pt-0"><button type="submit" class="btn btn-login">Verify Login</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title fw-bold">Reset Password</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <p class="text-muted small">Enter your username. We will send an OTP to the email associated with your account.</p>
+                    <div class="mb-3"><input type="text" id="resetUsername" class="form-control" placeholder="Username"></div>
+                    <div id="fpError1" class="text-danger small mb-2"></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button><button type="button" onclick="sendResetOtp()" class="btn btn-primary-custom">Send OTP</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="forgotOtpModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title fw-bold">Enter Verification Code</h5></div>
+                <div class="modal-body text-center"><p class="text-muted small">We sent a code to your registered email.</p><input type="text" id="resetCode" class="form-control text-center mx-auto" maxlength="4" style="font-size:24px; letter-spacing:5px; width:150px;"><div id="fpError2" class="text-danger small mt-2"></div></div>
+                <div class="modal-footer"><button type="button" onclick="verifyResetOtp()" class="btn btn-success w-100">Verify Code</button></div>
+            </div>
+        </div>
+    </div>
+
+        <div class="modal fade" id="resetPasswordModal" tabindex="-1" data-bs-backdrop="static">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold">Create New Password</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted small mb-3">Please create a secure password.</p>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">New Password</label>
+                            <input type="password" id="newPassword" class="form-control" placeholder="Enter new password">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Re-type new password</label>
+                            <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm password">
+
+                            <div id="passwordMatchError" class="text-danger small mt-1" style="display:none;">
+                                <i class="fas fa-exclamation-circle"></i> Passwords do not match
+                            </div>
+                        </div>
+
+                        <div id="fpError3" class="text-danger small"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="btnSavePassword" onclick="submitNewPassword()" class="btn btn-primary-custom w-100" disabled>
+                            Change Password
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            @if (ViewBag.ShowSetupEmailModal == true)
+            {
+                <text>new bootstrap.Modal(document.getElementById('setupEmailModal')).show();</text>
+            }
+            @if (ViewBag.ShowVerifySetupModal == true)
+            {
+                <text>new bootstrap.Modal(document.getElementById('verifySetupModal')).show();</text>
+            }
+            @if (ViewBag.ShowVerifyLoginModal == true)
+            {
+                <text>new bootstrap.Modal(document.getElementById('loginOtpModal')).show();</text>
+            }
+        });
+
+        // ✅ Updated Logic: Only send Username
+        function sendResetOtp() {
+            var u = $('#resetUsername').val();
+            if(!u) { $('#fpError1').text("Username is required."); return; }
+            $('#fpError1').text("Checking database...");
+
+            $.post('@Url.Action("SendOtp", "Admin")', { username: u }, function(res) {
+                if(res.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal')).hide();
+                    new bootstrap.Modal(document.getElementById('forgotOtpModal')).show();
+                } else {
+                    $('#fpError1').text(res.message || "Username not found or no email linked.");
+                }
+            });
+        }
+
+        function verifyResetOtp() {
+            var c = $('#resetCode').val();
+            $.post('@Url.Action("VerifyResetOtp", "Admin")', { code: c }, function(res) {
+                if(res.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('forgotOtpModal')).hide();
+                    new bootstrap.Modal(document.getElementById('resetPasswordModal')).show();
+                } else {
+                    $('#fpError2').text(res.message || "Invalid Code.");
+                }
+            });
+        }
+
+        function submitNewPassword() {
+            var p = $('#newPassword').val();
+            if(!p) { $('#fpError3').text("Password cannot be empty."); return; }
+            $.post('@Url.Action("ResetPassword", "Admin")', { newPassword: p }, function(res) {
+                if(res.success) {
+                    alert("Password changed successfully! You can now login.");
+                    location.reload();
+                } else {
+                    $('#fpError3').text(res.message || "Error resetting password.");
+                }
+            });
+        }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const passwordInput = document.getElementById("passwordInput");
+            const toggleBtn = document.getElementById("togglePasswordBtn");
+            const icon = toggleBtn.querySelector("i");
+
+            // Function to show password
+            function showPassword() {
+                passwordInput.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            }
+
+            // Function to hide password
+            function hidePassword() {
+                passwordInput.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+
+            // --- MOUSE EVENTS (Desktop) ---
+            toggleBtn.addEventListener("mousedown", function(e) {
+                e.preventDefault(); // Prevents focus loss
+                showPassword();
+            });
+
+            toggleBtn.addEventListener("mouseup", hidePassword);
+            toggleBtn.addEventListener("mouseleave", hidePassword);
+
+            // --- TOUCH EVENTS (Mobile) ---
+            toggleBtn.addEventListener("touchstart", function(e) {
+                e.preventDefault();
+                showPassword();
+            });
+
+            toggleBtn.addEventListener("touchend", hidePassword);
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            @if (ViewBag.ShowSetupEmailModal == true)
+            {
+                <text>new bootstrap.Modal(document.getElementById('setupEmailModal')).show();</text>
+            }
+            @if (ViewBag.ShowVerifySetupModal == true)
+            {
+                <text>new bootstrap.Modal(document.getElementById('verifySetupModal')).show();</text>
+            }
+            @if (ViewBag.ShowVerifyLoginModal == true)
+            {
+                <text>new bootstrap.Modal(document.getElementById('loginOtpModal')).show();</text>
+            }
+        });
+
+        // ✅ Updated Logic: Only send Username
+        function sendResetOtp() {
+            var u = $('#resetUsername').val();
+            if(!u) { $('#fpError1').text("Username is required."); return; }
+            $('#fpError1').text("Checking database...");
+
+            $.post('@Url.Action("SendOtp", "Admin")', { username: u }, function(res) {
+                if(res.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal')).hide();
+                    new bootstrap.Modal(document.getElementById('forgotOtpModal')).show();
+                } else {
+                    $('#fpError1').text(res.message || "Username not found or no email linked.");
+                }
+            });
+        }
+
+        function verifyResetOtp() {
+            var c = $('#resetCode').val();
+            $.post('@Url.Action("VerifyResetOtp", "Admin")', { code: c }, function(res) {
+                if(res.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('forgotOtpModal')).hide();
+                    new bootstrap.Modal(document.getElementById('resetPasswordModal')).show();
+                } else {
+                    $('#fpError2').text(res.message || "Invalid Code.");
+                }
+            });
+        }
+
+        function submitNewPassword() {
+            var p = $('#newPassword').val();
+            if(!p) { $('#fpError3').text("Password cannot be empty."); return; }
+            $.post('@Url.Action("ResetPassword", "Admin")', { newPassword: p }, function(res) {
+                if(res.success) {
+                    alert("Password changed successfully! You can now login.");
+                    location.reload();
+                } else {
+                    $('#fpError3').text(res.message || "Error resetting password.");
+                }
+            });
+        }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const passwordInput = document.getElementById("passwordInput");
+            const toggleBtn = document.getElementById("togglePasswordBtn");
+            const icon = toggleBtn.querySelector("i");
+
+            // Function to show password
+            function showPassword() {
+                passwordInput.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            }
+
+            // Function to hide password
+            function hidePassword() {
+                passwordInput.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+
+            // --- MOUSE EVENTS (Desktop) ---
+            toggleBtn.addEventListener("mousedown", function(e) {
+                e.preventDefault(); // Prevents focus loss
+                showPassword();
+            });
+
+            toggleBtn.addEventListener("mouseup", hidePassword);
+            toggleBtn.addEventListener("mouseleave", hidePassword);
+
+            // --- TOUCH EVENTS (Mobile) ---
+            toggleBtn.addEventListener("touchstart", function(e) {
+                e.preventDefault();
+                showPassword();
+            });
+
+            toggleBtn.addEventListener("touchend", hidePassword);
+        });
+    </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Get elements
+        const newPass = document.getElementById("newPassword");
+        const confirmPass = document.getElementById("confirmPassword");
+        const errorLabel = document.getElementById("passwordMatchError");
+        const saveBtn = document.getElementById("btnSavePassword");
+
+        function validatePasswords() {
+            const val1 = newPass.value;
+            const val2 = confirmPass.value;
+
+            // 1. If confirm box is empty, reset styles and keep disabled
+            if (val2 === "") {
+                confirmPass.classList.remove("is-invalid", "is-valid");
+                errorLabel.style.display = "none";
+                saveBtn.disabled = true;
+                return;
+            }
+
+            // 2. Check if they match
+            if (val1 === val2) {
+                // MATCH: Green border, hide error, enable button
+                confirmPass.classList.remove("is-invalid");
+                confirmPass.classList.add("is-valid"); // Bootstrap green border
+                errorLabel.style.display = "none";
+                saveBtn.disabled = false;
+            } else {
+                // MISMATCH: Red border, show error, disable button
+                confirmPass.classList.remove("is-valid");
+                confirmPass.classList.add("is-invalid"); // Bootstrap red border
+                errorLabel.style.display = "block";
+                saveBtn.disabled = true;
+            }
+        }
+
+        // Listen for typing in BOTH fields (so if they change the first one, it re-validates)
+        newPass.addEventListener("input", validatePasswords);
+        confirmPass.addEventListener("input", validatePasswords);
+    });
+</script>
+</body>
+</html>

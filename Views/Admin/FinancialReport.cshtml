@@ -1,0 +1,923 @@
+﻿@model Software_Engineering.Models.FinancialReportViewModel
+@using System.Globalization
+
+@{
+    bool isPdf = ViewBag.IsPdf == true;
+    ViewData["PageTitle"] = "Financial Report and Analytics";
+    var phCulture = new CultureInfo("en-PH");
+}
+<style>
+    .pdf-loader {
+        position: fixed;
+        inset: 0;
+        background: rgba(255,255,255,0.85);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        font-weight: 600;
+    }
+
+    .net,
+    .net-separator {
+        display: none;
+        margin: 0;
+    }
+
+    .show-net .gross {
+        display: none;
+    }
+
+    .show-net .net,
+    .show-net .net-separator {
+        display: block;
+    }
+
+    @@media print {
+        .gross,
+        .net,
+        .net-separator {
+            display: block !important;
+            margin: 0.75rem 0;
+        }
+
+        .flip-btn {
+            display: none !important;
+        }
+
+        card h2,
+        .card h5 {
+            white-space: nowrap;
+            font-size: 1.6rem; /* adjust if needed */
+            line-height: 1.2;
+        }
+    }
+
+    .flip-card {
+        perspective: 1000px;
+        height: 180px; 
+    }
+
+    .flip-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.5s ease;
+        transform-style: preserve-3d;
+    }
+
+    .flip-card.flipped .flip-card-inner {
+        transform: rotateY(180deg);
+    }
+
+    .flip-card-front,
+    .flip-card-back {
+        position: absolute;
+        inset: 0;
+        backface-visibility: hidden;
+        border-radius: 0.375rem;
+    }
+
+    .flip-card-back {
+        transform: rotateY(180deg);
+    }
+
+    .card h2 {
+        white-space: nowrap;
+        font-size: clamp(1.4rem, 2.5vw, 2rem);
+    }
+
+    .card h5 {
+        white-space: nowrap;
+    }
+    .card {
+        overflow: hidden;
+    }
+
+    /* top-right button */
+    .flip-toggle {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        z-index: 10;
+        border-radius: 50%;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 15px 20px;
+        margin-bottom: 10px;
+        color: #888;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 10px;
+        transition: all 0.3s;
+    }
+
+        .nav-item i {
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-item:hover {
+            background-color: #fff3cd;
+            color: #f36f21;
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            background-color: #f36f21;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(243, 111, 33, 0.3);
+        }
+
+    .nav-tabs .nav-link {
+        color: #000;
+ 
+        margin: 0 4px;
+    }
+
+        .nav-tabs .nav-link.active {
+            color: #000;
+            
+        }
+    /* MODAL */
+    .modal-header {
+        background-color: #fff;
+        color: #333;
+        border-bottom: none;
+    }
+
+    .modal-title {
+        font-weight: 800;
+        font-size: 1.5rem;
+        width: 100%;
+        text-align: center;
+    }
+    .btn-orange {
+        background-color: #f36f21;
+        border-color: #f36f21;
+        color: white;
+        transition: all 0.2s;
+        font-weight: 700;
+        border: none;
+    }
+
+        .btn-orange:hover {
+            background-color: #d65a10;
+            color: white;
+            text-decoration: none;
+        }
+
+    .btn-orange-round {
+        background-color: #f36f21;
+        border-color: #f36f21;
+        color: white;
+        border-radius: 18px;
+        padding: 8px 24px;
+        font-weight: 700;
+        transition: all 0.2s;
+        border: none;
+    }
+
+        .btn-orange-round:hover {
+            background-color: #d65a10;
+            color: white;
+            text-decoration: none;
+        }
+    .font-color{
+       color: #333;
+    }
+
+  
+    .yearly-card .net,
+    .yearly-card .net-separator {
+        display: none;
+    }
+
+    .yearly-card.show-net .gross {
+        display: none;
+    }
+
+    .yearly-card.show-net .net,
+    .yearly-card.show-net .net-separator {
+        display: block;
+    }
+
+    @@media print {
+        .yearly-card .gross,
+        .yearly-card .net,
+        .yearly-card .net-separator {
+            display: block !important;
+        }
+
+        .yearly-card .flip-btn {
+            display: none !important;
+        }
+
+        .yearly-card h4 {
+            white-space: nowrap;
+        }
+    .card h6 {
+        font-size: 1.1rem;
+    }
+
+    .card h4 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        white-space: nowrap; 
+    }
+    }
+
+    .table-custom-header thead th {
+        background-color: #f36f21 !important;
+        color: white !important;
+        border-color: #d65a10 !important;
+    }
+
+    .history-table-wrapper {
+        width: 100%;
+        max-width: 520px; /* 👈 controls how square it feels */
+    }
+
+    .table-container {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+    }
+
+        /* Hover effects */
+        .table-container table tbody tr {
+            cursor: context-menu;
+            transition: background-color 0.15s ease;
+        }
+
+            .table-container table tbody tr:hover > td,
+            .table-container table tbody tr.active-row > td {
+                background-color: #F2F0EF !important;
+            }
+
+        /* Optional: tighter columns */
+        .table-container th,
+        .table-container td {
+            padding: 12px 14px;
+        }
+
+  
+</style>
+
+
+
+<!-- ================= FILTERS (MONTH + YEAR) ================= -->
+@if (!isPdf)
+{
+    <form method="get" asp-action="FinancialReport" class="mb-4">
+        <input type="hidden" name="tab" id="activeTab" value="monthly" />
+
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label>Month:</label>
+                <select name="month" class="form-select" style="min-width: 180px;" onchange="this.form.submit()">
+                    @for (int m = 1; m <= 12; m++)
+                    {
+                        <option value="@m" selected="@(m == Model.Month ? "selected" : null)">
+                            @CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label>Year:</label>
+                <select name="year" class="form-select" style="min-width: 120px;" onchange="this.form.submit()">
+                    @for (int y = DateTime.Now.Year; y >= 2017; y--)
+                    {
+                        <option value="@y" selected="@(y == Model.Year ? "selected" : null)">
+                            @y
+                        </option>
+                    }
+                </select>
+            </div>
+        </div>
+    </form>
+}
+
+<!-- ================= TABS ================= -->
+<ul class="nav nav-tabs justify-content-center fw-bold mb-4">
+    <li class="nav-item">
+        <button class="nav-link active no-print" data-bs-toggle="tab" data-bs-target="#monthly">
+            Monthly
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link no-print" data-bs-toggle="tab" data-bs-target="#yearly">
+            Yearly
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content">
+
+    <!-- ================= MONTHLY TAB ====================== -->
+    <div class="tab-pane fade show active" id="monthly">
+        <div class="d-flex justify-content-start mb-4">
+            <a asp-action="GenerateMonthlyPdf"
+               asp-route-month="@Model.Month"
+               asp-route-year="@Model.Year"
+               class="btn btn-orange-round">
+                Download Monthly PDF
+            </a>
+        </div>
+
+        <!-- Cards-->
+        <div class="row mb-4">
+            <div class="col-12 col-sm-6 col-lg-3 mb-3">
+                <div class="card text-center shadow h-100">
+                    <div class="card-body d-flex flex-column justify-content-center position-relative">
+                        @if (!isPdf)
+                        {
+                            <div class="position-absolute top-0 end-0 mt-2 me-2 dropdown no-print">
+                                <button class="btn btn-link text-black p-0 opacity-75"
+                                        data-bs-toggle="dropdown">
+                                    <span style="font-size:1.2rem;">&vellip;</span>
+                                </button>
+
+                                <ul class="dropdown-menu dropdown-menu-end shadow">
+                                    <li>
+                                        <button class="dropdown-item"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#viewTargetsModal">
+                                            View Targets
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editTargetModal">
+                                            Edit Target
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        }
+
+         
+                        <h6 class="font-color">Target for @phCulture.DateTimeFormat.GetMonthName(Model.Month)</h6>
+                        <h2 class="fw-bold">@Model.MonthlyTarget.ToString("C", phCulture)</h2>
+                        <p class="text-muted mb-0 small">
+                            Previous: @Model.PreviousTarget.ToString("C", phCulture)
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3 mb-3">
+                <div class="card shadow h-100 position-relative">
+                    <button class="btn btn-sm btn-light position-absolute top-0 end-0 m-2 flip-btn">
+                        ↻
+                    </button>
+
+                    <div class="card-body text-center d-flex flex-column justify-content-center">
+
+                        <div class="gross">
+                            <h6 class="font-color">Gross Collected</h6>
+                            <h2 class="fw-bold">
+                                @Model.MonthlyGrossCollection.ToString("N2")
+                            </h2>
+                        </div>
+
+                        <hr class="net-separator" />
+
+                        <div class="net">
+                            <h6 class="font-color">Net Collected</h6>
+                            <h2 class="fw-bold">
+                                @Model.MonthlyNetCollection.ToString("N2")
+                            </h2>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3 mb-3">
+                <div class="card text-center shadow h-100">
+                    <div class="card-body d-flex flex-column justify-content-center">
+                        <h6 class="font-color">Remaining</h6>
+                        <h2 class="fw-bold">@Model.MonthlyRemainingToTarget.ToString("C", phCulture)</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3 mb-3">
+                <div class="card text-center shadow h-100">
+                    <div class="card-body d-flex flex-column justify-content-center">
+                        <h6 class="font-color">Collection Rate</h6>
+                        <h2 class="fw-bold">@Model.MonthlyRate.ToString("N2")%</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- MONTHLY PROGRESS BAR -->
+        <div class="card p-3 mt-3">
+            <h6>Monthly Collection Progress</h6>
+            <div class="progress" style="height:25px">
+                <div class="progress-bar @(Model.MonthlyRate >= 70 ? "bg-success" : Model.MonthlyRate >= 50 ? "bg-warning" : "bg-danger")"
+                     style="width:@Model.MonthlyRate%">
+                    @Model.MonthlyRate.ToString("N2")%
+                </div>
+            </div>
+            <div class="d-flex flex-wrap justify-content-center mt-2 small">
+                <span class="me-3"><span class="badge bg-success"> </span> 70–100% (Good)</span>
+                <span class="me-3"><span class="badge bg-warning"> </span> 50–69% (Warning)</span>
+                <span><span class="badge bg-danger"> </span> Below 50% (Critical)</span>
+            </div>
+        </div>
+
+        <!-- MONTHLY CHARTS -->
+        <div class="row mt-4 g-3">
+            <div class="col-lg-8">
+                <div class="card p-3 h-100">
+                    <h5 class="text-center">Monthly Target vs Collected</h5>
+                    <div class="chart-container" style="height:350px;">
+                        <canvas id="monthlyBar"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card p-3 h-100">
+                    <h5 class="text-center">Resident Status (Monthly) </h5>
+                    <div class="chart-container" style="height:350px;">
+                        <canvas id="monthlyPie"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- ================= YEARLY TAB ======================= -->
+    <!-- ===================================================== -->
+    <div class="tab-pane fade" id="yearly">
+        <div class="d-flex justify-content-start mb-4">
+            <a asp-action="GenerateYearlyPdf"
+               asp-route-year="@Model.Year"
+               class="btn btn-orange-round">
+                Download Yearly PDF
+            </a>
+        </div>
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="card shadow-sm p-3">
+                    <h6>Accumulated Target @Model.Year</h6>
+                    <h4 class="fw-bold" style="color: #333;">₱ @Model.YearlyTarget.ToString("N2")</h4>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm p-3 position-relative yearly-card">
+
+                    <!-- flip button (browser only) -->
+                    <button class="btn btn-sm btn-light position-absolute top-0 end-0 m-2 flip-btn">
+                        ↻
+                    </button>
+
+                    <!-- Gross -->
+                    <div class="gross">
+                        <h6>Yearly Gross Collected</h6>
+                        <h4 class="fw-bold" style="color:#333;">
+                            ₱ @Model.YearlyGrossCollection.ToString("N2")
+                        </h4>
+                    </div>
+
+                    <hr class="net-separator" />
+
+                    <!-- Net -->
+                    <div class="net">
+                        <h6>Yearly Net Collected</h6>
+                        <h4 class="fw-bold" style="color:#333;">
+                            ₱ @Model.YearlyNetCollection.ToString("N2")
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm p-3">
+                    <h6>Collection Rate</h6>
+                    <h4 class="fw-bold" style="color: #333;">@Model.YearlyRate.ToString("N2")%</h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- YEARLY CHARTS -->
+        <div class="row mt-4 g-3">
+            <div class="col-lg-8">
+                <div class="card p-3 h-100">
+                    <h5 class="text-center" style="color: #333;">Yearly Collection</h5>
+                    <div class="chart-container" style="height:350px;">
+                        <canvas id="yearlyBar"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card p-3 h-100">
+                    <h5 class="text-center" style="color: #333;">Resident Status (Yearly)</h5>
+                    <div class="chart-container" style="height:350px;">
+                        <canvas id="yearlyPie"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= EDIT TARGET MODAL ================= -->
+@if (!isPdf)
+{
+    <div class="modal fade" id="editTargetModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-4">
+
+                <h4 class="fw-bold text-center mb-3">
+                    Edit Monthly Target
+                </h4>
+
+                <form asp-action="UpdateTarget" method="post">
+
+                    <!-- REQUIRED -->
+                    <input type="hidden" name="month" value="@Model.Month" />
+                    <input type="hidden" name="year" value="@Model.Year" />
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Target Amount:
+                        </label>
+                        <input type="number"
+                               step="0.01"
+                               name="targetAmount"
+                               class="form-control"
+                               value="@Model.MonthlyTarget"
+                               required />
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="btn btn-orange">
+                            Save Changes
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="viewTargetsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 target-history-modal">
+
+                <!-- MODAL HEADER -->
+                <div class="modal-header px-4 py-3"
+                     style="background:#F97316;">
+                    <h5 class="fw-bold mx-auto mb-0 text-white">
+                        Monthly Target History
+                    </h5>
+                    <button type="button"
+                            class="btn-close btn-close-white position-absolute end-0 me-3"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+
+                <!-- FILTERS -->
+                <div class="row g-3 px-4 pt-3 pb-2 align-items-end">
+
+                    <!-- MONTH FILTER -->
+                    <div class="col-md-6 col-lg-4">
+                        <label for="historyMonth" class="fw-semibold">Month</label>
+                        <select id="historyMonth"
+                                class="form-select"
+                                onchange="filterHistory()">
+
+                            <option value="0"
+                                    selected="@(ViewBag.HistoryMonth == 0 ? "selected" : null)">
+                                All
+                            </option>
+
+                            @for (int m = 1; m <= 12; m++)
+                            {
+                                <option value="@m"
+                                        selected="@(ViewBag.HistoryMonth == m ? "selected" : null)">
+                                    @System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- YEAR FILTER -->
+                    <div class="col-md-6 col-lg-4">
+                        <label for="historyYear" class="fw-semibold">Year</label>
+                        <select id="historyYear"
+                                class="form-select"
+                                onchange="filterHistory()">
+
+                            <option value="0"
+                                    selected="@(ViewBag.HistoryYear == 0 ? "selected" : null)">
+                                All
+                            </option>
+
+                            @foreach (var y in Model.Years)
+                            {
+                                <option value="@y"
+                                        selected="@(ViewBag.HistoryYear == y ? "selected" : null)">
+                                    @y
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                </div>
+
+                <!-- MODAL BODY -->
+                <div class="modal-body px-4 pb-4">
+
+                    <div class="d-flex justify-content-center mt-1">
+                        <div class="history-table-wrapper">
+                            <div class="table-container custom-table">
+                                <table class="table table-borderless mb-0">
+                                    <thead class="border-bottom">
+                                        <tr class="text-muted">
+                                            <th>Month</th>
+                                            <th class="text-center" style="width:90px;">Year</th>
+                                            <th class="text-end">Target Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model.TargetHistory != null && Model.TargetHistory.Any())
+                                        {
+                                            foreach (var t in Model.TargetHistory)
+                                            {
+                                                <tr>
+                                                    <td>@t.MonthName</td>
+                                                    <td class="text-center">@t.Year</td>
+                                                    <td class="text-end fw-semibold">
+                                                        @t.Amount.ToString("C", phCulture)
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="3"
+                                                    class="text-center text-muted py-4">
+                                                    No target records found.
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+ 
+}
+
+<script>
+    document.addEventListener("click", function (e) {
+        if (e.target.classList.contains("flip-btn")) {
+            const card = e.target.closest(".card");
+            card.classList.toggle("show-net");
+        }
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // ================= GLOBAL FUNCTIONS =================
+            function filterHistory() {
+        const month = document.getElementById('historyMonth').value;
+        const year = document.getElementById('historyYear').value;
+
+        const params = new URLSearchParams(window.location.search);
+
+        params.set('historyMonth', month);
+        params.set('historyYear', year);
+
+        window.location.search = params.toString();
+    }
+
+    function showPdfLoader() {
+        const loader = document.getElementById("pdfLoader");
+        if(loader) loader.classList.remove('d-none');
+    }
+
+    function hidePdfLoader() {
+        const loader = document.getElementById("pdfLoader");
+        if(loader) loader.classList.add('d-none');
+    }
+
+    // ================= DOM CONTENT LOADED =================
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+        };
+
+        // ================= RESTORE ACTIVE TAB =================
+        const urlParams = new URLSearchParams(window.location.search);
+        const savedTab = urlParams.get('tab') || localStorage.getItem('activeTab') || 'monthly';
+
+        const triggerEl = document.querySelector(`[data-bs-target="#${savedTab}"]`);
+        if (triggerEl) {
+            new bootstrap.Tab(triggerEl).show();
+        }
+
+        const tabInput = document.getElementById('activeTab');
+        if (tabInput) tabInput.value = savedTab;
+
+        document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+            tab.addEventListener('shown.bs.tab', function (e) {
+                const tabName = e.target.getAttribute('data-bs-target').replace('#', '');
+                if (tabInput) tabInput.value = tabName;
+                localStorage.setItem('activeTab', tabName);
+            });
+        });
+
+        // ================= AUTO-OPEN MODAL IF FILTERED =================
+        if (urlParams.has('historyMonth') || urlParams.has('historyYear')) {
+            const historyModalEl = document.getElementById('viewTargetsModal');
+            if (historyModalEl) {
+                const historyModal = new bootstrap.Modal(historyModalEl);
+                historyModal.show();
+            }
+        }
+
+        // ================= MONTHLY BAR CHART =================
+        const monthLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyChart.Select(x => x.Month).ToList()));
+        const monthlyCollected = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyChart.Select(x => x.Collection).ToList()));
+        const monthlyTargets = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyChart.Select(x => x.Target).ToList()));
+
+        const monthBarChart = new Chart(document.getElementById('monthlyBar'), {
+            type: 'bar',
+            data: {
+                labels: monthLabels,
+                datasets: [
+                    {
+                        label: 'Target',
+                        data: monthlyTargets,
+                        backgroundColor: 'rgba(0,123,255,0.5)'
+                    },
+                    {
+                        label: 'Collected',
+                        data: monthlyCollected,
+                        backgroundColor: 'rgba(40,167,69,0.7)'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) { return value.toLocaleString(); }
+                        }
+                    }
+                }
+            }
+        });
+
+        // ================= MONTHLY PIE CHART =================
+        const monthlyPie = new Chart(document.getElementById('monthlyPie'), {
+            type: 'pie',
+            data: {
+                labels: ['Updated', 'Delinquent'],
+                datasets: [{
+                    data: [@Model.UpdatedResidents, @Model.DelinquentResidents],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            },
+            options: {
+                ...commonOptions,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            generateLabels: chart => {
+                                const data = chart.data.datasets[0].data;
+                                const total = data.reduce((a, b) => a + b, 0);
+                                return chart.data.labels.map((label, i) => ({
+                                    text: `${label}: ${data[i]} (${total > 0 ? ((data[i]/total)*100).toFixed(1) : 0}%)`,
+                                    fillStyle: chart.data.datasets[0].backgroundColor[i],
+                                    index: i
+                                }));
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // ================= YEARLY BAR CHART =================
+        const yearLabels = @Html.Raw(Json.Serialize(Model.YearlyChart.Select(x => x.Year)));
+        const yearlyCollected = @Html.Raw(Json.Serialize(Model.YearlyChart.Select(x => x.Collection)));
+
+        const yearBarChart = new Chart(document.getElementById('yearlyBar'), {
+            type: 'bar',
+            data: {
+                labels: yearLabels,
+                datasets: [
+                    { label: 'Yearly Income', data: yearlyCollected, backgroundColor: 'rgba(40,167,69,0.7)' }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, ticks: { precision: 0 } }
+                },
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) { return `₱${ctx.parsed.y.toLocaleString()}`; }
+                        }
+                    }
+                }
+            }
+        });
+
+        // ================= YEARLY PIE CHART =================
+        const yearlyPie = new Chart(document.getElementById('yearlyPie'), {
+            type: 'pie',
+            data: {
+                labels: ['Updated', 'Delinquent'],
+                datasets: [{
+                    data: [@Model.YearlyUpdatedResidents, @Model.YearlyDelinquentResidents],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            },
+            options: {
+                ...commonOptions,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            generateLabels: chart => {
+                                const data = chart.data.datasets[0].data;
+                                const total = data.reduce((a, b) => a + b, 0);
+                                return chart.data.labels.map((label, i) => ({
+                                    text: `${label}: ${data[i]} (${total > 0 ? ((data[i]/total)*100).toFixed(1) : 0}%)`,
+                                    fillStyle: chart.data.datasets[0].backgroundColor[i],
+                                    index: i
+                                }));
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // ================= TAB RESIZE FIX =================
+        document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tabEl => {
+            tabEl.addEventListener('shown.bs.tab', () => {
+                setTimeout(() => {
+                    monthBarChart.resize();
+                    yearBarChart.resize();
+                    monthlyPie.resize();
+                    yearlyPie.resize();
+                }, 200);
+            });
+        });
+
+        // ================= PDF BUTTONS =================
+        document.querySelectorAll('.btn-orange-round').forEach(btn => {
+            if(btn.href.includes('Pdf')) {
+                btn.addEventListener('click', showPdfLoader);
+            }
+        });
+
+        window.onafterprint = hidePdfLoader;
+    });
+</script>

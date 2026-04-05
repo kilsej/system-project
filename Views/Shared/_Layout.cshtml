@@ -1,0 +1,585 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]Carlton Residences</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/startbootstrap-sb-admin-2@4.1.4/css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" />
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8f9fc;
+            overflow-x: hidden;
+            overflow-y: auto;
+            margin: 0;
+            color: #333;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            min-width: 250px; /* Match the width to prevent snapping */
+            flex-shrink: 0; /* THIS IS THE KEY: Prevents the sidebar from being squished */
+            height: 100vh; /* Use viewport height to keep it pinned */
+            position: sticky;
+            top: 0;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            border-right: 1px solid #eee;
+            z-index: 10;
+            overflow-y: auto; /* Allow the sidebar itself to scroll if items are too many */
+        }
+
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #000;
+            line-height: 1.2;
+            margin-bottom: 50px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            color: #888;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+            .nav-item i {
+                margin-right: 15px;
+                width: 20px;
+                text-align: center;
+            }
+
+            .nav-item:hover {
+                background-color: #fff3cd;
+                color: #f36f21;
+                text-decoration: none;
+            }
+
+            .nav-item.active {
+                background-color: #f36f21;
+                color: #fff;
+                box-shadow: 0 4px 10px rgba(243, 111, 33, 0.3);
+            }
+
+            /* ADMIN MANAGEMENT BUTTON STYLE */
+            .nav-item.admin-btn {
+                color: #f36f21;
+                border: 1px dashed #f36f21;
+                background-color: #fffbf5;
+            }
+
+                .nav-item.admin-btn:hover {
+                    background-color: #f36f21;
+                    color: white;
+                    border-style: solid;
+                }
+
+            .nav-item.logout {
+                margin-top: auto;
+                margin-bottom: 40px;
+                background-color: #ffffff;
+                color: #e74a3b;
+                font-weight: 700;
+                border: 2px solid #f36f21;
+            }
+
+                .nav-item.logout:hover {
+                    background-color: #f36f21;
+                    color: #ffffff;
+                    border-color: #f36f21;
+                }
+
+        /* CONTENT */
+        .main-content {
+            flex-grow: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+
+        .header-title h2 {
+            font-weight: 800;
+            color: #000;
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            text-align: right;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #f36f21;
+            border-radius: 50%;
+            font-weight: bold;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    @if (TempData["Success"] != null)
+    {
+        <div id="floatingSuccessAlert"
+             class="alert alert-success shadow-sm position-fixed top-0 start-50 translate-middle-x mt-4"
+             style="z-index: 1050; min-width: 300px; text-align: center; border-radius: 30px;">
+            <i class="fas fa-check-circle me-2"></i> @TempData["Success"]
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const alertBox = document.getElementById("floatingSuccessAlert");
+
+                setTimeout(function () {
+                    if (alertBox) {
+                        alertBox.style.transition = "opacity 0.5s ease";
+                        alertBox.style.opacity = "0";
+
+                        setTimeout(() => alertBox.remove(), 500);
+                    }
+                }, 3000);
+            });
+        </script>
+    }
+
+    <div class="wrapper">
+        <div class="sidebar">
+            <div class="brand">Carlton<br>Residences</div>
+
+            <a href="@Url.Action("Dashboard", "Admin")" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")">
+                <i class="fas fa-chart-pie"></i> Dashboard
+            </a>
+            <a href="@Url.Action("Residents", "Admin")"
+               class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Residents"
+                                      || ViewContext.RouteData.Values["action"]?.ToString() == "ResidentProfile"
+                                      ? "active" : "")">
+                <i class="fas fa-users"></i> Residents
+            </a>
+            <a href="@Url.Action("FinancialReport", "Admin")" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "FinancialReport" ? "active" : "")">
+                <i class="fas fa-chart-line"></i> Financial Report
+            </a>
+            <a href="@Url.Action("Expense", "Admin")" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Expense" ? "active" : "")">
+                <i class="fas fa-chart-line"></i> Expenses
+            </a>
+            <a href="@Url.Action("ActivityLogs", "Admin")" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "ActivityLogs" ? "active" : "")">
+                <i class="fas fa-list"></i> Activity Logs
+            </a>
+
+            @if (Context.Session.GetString("IsPrimary") == "True")
+            {
+                <div class="my-3 border-top pt-3">
+                    <div id="sidebarAdminBtn" class="nav-item admin-btn">
+                        <i class="fas fa-user-shield"></i> Admin Control
+                    </div>
+                </div>
+            }
+
+            <a href="@Url.Action("Logout", "Admin")" class="nav-item logout" onclick="return confirm('Are you sure you want to log out?');">
+                <i class="fas fa-sign-out-alt"></i> Log Out
+            </a>
+
+        </div>
+
+        <main class="main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-outline-secondary d-lg-none" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+
+
+                    <div>
+                        <h2 class="mb-1">@ViewData["PageTitle"]</h2>
+                        <small id="pageSubtitle" class="page-subtitle"></small>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <div class="text-end">
+                        <div class="fw-bold">@Context.Session.GetString("AdminName")</div>
+                        <small class="text-muted">@Context.Session.GetString("AdminUsername")</small>
+                    </div>
+                    <div class="avatar">
+                        @Context.Session.GetString("AdminName")?.Substring(0, 1)
+                    </div>
+                </div>
+            </div>
+
+            @RenderBody()
+        </main>
+    </div>
+
+    <div class="modal fade" id="createAdminModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #f36f21; color: white;">
+                    <h5 class="modal-title" id="modalTitle">Admin Management</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <div id="adminListScreen">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="fw-bold text-gray-800">Existing Sub-Admins</h6>
+                            <button class="btn text-white" style="background-color: #f36f21;" onclick="showCreateForm()">
+                                <i class="fas fa-plus"></i> Create New
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="adminTable">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Permissions</th>
+                                        <th style="width: 120px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="adminFormScreen" style="display: none;">
+                        <form method="post" id="adminForm" action="@Url.Action("CreateSubAdmin", "Admin")">
+                            <input type="hidden" name="AdminId" id="editAdminId" value="0">
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Username</label>
+                                <input type="text" name="Username" id="formUsername" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Full Name</label>
+                                <input type="text" name="FullName" id="formFullName" class="form-control" placeholder="e.g., Juan Dela Cruz" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold" id="passLabel">Password</label>
+                                <div class="input-group">
+                                    <input type="text" name="Password" id="formPassword" class="form-control" placeholder="Leave blank to keep current password">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="generateRandomPass()">
+                                        <i class="fas fa-random"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <label class="form-label fw-bold mb-2">Access Permissions</label>
+                            <div class="card p-3 bg-light border-0 mb-3">
+
+                                <h6 class="fw-bold text-primary mb-2">Resident Management</h6>
+                                <div class="d-flex flex-wrap mb-3 gap-3">
+                                    <div class="form-check">
+                                        <input type="checkbox" name="SelectedPermissions" value="AddResident" id="perm_add_res" class="form-check-input">
+                                        <label>Add</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" name="CanEditResident" value="true" id="perm_edit_res" class="form-check-input">
+                                        <label>Edit</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" name="CanImportResident" value="true" id="perm_imp_res" class="form-check-input">
+                                        <label>Import CSV</label>
+                                    </div>
+                                </div>
+
+                                <h6 class="fw-bold text-primary mb-2">Invoice Management</h6>
+                                <div class="d-flex flex-wrap mb-3 gap-3">
+                                    <div class="form-check">
+                                        <input type="checkbox" name="SelectedPermissions" value="CreateInvoice" id="perm_add_inv" class="form-check-input">
+                                        <label>Create</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" name="CanEditInvoice" value="true" id="perm_edit_inv" class="form-check-input">
+                                        <label>Edit Unpaid</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" name="CanImportInvoice" value="true" id="perm_imp_inv" class="form-check-input">
+                                        <label>Import CSV</label>
+                                    </div>
+                                </div>
+
+                                <h6 class="fw-bold text-primary mb-2">Payment Management</h6>
+                                <div class="d-flex flex-wrap gap-3">
+                                    <div class="form-check">
+                                        <input type="checkbox" name="SelectedPermissions" value="AddPayment" id="perm_add_pay" class="form-check-input">
+                                        <label>Add</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" name="CanImportPayment" value="true" id="perm_imp_pay" class="form-check-input">
+                                        <label>Import CSV</label>
+                                    </div>
+                                </div>
+
+                                <h6 class="fw-bold text-primary mb-2">Expense Management</h6>
+                                <div class="d-flex flex-wrap gap-3">
+                                    <div class="form-check">
+                                        <input type="checkbox" name="CanManageExpenses" value="true" id="perm_manage_exp" class="form-check-input">
+                                        <label>Add Expense</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" name="CanEditExpense" value="true" id="perm_edit_exp" class="form-check-input">
+                                        <label>Edit Expense</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-secondary" onclick="showListScreen()">
+                                    <i class="fas fa-arrow-left"></i> Back to List
+                                </button>
+                                <button type="submit" class="btn text-white" style="background-color: #f36f21;" id="saveBtn">Create Admin</button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    @RenderSection("Scripts", required: false)
+
+    <script>
+        // SESSION TIMEOUT
+        let inactivityTimer;
+        const timeoutWarning = 14 * 60 * 1000;
+        const timeoutLimit = 15 * 60 * 1000; //change para matest
+
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+
+            inactivityTimer = setTimeout(forceLogout, timeoutLimit);
+        }
+
+        function forceLogout() {
+            alert("Your session has expired due to inactivity. For your security, you have been logged out.");
+
+            var userType = '@Context.Session.GetString("UserType")';
+
+            // Redirect them to their specific logout page!
+            if (userType === 'Resident') {
+                window.location.href = '/Resident/Logout'; // Kicks residents here
+            } else {
+                window.location.href = '/Admin/Logout';    // Kicks admins here
+            }
+        }
+
+        window.onload = resetInactivityTimer;
+        document.onmousemove = resetInactivityTimer;
+        document.onkeypress = resetInactivityTimer;
+        document.onscroll = resetInactivityTimer;
+        document.onclick = resetInactivityTimer;
+
+        function syncImportPermissions() {
+            console.log("Syncing permissions...");
+            // Resident Module
+            var canAddRes = $('#perm_add_res').is(':checked');
+            $('#perm_imp_res').prop('disabled', !canAddRes);
+            if (!canAddRes) $('#perm_imp_res').prop('checked', false);
+
+            // Invoice Module
+            var canAddInv = $('#perm_add_inv').is(':checked');
+            $('#perm_imp_inv').prop('disabled', !canAddInv);
+            if (!canAddInv) $('#perm_imp_inv').prop('checked', false);
+
+            // Payment Module
+            var canAddPay = $('#perm_add_pay').is(':checked');
+            $('#perm_imp_pay').prop('disabled', !canAddPay);
+            if (!canAddPay) $('#perm_imp_pay').prop('checked', false);
+        }
+
+        function loadAdminList() {
+            $("#adminTableBody").html('<tr><td colspan="3" class="text-center">Loading...</td></tr>');
+            $.get('/Admin/GetSubAdmins', function(response) {
+                if(response.success) {
+                    let html = '';
+                    response.data.forEach(function(admin) {
+                        html += `
+                            <tr>
+                                <td class="fw-bold"> ${admin.fullName} <br> <small class="text-muted fw-normal">(${admin.username})</small> </td>
+                                <td><small class="text-muted">${admin.permissions}</small></td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary me-1" onclick="editAdmin(${admin.admin_Id})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteAdmin(${admin.admin_Id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>`;
+                    });
+                    $("#adminTableBody").html(html);
+                } else {
+                    $("#adminTableBody").html('<tr><td colspan="3" class="text-center text-danger">Error loading data</td></tr>');
+                }
+            });
+        }
+
+        function showCreateForm() {
+            $("#adminListScreen").hide();
+            $("#adminFormScreen").show();
+            $("#modalTitle").text("Create New Admin");
+
+            $("#adminForm")[0].reset();
+
+            $(".form-check-input").prop('checked', false);
+
+            $("#editAdminId").val(0);
+            $("#adminForm").attr("action", "@Url.Action("CreateSubAdmin", "Admin")");
+            $("#saveBtn").text("Create Admin");
+            $("#formPassword").attr("required", "required");
+
+            syncImportPermissions();
+        }
+
+        function showListScreen() {
+            $("#adminFormScreen").hide();
+            $("#adminListScreen").show();
+            $("#modalTitle").text("Admin Management");
+            loadAdminList();
+        }
+
+        function editAdmin(id) {
+            $.get('/Admin/GetSubAdminDetails?id=' + id, function(response) {
+                if(response.success) {
+                    $("#adminListScreen").hide();
+                    $("#adminFormScreen").show();
+                    $("#modalTitle").text("Edit Admin: " + response.username);
+                    $("#editAdminId").val(response.id);
+                    $("#formFullName").val(response.fullName);
+                    $("#formUsername").val(response.username);
+                    $("#formPassword").val("").removeAttr("required");
+
+                    //Check boxes
+                    $("#perm_add_res").prop('checked', response.canAddResident);
+                    $("#perm_edit_res").prop('checked', response.canEditResident);
+                    $("#perm_imp_res").prop('checked', response.canImportResident);
+
+                    $("#perm_add_inv").prop('checked', response.canCreateInvoice);
+                    $("#perm_edit_inv").prop('checked', response.canEditInvoice);
+                    $("#perm_imp_inv").prop('checked', response.canImportInvoice);
+
+                    $("#perm_add_pay").prop('checked', response.canAddPayment);
+                    $("#perm_imp_pay").prop('checked', response.canImportPayment);
+                    $("#perm_manage_exp").prop('checked', response.canManageExpenses);
+                    $("#perm_edit_exp").prop('checked', response.canEditExpense);
+
+                    //sync UI after checking boxes
+                    syncImportPermissions();
+
+                    $("#adminForm").attr("action", "@Url.Action("UpdateSubAdmin", "Admin")");
+                    $("#saveBtn").text("Update Admin");
+                }
+            });
+        }
+
+        function deleteAdmin(id) {
+            if(confirm("Are you sure you want to delete this admin?")) {
+                $.post('/Admin/DeleteSubAdmin', { id: id }, function(response) {
+                    loadAdminList();
+                });
+            }
+        }
+
+        function generateRandomPass() {
+            const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@@#";
+            let pass = "";
+            for (let i = 0; i < 10; i++) {
+                pass += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            $('#formPassword').val(pass);
+        }
+
+        function updatePageSubtitle() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true, timeZone: 'Asia/Manila', timeZoneName: 'short' };
+            $("#pageSubtitle").text(now.toLocaleString('en-US', options));
+        }
+
+        // 2. DOCUMENT READY (For Event Listeners)
+        $(document).ready(function() {
+            // Clock
+            updatePageSubtitle();
+            setInterval(updatePageSubtitle, 1000);
+
+            // Sidebar Button - Single Definition
+            $(document).on("click", "#sidebarAdminBtn", function(e) {
+                e.preventDefault();
+                var myModal = new bootstrap.Modal(document.getElementById('createAdminModal'));
+                myModal.show();
+                loadAdminList();
+                showListScreen();
+            });
+
+            // Toggle Listener for Checkboxes
+            $(document).on('change', '#perm_add_res, #perm_add_inv, #perm_add_pay', function() {
+                syncImportPermissions();
+            });
+
+            // Sidebar Mobile Toggle
+            $("#sidebarToggle").click(function() {
+                $(".sidebar").toggleClass("show");
+            });
+        });
+
+                document.addEventListener("DOMContentLoaded", function () {
+            const adminForm = document.getElementById("adminForm");
+
+            if (adminForm) {
+                adminForm.addEventListener("submit", function (e) {
+                    const actionUrl = this.getAttribute("action");
+
+                    // Only trigger the popup if the action is creating a new admin
+                    if (actionUrl && actionUrl.includes("CreateSubAdmin")) {
+                        if (!confirm("Are you sure you want to create this new sub-admin account?")) {
+                            e.preventDefault(); // Stops the form from submitting if they click Cancel
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

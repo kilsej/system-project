@@ -1,0 +1,2228 @@
+﻿@model List<Software_Engineering.Models.ResidentInfo>
+@using System.Globalization
+
+@{
+    ViewData["PageTitle"] = "Residents List Overview";
+    ViewData["PageSubtitle"] = "";
+}
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]Carlton Residences</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/startbootstrap-sb-admin-2@4.1.4/css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8f9fc;
+            overflow: hidden;
+            margin: 0;
+            color: #333;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            min-width: 250px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            border-right: 1px solid #eee;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #000;
+            line-height: 1.2;
+            margin-bottom: 50px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            color: #888;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+            .nav-item i {
+                margin-right: 15px;
+                width: 20px;
+                text-align: center;
+            }
+
+            .nav-item:hover {
+                background-color: #fff3cd;
+                color: #f36f21;
+                text-decoration: none;
+            }
+
+            .nav-item.active {
+                background-color: #f36f21;
+                color: #fff;
+                box-shadow: 0 4px 10px rgba(243, 111, 33, 0.3);
+            }
+
+            /* --- LOGOUT BUTTON STYLES --- */
+            .nav-item.logout {
+                margin-top: auto;
+                margin-bottom: 40px;
+                background-color: #ffffff;
+                color: #e74a3b;
+                font-weight: 700;
+                border: 2px solid #f36f21;
+            }
+
+                .nav-item.logout:hover {
+                    background-color: #f36f21;
+                    color: #ffffff;
+                    border-color: #f36f21;
+                }
+
+        /* CONTENT */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+
+        .header-title h2 {
+            font-weight: 800;
+            color: #000;
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .header-title p {
+            color: #000;
+            margin: 5px 0 0;
+            font-size: 0.9rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            text-align: right;
+        }
+
+        .user-info {
+            margin-right: 15px;
+        }
+
+        .user-name {
+            font-weight: 700;
+            color: #000;
+            display: block;
+        }
+
+        .user-settings {
+            font-size: 0.8rem;
+            color: #888;
+            text-decoration: none;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            background-color: #f36f21;
+            border-radius: 50%;
+        }
+
+        /* CONTROLS & BUTTONS */
+        .search-input {
+            background-color: #e9ecef;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            width: 100%;
+        }
+
+        .filter-select {
+            background-color: #e9ecef;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 10px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .bg-orange {
+            background-color: #f36f21;
+        }
+
+        .import-csv-form {
+            flex-wrap: nowrap; 
+        }
+
+        .csv-input {
+            width: 220px;
+            min-width: 220px;
+            height: 34px;
+            padding: 6px 10px;
+            font-size: 14px;
+            border-radius: 25px;
+        }
+
+        .btn-orange-round {
+            background-color: #f36f21;
+            border-color: #f36f21;
+            color: white;
+            border-radius: 18px;
+            padding: 8px 24px;
+            font-weight: 700;
+            transition: all 0.2s;
+            border: none;
+        }
+
+            .btn-orange-round:hover {
+                background-color: #d65a10;
+                color: white;
+                text-decoration: none;
+            }
+
+        .btn-orange {
+            background-color: #f36f21;
+            border-color: #f36f21;
+            color: white;
+            transition: all 0.2s;
+            font-weight: 700;
+            border: none;
+        }
+
+            .btn-orange:hover {
+                background-color: #d65a10;
+                color: white;
+                text-decoration: none;
+            }
+
+        /* TABLE */
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+        }
+            .table-container table tbody tr:hover > td {
+                background-color: #F2F0EF !important;
+            }
+            .table-container table tbody tr.active-row > td {
+                background-color: #F2F0EF !important;
+            }
+            .table-container table tbody tr {
+                cursor: context-menu;
+                transition: background-color 0.15s ease;
+            }
+
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #f36f21;
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            color: #333;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9fa;
+            cursor: context-menu;
+        }
+
+        .status-paid {
+            color: #28a745;
+            font-weight: 700;
+        }
+
+        .status-delinquent {
+            color: #dc3545;
+            font-weight: 700;
+        }
+
+        .status-inactive {
+            color: #858796;
+            font-weight: 700;
+            font-style: italic;
+        }
+
+        .username-link {
+            color: #f36f21;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+            .username-link:hover {
+                text-decoration: underline;
+                color: #d65a10;
+            }
+
+        .action-link {
+            color: #333;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+            .action-link:hover {
+                text-decoration: underline;
+            }
+
+        /* MODAL */
+        .modal-header {
+            background-color: #fff;
+            color: #333;
+            border-bottom: none;
+        }
+
+        .modal-title {
+            font-weight: 800;
+            font-size: 1.5rem;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-close {
+            filter: none;
+        }
+
+        .context-menu {
+            position: absolute;
+            display: none;
+            background: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            min-width: 140px;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 4px 0;
+        }
+
+            .context-menu a {
+                display: block;
+                padding: 8px 12px;
+                text-decoration: none;
+                color: #212529;
+                cursor: pointer;
+                font-size: 0.9rem;
+            }
+
+                .context-menu a:hover {
+                    background-color: #f36f21;
+                    color: white;
+                }
+    </style>
+</head>
+
+
+<input type="hidden" id="adminName" value="@ViewBag.AdminName" />
+<div class="">
+
+    <!-- Search + Filters -->
+    <form method="get" asp-action="Residents">
+        <div class="row mb-3">
+
+            <!-- SEARCH BAR -->
+            <div class="col-md-4">
+                <label>Search:</label>
+                <input type="text"
+                       class="form-control"
+                       name="search"
+                       value="@ViewBag.Search"
+                       placeholder="Search by ID, name, block, lot..." />
+            </div>
+
+            <div class="col-md-3">
+                <label>Month:</label>
+                <select class="form-select" name="month" onchange="this.form.submit()" style="max-height:150px; overflow-y:auto;">
+                    @for (int m = 1; m <= 12; m++)
+                    {
+                        <option value="@m" selected="@(ViewBag.SelectedMonth == m)">
+                            @System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label>Year:</label>
+                <select class="form-select" name="year" onchange="this.form.submit()" style="max-height:150px; overflow-y:auto;">
+                    @for (int y = DateTime.Now.Year; y >= 2000; y--)
+                    {
+                        <option value="@y" selected="@(ViewBag.SelectedYear == y)">
+                            @y
+                        </option>
+                    }
+                </select>
+            </div>
+        </div>
+    </form>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div class="d-flex gap-2">
+                <!-- add payment button -->
+                @{
+                    var canPay =
+                    Context.Session.GetString("IsPrimary") == "True" ||
+                    Context.Session.GetString("CanAddPayment") == "True";
+                }
+
+                @if (canPay)
+                {
+                    <button class="btn btn-orange-round me-2"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addPaymentModal">
+                        <i class="fas fa-plus"></i> Add Payment
+                    </button>
+                }
+                else
+                {
+                    <button class="btn btn-orange-round me-2"
+                            onclick="alert('You are not allowed to do this.');">
+                        <i class="fas fa-plus"></i> Add Payment
+                    </button>
+                }
+
+                <!-- create invoice button -->
+                @{
+                    var canInvoice =
+                    Context.Session.GetString("IsPrimary") == "True" ||
+                    Context.Session.GetString("CanCreateInvoice") == "True";
+                }
+
+                @if (canInvoice)
+                {
+                    <button class="btn btn-orange-round me-2"
+                            data-bs-toggle="modal"
+                            data-bs-target="#createInvoiceModal">
+                        <i class="fas fa-file-invoice"></i> Create Invoice
+                    </button>
+                }
+                else
+                {
+                    <button class="btn btn-orange-round me-2"
+                            onclick="alert('You are not allowed to do this.');">
+                        <i class="fas fa-file-invoice"></i> Create Invoice
+                    </button>
+                }
+
+                <!-- add resident button -->
+                @{
+                    // 1. Check Permissions
+                    var isPrimary = Context.Session.GetString("IsPrimary") == "True";
+                    var canAdd = Context.Session.GetString("CanAddResident") == "True";
+                    bool isAllowed = isPrimary || canAdd;
+                }
+
+                @if (isAllowed)
+                {
+                    <button class="btn btn-orange-round"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addResidentModal">
+                            <i class="bi bi-person-add"></i>
+                        Add Resident
+                    </button>
+                }
+                else
+                {
+                    <button class="btn btn-orange-round"
+                            onclick="alert('You are not allowed to do this.');">
+                        Add Resident
+                    </button>
+                }
+                </div>
+                <div class="d-flex align-items-center gap-2 ms-auto">
+
+                <!-- para mawala button if hindi checked sa permissions -->
+                @if (Context.Session.GetString("CanImportResident") == "True" || Context.Session.GetString("IsPrimary") == "True")
+                {
+                    <button class="btn btn-orange-round"
+                            data-bs-toggle="modal"
+                            data-bs-target="#importResidentCsvModal">
+                        Import CSV
+                    </button>
+                }
+                    <a asp-controller="Template"
+                       asp-action="DownloadResidentsCsv"
+                       class="btn btn-orange d-flex align-items-center justify-content-center"
+                       title="Download Residents CSV"
+                       style="width:42px; height:42px;">
+                        <i class="bi bi-download"></i>
+                    </a>
+                </div>
+               </div>
+        </div>
+    </div>
+
+
+    @using System.Text.Json
+
+    @if (TempData["ImportErrors"] != null)
+    {
+        var errors = JsonSerializer.Deserialize<List<string>>(TempData["ImportErrors"].ToString());
+
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Import Errors:</strong>
+            <ul class="mb-0 mt-2">
+                @foreach (var e in errors)
+                {
+                    <li>@e</li>
+                }
+            </ul>
+
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ImportSuccessDetails"] != null)
+    {
+        var success = JsonSerializer.Deserialize<List<string>>(TempData["ImportSuccessDetails"].ToString());
+
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <strong>Generated Accounts:</strong>
+            <ul class="mb-0 mt-2">
+                @foreach (var s in success)
+                {
+                    <li>@s</li>
+                }
+            </ul>
+
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- TABLE -->
+    <div class="table-container" style="max-height: 460px; overflow-y: auto;">
+        <table class="table">
+            <thead style="background-color: #f36f21; color: white;">
+                <tr>
+                    <th style="background-color: #f36f21; color: white;">Resident ID</th>
+                    <th style="background-color: #f36f21; color: white;">Username</th>
+                    <th style="background-color: #f36f21; color: white;">Name</th>
+                    <th style="background-color: #f36f21; color: white;">Address</th>
+                    <th style="background-color: #f36f21; color: white;">Total Dues</th>
+                    <th style="background-color: #f36f21; color: white;">Status</th>
+                    <th style="background-color: #f36f21; color: white;">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">
+                            No records
+                        </td>
+                    </tr>
+                }
+                @foreach (var r in Model)
+                {
+                    string yy = (r.Year_Of_Residency % 100).ToString("D2");
+                    string formattedId = $"R{yy}-{r.Resident_Id:D4}";
+
+                    // ================= TOTAL DUES =================
+                    decimal totalDues = r.Invoices?
+                    .Where(i => i.Status != "Paid")
+                    .Sum(i => i.Total_Amount) ?? 0;
+
+                    // ================= STATUS LOGIC =================
+                    string statusText = "No Invoice";
+                    string statusClass = "text-secondary";
+
+                    // These should come from the dropdowns
+                    int? selectedMonth = ViewBag.SelectedMonth;
+                    int? selectedYear = ViewBag.SelectedYear;
+
+                    if (selectedMonth != null && selectedYear != null)
+                    {
+                        var invoice = r.Invoices?.FirstOrDefault(i =>
+                        i.Billing_Period.Month == selectedMonth &&
+                        i.Billing_Period.Year == selectedYear);
+
+                        if (invoice != null)
+                        {
+                            if (invoice.Status == "Paid")
+                            {
+                                statusText = "Paid";
+                                statusClass = "text-success fw-bold";
+                            }
+                            else
+                            {
+                                statusText = "Unpaid";
+                                statusClass = "text-danger fw-bold";
+                            }
+                        }
+                        else
+                        {
+                            statusText = "No Invoice";
+                            statusClass = "text-secondary";
+                        }
+                    }
+                    // =================================================
+
+                    <tr class="@(r.ResidentAccount?.Status == "Inactive" ? "table-secondary text-muted" : "")"
+                        data-id="@r.Resident_Id"
+                        data-fullname="@r.FullName"
+                        data-block="@r.Block"
+                        data-lot="@r.Lot"
+                        data-phase="@r.Phase_No"
+                        data-year="@r.Year_Of_Residency"
+                        data-username="@r.ResidentAccount?.Username"
+                        data-password="@r.ResidentAccount?.Password"
+                        data-status="@r.ResidentAccount?.Status"
+                        data-email="@r.Email"
+                        data-contact="@r.Contact_No">
+
+                        <td>@formattedId</td>
+                        <td>@r.ResidentAccount?.Username</td>
+                        <td>@r.FullName</td>
+                        <td>Block @r.Block, Lot @r.Lot, Phase @r.Phase_No</td>
+                        <td>PHP @totalDues.ToString("N2")</td>
+                        <td class="@statusClass">@statusText</td>
+                        <td>
+                            <a href="@Url.Action("ResidentProfile", "Admin", new { id = r.Resident_Id })" class="action-link">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+<!-- ADD RESIDENT MODAL -->
+<div class="modal fade" id="addResidentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content p-4">
+
+            <h4 class="fw-bold text-center">Add Resident</h4>
+
+            <form asp-controller="Admin" asp-action="AddResident" method="post" onsubmit="return confirmAddResident();">
+
+                <div class="row mt-3">
+
+                    <!-- First Name -->
+                    <div class="col-md-4 mb-3">
+                        <label>First Name: *</label>
+                        <input type="text" name="FirstName" id="FirstName" class="form-control"
+                               pattern="[A-Za-z\s]+" title="Only letters are allowed." required />
+                    </div>
+
+                    <!-- Last Name -->
+                    <div class="col-md-4 mb-3">
+                        <label>Last Name: *</label>
+                        <input type="text" name="LastName" id="LastName" class="form-control"
+                               pattern="[A-Za-z\s]+" title="Only letters are allowed." required />
+                    </div>
+
+                    <!-- Middle Name -->
+                    <div class="col-md-4 mb-3">
+                        <label>Middle Name:</label>
+                        <input type="text" name="MiddleName" id="MiddleName" class="form-control"
+                               pattern="[A-Za-z\s]*" title="Only letters are allowed." />
+                    </div>
+
+                    <!-- Address Inputs -->
+                    <div class="col-md-3 mb-3">
+                        <label>Block No.: *</label>
+                        <input type="text" name="Block" id="Block" class="form-control"
+                               pattern="[0-9]+" title="Numbers only." required />
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Lot No.: *</label>
+                        <input type="text" name="Lot" id="Lot" class="form-control"
+                               pattern="[0-9]+" title="Numbers only." required />
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Phase No.: *</label>
+                        <input type="text" name="PhaseNo" id="PhaseNo" class="form-control"
+                               pattern="[0-9]+" title="Numbers only." required />
+                    </div>
+
+                    <!-- Year of Residency -->
+                    <div class="col-md-3 mb-3">
+                        <label>Year of Residency: *</label>
+                        <input type="number" id="YearOfResidency" name="YearOfResidency" class="form-control"
+                               oninput="updateDisplayID()" min="1950" max="@DateTime.Now.Year" required />
+                    </div>
+
+                    <!-- Display-only ID -->
+                    <div class="col-md-3 mb-3">
+                        <label>Resident Display ID:</label>
+                        <input type="text" id="DisplayID" class="form-control" readonly />
+                    </div>
+
+                    <!-- Contact Number -->
+                    <div class="col-md-3 mb-3">
+                        <label>Contact No.:</label>
+                        <input type="text" name="ContactNo" id="ContactNo" class="form-control"
+                               pattern="[0-9]{11}" maxlength="11"
+                               title="Contact number must be exactly 11 digits." />
+                    </div>
+
+                    <!-- Email -->
+                    <div class="col-md-6 mb-3">
+                        <label>Email:</label>
+                        <input type="email" name="Email" id="Email" class="form-control"
+                               title="Enter a valid email address (e.g., name@example.com)" />
+                    </div>
+
+                </div>
+
+                <div class="text-end mt-3">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="reset" class="btn btn-secondary">Clear</button>
+                    <button type="submit" class="btn btn-orange">Submit</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- CREATE INVOICE MODAL -->
+<div class="modal fade" id="createInvoiceModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content p-4">
+
+            <h4 class="fw-bold text-center mb-3">Create Invoice</h4>
+
+            <form id="invoiceForm" asp-controller="Admin" asp-action="CreateInvoice"
+                  method="post" onsubmit="return validateInvoiceForm();">
+
+
+                <div class="row mt-3">
+
+                    <!-- BLOCK -->
+                    <div class="col-md-3 mb-3">
+                        <label>Block: *</label>
+                        <input type="text" id="invBlock" name="Block"
+                               class="form-control"
+                               pattern="[0-9]+" title="Numbers only."
+                               required />
+                    </div>
+
+                    <!-- LOT -->
+                    <div class="col-md-3 mb-3">
+                        <label>Lot: *</label>
+                        <input type="text" id="invLot" name="Lot"
+                               class="form-control"
+                               pattern="[0-9]+" title="Numbers only."
+                               required />
+                    </div>
+
+                    <!-- PHASE -->
+                    <div class="col-md-3 mb-3">
+                        <label>Phase: *</label>
+                        <input type="text" id="invPhase" name="Phase_No"
+                               class="form-control"
+                               pattern="[0-9]+" title="Numbers only."
+                               required />
+                    </div>
+
+                    <!-- NAME (AUTO-FILLED) -->
+                    <div class="row justify-content-left">
+                        <div class="col-md-6 mb-3">
+                            <label>Name: *</label>
+                            <input type="text"
+                                   id="invName"
+                                   class="form-control"
+                                   readonly />
+                        </div>
+                    </div>
+
+
+                    <!-- YEAR DROPDOWN -->
+                    <div class="row justify-content-left">
+                        <div class="col-md-4 mb-3">
+                            <label>Year: *</label>
+                            <select id="invYear" name="Year" class="form-select">
+                                @{
+                                    int currentYear = DateTime.Now.Year;
+                                    int endYear = currentYear + 5;
+                                }
+
+                                @for (int y = endYear; y >= 2000; y--)
+                                {
+                                    <option value="@y" selected="@(y == currentYear)">
+                                        @y
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- BILLING PERIOD -->
+                <div class="mb-2 fw-bold">Billing Period Selection</div>
+                <p class="text-muted" style="margin-top:-10px; font-size:13px;">
+                    Select one or more months to generate separate invoices.
+                </p>
+
+                <div class="border rounded p-3" style="max-height: 140px; overflow-y: auto;">
+
+                    <div class="form-check">
+                        <input class="form-check-input month-checkbox" type="checkbox" name="Months" value="1">
+                        <span class="month-label">January</span>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input month-checkbox" type="checkbox" name="Months" value="2">
+                        <span class="month-label">February</span>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input month-checkbox" type="checkbox" name="Months" value="3">
+                        <span class="month-label">March</span>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input month-checkbox" type="checkbox" name="Months" value="4">
+                        <span class="month-label">April</span>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input month-checkbox" type="checkbox" name="Months" value="5">
+                        <span class="month-label">May</span>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input month-checkbox" type="checkbox" name="Months" value="6">
+                        <span class="month-label">June</span>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input month-checkbox" type="checkbox" name="Months" value="7">
+                        <span class="month-label">July</span>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input month-checkbox" type="checkbox" name="Months" value="8">
+                        <span class="month-label">August</span>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input month-checkbox" type="checkbox" name="Months" value="9">
+                        <span class="month-label">September</span>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input month-checkbox" type="checkbox" name="Months" value="10">
+                        <span class="month-label">October</span>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input month-checkbox" type="checkbox" name="Months" value="11">
+                        <span class="month-label">November</span>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input month-checkbox" type="checkbox" name="Months" value="12">
+                        <span class="month-label">December</span>
+                    </div>
+                </div>
+
+                <!-- TOGGLE DURATION -->
+                <div class="form-check mt-2">
+
+
+                    <!-- actual checkbox -->
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="useDuration"
+                           name="UseDuration"
+                           value="true"
+                           checked>
+
+                    <!-- hidden for false -->
+                    <input type="hidden" name="UseDuration" value="false" />
+
+                    <label class="form-check-label" for="useDuration">
+                        Apply duration to future invoices
+                    </label>
+                </div>
+
+                <div id="durationContainer" class="mt-3 mb-3 d-none">
+                    <label>
+                        Duration of Invoices:
+                    </label>
+
+                    <div class="row mt-2" style="max-width: 400px;">
+
+                        <!-- NUMBER -->
+                        <div class="col-5">
+                            <input type="number"
+                                   id="invDuration"
+                                   name="DurationValue"
+                                   min="1"
+                                   class="form-control"
+                                   value="1">
+                        </div>
+
+                        <!-- UNIT -->
+                        <div class="col-7">
+                            <select id="invDurationUnit"
+                                    name="DurationUnit"
+                                    class="form-select">
+                                <option value="days">Days</option>
+                                <option value="weeks">Weeks</option>
+                                <option value="months">Months</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+
+               
+
+                <!-- DATE ISSUED -->
+                <div class="mb-3 mt-2">
+                    <label>Date Issued: *</label>
+                    <input type="text" id="invDate" name="DateIssued" class="form-control keep" readonly />
+                </div>
+
+                <div class="row">
+
+                    <!-- RATE -->
+                    <div class="col-md-6 mb-3">
+                        <label>Rate/Month: *</label>
+                        <input type="number" id="invRate" name="Rate"
+                               min="1"
+                               value="150"
+                               class="form-control keep"
+                               required />
+
+                        <div class="mt-2" style="height: 24px;">
+                            <span id="btnSetDefaultRate"
+                                  class="d-none"
+                                  style="color:#0d6efd; cursor:pointer; text-decoration:underline">
+                                Set as default value
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- TOTAL -->
+                    <div class="col-md-6 mb-3">
+                        <label>Total Amount:</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₱</span>
+                            <input type="text" id="invTotal" class="form-control" readonly />
+                        </div>
+
+                        <!-- ADVANCE PAYMENT -->
+                        <div class="mt-2" style="height: 24px;">
+                            <div class="form-check m-0">
+                                <input class="form-check-input" type="checkbox" id="advancePayment">
+                                <label class="form-check-label" for="advancePayment">
+                                    Advance Payment (10% Discount)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- DESCRIPTION -->
+                <div class="mb-3">
+                    <label>Description:</label>
+                    <textarea name="Description" class="form-control" rows="2"></textarea>
+                </div>
+
+                <!-- ISSUED BY -->
+                <div class="mb-3">
+                    <label>Issued By: </label>
+                    <input type="text" id="invIssuedBy" name="IssuedBy" class="form-control keep" value="@ViewBag.AdminName" readonly />
+                </div>
+
+                <div class="text-end mt-3">
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="btnClear" class="btn btn-secondary">Clear</button>
+                    <button type="submit" class="btn btn-orange">Submit</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- ADD PAYMENT MODAL -->
+<div class="modal fade" id="addPaymentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content p-4">
+
+            <h4 class="fw-bold text-center mb-3">Add Payment</h4>
+
+            <form asp-controller="Admin" asp-action="AddPayment" method="post"
+                  onsubmit="return validatePaymentForm();">
+
+                <div class="row mt-3">
+
+                    <!-- BLOCK -->
+                    <div class="col-md-3 mb-3">
+                        <label>Block: *</label>
+                        <input type="text" id="payBlock" name="Block" class="form-control"
+                               required pattern="[0-9]+">
+                    </div>
+
+                    <!-- LOT -->
+                    <div class="col-md-3 mb-3">
+                        <label>Lot: *</label>
+                        <input type="text" id="payLot" name="Lot" class="form-control"
+                               required pattern="[0-9]+">
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Phase: *</label>
+                        <input type="text" id="payPhase" name="Phase" class="form-control"
+                               required pattern="[0-9]+">
+                    </div>
+
+
+                    <!-- NAME -->
+                    <div class="col-md-6 mb-3">
+                        <label>Name:</label>
+                        <input type="text" id="payName" class="form-control" readonly>
+                    </div>
+
+                    <!-- INVOICE NO -->
+                    <div class="col-md-12 mb-3">
+                        <label>Select Invoice(s) to Pay: *</label>
+
+                        <!-- Container where JS injects invoice checkboxes -->
+                        <div id="payInvoiceContainer"
+                             class="border rounded p-2"
+                             style="max-height: 200px; overflow-y: auto; min-height: 45px;">
+                            <!-- JS will insert checkboxes here -->
+                        </div>
+                    </div>
+
+                    <!-- DATE OF PAYMENT -->
+                    <div class="col-md-6 mb-3">
+                        <label>Date of Payment:</label>
+                        <input type="date" id="payDate" name="DatePaid" class="form-control keep" readonly>
+                    </div>
+
+                    <!-- PAYMENT METHOD -->
+                    <div class="col-md-6 mb-3">
+                        <label>Method: *</label>
+                        <select id="payMethod" name="Method" class="form-select" required>
+                            <option>Cash</option>
+                            <option>GCash</option>
+                        </select>
+                    </div>
+
+                    <!-- OR NUMBER -->
+                    <div class="col-md-6 mb-3">
+                        <label>OR No.:</label>
+                        <input type="text"
+                               id="payOR"
+                               name="OR_No"
+                               class="form-control"
+                               maxlength="5"
+                               pattern="\d{5}"
+                               inputmode="numeric"
+                               required
+                               placeholder="5-digit OR No.">
+                    </div>
+
+                    <!-- TOTAL AMOUNT AUTO -->
+                    <div class="col-md-6 mb-3">
+                        <label>Total Amount:</label>
+                        <input type="text" id="payAmount" name="Amount" class="form-control" readonly>
+                    </div>
+
+                    <!-- REMARKS -->
+                    <div class="col-md-12 mb-3">
+                        <label>Remarks:</label>
+                        <textarea name="Remarks" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <!-- ISSUED BY -->
+                    <div class="col-md-6 mb-3">
+                        <label>Issued By:</label>
+                        <input type="text" id="payIssuedBy" name="IssuedBy" class="form-control keep" value="@ViewBag.AdminName" readonly>
+                    </div>
+
+                </div>
+
+                <div class="text-end mt-3">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="clearBtn" class="btn btn-secondary">Clear</button>
+                    <button type="submit" class="btn btn-orange">Submit</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- SUCCESS POPUP MODAL -->
+<div class="modal fade" id="successModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content p-4">
+
+            <h4 class="fw-bold text-success text-center mb-3">
+                Resident Successfully Added!
+            </h4>
+
+            <p class="text-center">Here are the login details:</p>
+
+            <div class="mb-3">
+                <label class="fw-bold">Username:</label>
+                <input id="popupUsername" type="text" class="form-control" readonly />
+            </div>
+
+            <div class="mb-3">
+                <label class="fw-bold">Password:</label>
+                <input id="popupPassword" type="text" class="form-control" readonly />
+            </div>
+
+            <div class="text-center mt-3">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="invoiceSuccessModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content p-4 text-center">
+
+            <h4 class="fw-bold text-success">Invoice Created!</h4>
+            <p>@TempData["InvoiceSuccess"]</p>
+
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+                OK
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="residentStatusSuccessModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content p-4 text-center">
+
+            <h4 class="fw-bold text-success">Resident Status Updated!</h4>
+            <p>@TempData["ResidentStatusSuccess"]</p>
+
+            <button type="button"
+                    class="btn btn-success"
+                    data-bs-dismiss="modal">
+                OK
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="invoiceErrorModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content p-4 text-center">
+
+            <h4 class="fw-bold text-danger">Invoice Error!</h4>
+            <p>@TempData["InvoiceError"]</p>
+
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                OK
+            </button>
+        </div>
+    </div>
+</div>
+<!-- PAYMENT SUCCESS MODAL -->
+<div class="modal fade" id="paymentSuccessModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content p-4 text-center">
+
+            <h3 class="text-success fw-bold">Payment Recorded!</h3>
+            <p>@TempData["PaymentSuccess"]</p>
+
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+                OK
+            </button>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="paymentErrorModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content p-4 text-center">
+
+            <h3 class="text-danger fw-bold">Payment Error!</h3>
+            <p>@TempData["PaymentError"]</p>
+
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                OK
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT RESIDENT MODAL -->
+<div class="modal fade" id="editResidentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content p-4">
+
+            <h4 class="fw-bold text-center">Edit Resident</h4>
+
+            <form method="post"
+                  asp-controller="Admin"
+                  asp-action="EditResident"
+                  onsubmit="return confirmEditResident();">
+
+                <!-- READ-ONLY ID -->
+                <div class="mb-3">
+                    <label>Resident ID</label>
+                    <input type="text" id="editResidentIdDisplay" class="form-control" readonly>
+                    <input type="hidden" id="editResidentId" name="Resident_Id">
+                </div>
+
+                <div class="row">
+
+                    <!-- FIRST NAME -->
+                    <div class="col-md-4 mb-3">
+                        <label>First Name *</label>
+                        <input type="text"
+                               id="editFirstName"
+                               name="FirstName"
+                               class="form-control"
+                               required
+                               pattern="[A-Za-z\s]+"
+                               title="Letters only">
+                    </div>
+
+                    <!-- LAST NAME -->
+                    <div class="col-md-4 mb-3">
+                        <label>Last Name *</label>
+                        <input type="text"
+                               id="editLastName"
+                               name="LastName"
+                               class="form-control"
+                               required
+                               pattern="[A-Za-z\s]+"
+                               title="Letters only">
+                    </div>
+
+                    <!-- MIDDLE NAME -->
+                    <div class="col-md-4 mb-3">
+                        <label>Middle Name</label>
+                        <input type="text"
+                               id="editMiddleName"
+                               name="MiddleName"
+                               class="form-control"
+                               pattern="[A-Za-z\s]*"
+                               title="Letters only">
+                    </div>
+
+                    <!-- BLOCK -->
+                    <div class="col-md-4 mb-3">
+                        <label>Block *</label>
+                        <input type="text"
+                               id="editBlock"
+                               name="Block"
+                               class="form-control"
+                               required
+                               pattern="[0-9]+"
+                               inputmode="numeric"
+                               title="Numbers only">
+                    </div>
+
+                    <!-- LOT -->
+                    <div class="col-md-4 mb-3">
+                        <label>Lot *</label>
+                        <input type="text"
+                               id="editLot"
+                               name="Lot"
+                               class="form-control"
+                               required
+                               pattern="[0-9]+"
+                               inputmode="numeric"
+                               title="Numbers only">
+                    </div>
+
+                    <!-- PHASE -->
+                    <div class="col-md-4 mb-3">
+                        <label>Phase *</label>
+                        <input type="text"
+                               id="editPhase"
+                               name="Phase_No"
+                               class="form-control"
+                               required
+                               pattern="[0-9]+"
+                               inputmode="numeric"
+                               title="Numbers only">
+                    </div>
+
+                    <!-- YEAR -->
+                    <div class="col-md-4 mb-3">
+                        <label>Year of Residency *</label>
+                        <input type="number"
+                               id="editYear"
+                               name="Year_Of_Residency"
+                               class="form-control"
+                               required
+                               min="1950"
+                               max="2100">
+                    </div>
+
+                    <!-- STATUS -->
+                    <div class="col-md-4 mb-3">
+                        <label>Status *</label>
+                        <select id="editStatus" name="Status" class="form-select" required>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+
+                    <!-- USERNAME (READ ONLY) -->
+                    <div class="col-md-6 mb-3">
+                        <label>Username</label>
+                        <input type="text"
+                               id="editUsername"
+                               class="form-control"
+                               readonly
+                               style="background-color:#f8f9fa;">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Password</label>
+
+                        <div class="input-group">
+                            <input type="password"
+                                   id="editPassword"
+                                   class="form-control"
+                                   readonly
+                                   style="background-color:#f8f9fa;">
+
+                            <button class="btn btn-outline-secondary"
+                                    type="button"
+                                    onclick="togglePasswordVisibility()">
+                                <i class="bi bi-eye" id="passwordEyeIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <!-- EMAIL -->
+                    <div class="col-md-6 mb-3">
+                        <label>Email</label>
+                        <input type="email"
+                               id="editEmail"
+                               name="Email"
+                               class="form-control">
+                    </div>
+
+                    <!-- CONTACT -->
+                    <div class="col-md-6 mb-3">
+                        <label>Contact No.</label>
+                        <input type="text"
+                               id="editContact"
+                               name="ContactNo"
+                               class="form-control"
+                               pattern="[0-9]{11}"
+                               maxlength="11"
+                               inputmode="numeric"
+                               title="Must be 11 digits">
+                    </div>
+
+                </div>
+
+                <div class="text-end mt-3">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    @if (Context.Session.GetString("CanEditResident") == "True" || Context.Session.GetString("IsPrimary") == "True")
+                    {
+                    <button type="submit" class="btn btn-orange">Save Changes</button>
+                    }
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+<div id="residentMenu" class="context-menu" style="display: none; position:absolute;">
+    
+    <a id="editResident">View/Edit</a>
+    
+    @* 2. Deactivate is strictly for Primary Super Admin ONLY *@
+    @if (Context.Session.GetString("IsPrimary") == "True")
+    {
+        <a id="toggleResidentStatus"></a>
+    }
+</div>
+
+
+<!-- RESIDENT EDIT SUCCESS MODAL -->
+<div class="modal fade" id="residentEditSuccessModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content text-center p-4">
+            <h4 class="text-success fw-bold">Resident Updated</h4>
+            <p>The resident details were updated successfully.</p>
+            <button class="btn btn-success" data-bs-dismiss="modal">OK</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="importResidentCsvModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header text-white" style="background-color: #f36f21;">
+                <h5 class="modal-title">Import Residents from CSV</h5>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"></button>
+            </div>
+
+            <form asp-action="ImportResidentsCsv"
+                  asp-controller="Admin"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                <div class="modal-body">
+
+                    <label class="form-label d-block">
+                        <b>Required Fields:</b>
+                        <span class="d-block">
+                            FirstName, MiddleName, LastName, Block, Lot, Phase, YearOfResidency, Email, ContactNo
+                        </span>
+                    </label>
+
+                    <input type="file"
+                           name="csvFile"
+                           accept=".csv"
+                           required
+                           class="form-control" />
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                            class="btn btn-orange">
+                        Confirm Import
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- ======================== SCRIPTS ======================== -->
+@{
+    var simpleList = Model.Select(r => new
+    {
+        block = r.Block.Trim(),
+        lot = r.Lot.Trim(),
+        phase = r.Phase_No.Trim(),
+        fullName = r.FullName,
+        email = r.Email
+    });
+}
+
+<input type="hidden" id="invoiceJson"
+       value='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.InvoiceList))' />
+
+
+<input type="hidden" id="residentsJson"
+       value='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(simpleList))' />
+
+
+<script src="~/js/resident.js"></script>
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            var success = "@(TempData["ResidentStatusSuccess"] ?? "")";
+
+            if (success !== "") {
+                var modal = new bootstrap.Modal(
+                    document.getElementById("residentStatusSuccessModal")
+                );
+                modal.show();
+            }
+
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const select = document.getElementById("invYear");
+            if (!select) return;
+
+            const currentYear = new Date().getFullYear();
+            let found = false;
+
+            // remove duplicates
+            const seen = new Set();
+            [...select.options].forEach(opt => {
+                if (seen.has(opt.value)) {
+                    opt.remove();
+                } else {
+                    seen.add(opt.value);
+                }
+            });
+
+            // force-select current year
+            [...select.options].forEach(opt => {
+                if (parseInt(opt.value) === currentYear) {
+                    opt.selected = true;
+                    found = true;
+                }
+            });
+
+            if (!found && select.options.length > 0) {
+                select.selectedIndex = 0;
+            }
+        });
+    </script>
+
+
+
+    <script>
+                $('#createInvoiceModal').on('shown.bs.modal', function () {
+            loadInvoiceHeader();
+        });
+    </script>
+    <script>
+        function resetPaymentUI() {
+            document.getElementById("payName").value = "";
+            document.getElementById("payInvoiceContainer").innerHTML = "";
+            document.getElementById("payAmount").value = "";
+        }
+
+        async function loadPaymentData() {
+
+            const block = document.getElementById("payBlock").value.trim();
+            const lot = document.getElementById("payLot").value.trim();
+            const phase = document.getElementById("payPhase").value.trim();
+
+            if (!block || !lot || !phase) {
+                resetPaymentUI();
+                return;
+            }
+
+            // Fetch resident by address
+            const res = await fetch(`/Admin/GetResidentByAddress?block=${block}&lot=${lot}&phase=${phase}`);
+            const resident = await res.json();
+
+            if (!resident) {
+                resetPaymentUI();
+                return;
+            }
+
+            document.getElementById("payName").value = resident.fullName;
+
+            // Fetch unpaid invoices of that resident
+            const invres = await fetch(`/Admin/GetUnpaidInvoices?residentId=${resident.residentId}`);
+            const invoices = await invres.json();
+
+            const box = document.getElementById("payInvoiceContainer");
+            box.innerHTML = "";
+
+            if (invoices.length === 0) {
+                box.innerHTML = `<p class="text-muted">No unpaid invoices.</p>`;
+                return;
+            }
+
+            invoices.forEach(inv => {
+                const html = `
+                <div class="form-check">
+                    <input type="checkbox"
+                           class="form-check-input pay-invoice-check"
+                           name="InvoiceNos"
+                           value="${inv.invoiceNo}"
+                           data-amount="${inv.amount}"
+                           id="inv_${inv.invoiceNo}">
+
+                    <label class="form-check-label" for="inv_${inv.invoiceNo}">
+                        Invoice #${inv.invoiceNo} — ${inv.month} ${inv.year} — ₱${inv.amount}
+                    </label>
+                </div>`;
+                box.insertAdjacentHTML("beforeend", html);
+            });
+
+            document.querySelectorAll(".pay-invoice-check")
+                .forEach(chk => chk.addEventListener("change", updatePaymentTotal));
+        }
+
+        function updatePaymentTotal() {
+            let total = 0;
+            document.querySelectorAll(".pay-invoice-check:checked")
+                .forEach(c => total += parseFloat(c.dataset.amount));
+
+            document.getElementById("payAmount").value =
+                total > 0 ? total.toFixed(2) : "";
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            ["payBlock", "payLot", "payPhase"].forEach(id => {
+                const el = document.getElementById(id);
+
+                el.addEventListener("input", resetPaymentUI);
+                el.addEventListener("blur", loadPaymentData);
+            });
+        });
+    </script>
+
+    <script>
+            document.getElementById('btnClear').addEventListener('click', function() {
+        
+            const fieldsToClear = document.querySelectorAll('input:not(.keep), textarea:not(.keep), select:not(.keep)');
+
+            fieldsToClear.forEach(field => {
+                if (field.type === 'checkbox' || field.type === 'radio') {
+                    field.checked = false;
+                } else {
+                    field.value = '';
+                }
+            });
+        });
+    </script>
+
+    <script>
+                document.getElementById("btnClear").addEventListener("click", function () {
+            document.getElementById("invTotal").value = 0;
+
+            document.querySelectorAll(".month-checkbox").forEach(cb => {
+                cb.checked = false;
+            });
+        });
+    </script>
+    <script>
+            document.getElementById('clearBtn').addEventListener('click', function() {
+            
+            const fieldsToClear = document.querySelectorAll('input:not(.keep), textarea:not(.keep), select:not(.keep)');
+
+            fieldsToClear.forEach(field => {
+                if (field.type === 'checkbox' || field.type === 'radio') {
+                    field.checked = false;
+                } else {
+                    field.value = '';
+                }
+            });
+        });
+    </script>
+
+    <script>
+        function resetInvoiceUI() {
+            // Clear name & email
+            document.getElementById("invName").value = "";
+
+            // Reset all month checkboxes
+            document.querySelectorAll(".month-checkbox").forEach(cb => {
+                cb.disabled = false;
+                cb.checked = false;
+                cb.closest(".form-check").style.opacity = "1";
+            });
+        }
+
+        async function loadResidentAndMonths() {
+
+            const block = document.getElementById("invBlock").value.trim();
+            const lot = document.getElementById("invLot").value.trim();
+            const phase = document.getElementById("invPhase").value.trim();
+            const year = document.getElementById("invYear").value;
+
+            // If any field missing → reset and stop
+            if (!block || !lot || !phase || !year) {
+                resetInvoiceUI();
+                return;
+            }
+
+            // 🔎 GET RESIDENT
+            const res = await fetch(`/Admin/GetResidentByAddress?block=${block}&lot=${lot}&phase=${phase}`);
+            const resident = await res.json();
+
+            if (!resident) {
+                resetInvoiceUI();
+                return;
+            }
+
+            // Fill name/email
+            document.getElementById("invName").value = resident.fullName;
+  
+
+            // 📅 GET DISABLED MONTHS
+            const mres = await fetch(`/Admin/GetExistingInvoiceMonths?block=${block}&lot=${lot}&phase=${phase}&year=${year}`);
+            const disabledMonths = await mres.json();
+
+            // Reset first
+            document.querySelectorAll(".month-checkbox").forEach(cb => {
+                cb.disabled = false;
+                cb.checked = false;
+                cb.closest(".form-check").style.opacity = "1";
+            });
+
+            // Disable existing months
+            disabledMonths.forEach(m => {
+                const checkbox = document.querySelector(`.month-checkbox[value='${m}']`);
+                if (checkbox) {
+                    checkbox.disabled = true;
+                    checkbox.closest(".form-check").style.opacity = "0.4";
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            ["invBlock", "invLot", "invPhase"].forEach(id => {
+                const el = document.getElementById(id);
+
+                // As soon as user TYPES → reset instantly
+                el.addEventListener("input", resetInvoiceUI);
+
+                // When they leave the field → try load
+                el.addEventListener("blur", loadResidentAndMonths);
+            });
+
+            document.getElementById("invYear")
+                .addEventListener("change", loadResidentAndMonths);
+        });
+    </script>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var username = "@TempData["NewUsername"]";
+            var password = "@Html.Raw(TempData["NewPassword"])";
+
+            if (username !== "" && password !== "") {
+                document.getElementById("popupUsername").value = username;
+                document.getElementById("popupPassword").value = password;
+
+                var popup = new bootstrap.Modal(document.getElementById("successModal"));
+                popup.show();
+            }
+        });
+    </script>
+
+    @if (TempData["ResidentErrorAlert"] != null)
+    {
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // Show popup alert
+                alert("⚠ @TempData["ResidentErrorAlert"]");
+
+                // Reopen the Add Resident modal
+                var modal = new bootstrap.Modal(document.getElementById('addResidentModal'));
+                modal.show();
+            });
+        </script>
+    }
+
+    @if (TempData["ResidentErrorAlert2"] != null)
+    {
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // Show popup alert
+                alert("⚠ @TempData["ResidentErrorAlert2"]");
+
+
+            });
+        </script>
+    }
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // ✓ SUCCESS POPUP FOR INVOICE
+            var inv = "@(TempData["InvoiceSuccess"] ?? "")";
+
+            if (inv !== "") {
+                var successModal = new bootstrap.Modal(document.getElementById("invoiceSuccessModal"));
+                successModal.show();
+            }
+
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            var invErr = "@(TempData["InvoiceError"] ?? "")";
+
+            if (invErr !== "") {
+                var errModal = new bootstrap.Modal(document.getElementById("invoiceErrorModal"));
+                errModal.show();
+            }
+
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // ✓ PAYMENT SUCCESS POPUP
+            var pay = "@(TempData["PaymentSuccess"] ?? "")";
+
+            if (pay !== "") {
+                var modal = new bootstrap.Modal(document.getElementById("paymentSuccessModal"));
+                modal.show();
+            }
+
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            var pay = "@(TempData["PaymentError"] ?? "")";
+
+            if (pay !== "") {
+                var modal = new bootstrap.Modal(document.getElementById("paymentErrorModal"));
+                modal.show();
+            }
+
+        });
+    </script>
+
+
+    <script>
+        // SEARCH FUNCTION JS
+               document.addEventListener("DOMContentLoaded", function () {
+
+                   const searchInput = document.querySelector("input[name='search']");
+                   const tableRows = document.querySelectorAll("tbody tr");
+
+                   if (!searchInput) return;
+
+                   searchInput.addEventListener("keyup", function () {
+                       const value = this.value.toLowerCase().trim();
+
+                       tableRows.forEach(row => {
+                           const text = row.innerText.toLowerCase();
+
+                           row.style.display = text.includes(value) ? "" : "none";
+                       });
+                   });
+
+               });
+    </script>
+
+    <script>
+            let clickedResidentId = null;
+            let clickedRow = null;
+
+            document.addEventListener("contextmenu", function (e) {
+                const row = e.target.closest("tr[data-id]");
+                if (!row) return;
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                clickedResidentId = row.dataset.id;
+                clickedRow = row;
+
+                    const menu = document.getElementById("residentMenu");
+                    const canManage = "@Context.Session.GetString("CanAddResident")" === "True" || "@Context.Session.GetString("IsPrimary")" === "True";
+                    if (!canManage) return;
+                    
+                menu.style.left = e.pageX + "px";
+                menu.style.top = e.pageY + "px";
+                menu.style.display = "block";
+            });
+
+            document.addEventListener("click", function () {
+                document.getElementById("residentMenu").style.display = "none";
+            });
+
+            document.getElementById("editResident").onclick = function () {
+                openEditResidentModal(clickedRow);
+            };
+
+            document.getElementById("disableResident").onclick = function () {
+            if (!confirm("Disable this resident? They will no longer receive invoices or payments.")) return;
+
+            window.location.href = "/Admin/DisableResident/" + clickedResidentId;
+        };
+
+    </script>
+
+    <script>
+        function openEditResidentModal(row) {
+
+            document.getElementById("residentMenu").style.display = "none";
+
+            const fullName = row.dataset.fullname || "";
+
+            let lastName = "";
+            let firstName = "";
+            let middleName = "";
+
+            // Expected formats:
+            // "Lastname, Firstname Middlename"
+            // "Lastname, Firstname"
+            if (fullName.includes(",")) {
+                const [last, rest] = fullName.split(",");
+                lastName = last.trim();
+
+                const nameParts = rest.trim().split(" ");
+                firstName = nameParts[0] || "";
+                middleName = nameParts.length > 1
+                    ? nameParts.slice(1).join(" ")
+                    : "";
+            } else {
+                // Fallback: "Firstname Middlename Lastname"
+                const parts = fullName.split(" ");
+                firstName = parts[0] || "";
+                lastName = parts.length > 1 ? parts[parts.length - 1] : "";
+                middleName = parts.length > 2 ? parts.slice(1, -1).join(" ") : "";
+            }
+
+            document.getElementById("editResidentId").value = row.dataset.id;
+            const year = row.dataset.year;
+            const yy = year.slice(-2);
+            const paddedId = row.dataset.id.padStart(4, "0");
+
+            document.getElementById("editResidentIdDisplay").value = `R${yy}-${paddedId}`;
+            document.getElementById("editLastName").value = lastName;
+            document.getElementById("editFirstName").value = firstName;
+            document.getElementById("editMiddleName").value = middleName;
+
+            document.getElementById("editBlock").value = row.dataset.block || "";
+            document.getElementById("editLot").value = row.dataset.lot || "";
+            document.getElementById("editPhase").value = row.dataset.phase || "";
+            document.getElementById("editYear").value = row.dataset.year || "";
+            document.getElementById("editStatus").value = row.dataset.status || "Active";
+            document.getElementById("editEmail").value = row.dataset.email || "";
+            document.getElementById("editContact").value = row.dataset.contact || "";
+            document.getElementById("editUsername").value = row.dataset.username || "";
+            document.getElementById("editPassword").value =
+                row.dataset.password ? row.dataset.password : "********";
+
+
+            new bootstrap.Modal(
+                document.getElementById("editResidentModal")
+            ).show();
+        }
+    </script>
+
+    <script>
+        function confirmEditResident() {
+            return confirm("Are you sure you want to save changes to this resident?");
+        }
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const editSuccess = "@(TempData["ResidentEditSuccess"] ?? "")";
+
+            if (editSuccess !== "") {
+                new bootstrap.Modal(
+                    document.getElementById("residentEditSuccessModal")
+                ).show();
+            }
+
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            let clickedResidentId = null;
+            let clickedRow = null;
+
+            // RIGHT CLICK MENU
+            document.addEventListener("contextmenu", function (e) {
+                const row = e.target.closest("tr[data-id]");
+                if (!row) return;
+
+                e.preventDefault();
+
+                clickedResidentId = row.dataset.id;
+                clickedRow = row;
+
+                const status = row.dataset.status;
+                const toggleBtn = document.getElementById("toggleResidentStatus");
+
+                toggleBtn.textContent = (status === "Inactive") ? "Activate" : "Deactivate";
+
+                const menu = document.getElementById("residentMenu");
+                menu.style.left = e.pageX + "px";
+                menu.style.top = e.pageY + "px";
+                menu.style.display = "block";
+            });
+
+            // HIDE MENU
+            document.addEventListener("click", function () {
+                document.getElementById("residentMenu").style.display = "none";
+            });
+
+            // EDIT
+            document.getElementById("editResident").addEventListener("click", function (e) {
+                e.stopPropagation();
+                openEditResidentModal(clickedRow);
+            });
+
+            // ENABLE / DISABLE
+            document.getElementById("toggleResidentStatus").addEventListener("click", function (e) {
+                e.stopPropagation();
+
+                const action = this.textContent.toLowerCase();
+
+                if (confirm(`Are you sure you want to ${action} this resident?`)) {
+                    window.location.href =
+                        `/Admin/ToggleResidentStatus?id=${clickedResidentId}`;
+                }
+            });
+
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const durationContainer = document.getElementById("durationContainer");
+            const monthCheckboxes = document.querySelectorAll(".month-checkbox");
+            const useDuration = document.getElementById("useDuration");
+            const yearSelect = document.getElementById("invYear");
+
+            function checkFutureMonths() {
+                const now = new Date();
+                const currentMonth = now.getMonth() + 1;
+                const currentYear = now.getFullYear();
+
+                const selectedYear = parseInt(yearSelect.value);
+
+                let hasFutureMonth = false;
+
+                monthCheckboxes.forEach(cb => {
+                    if (cb.checked) {
+                        const selectedMonth = parseInt(cb.value);
+
+                        // ✅ FULL DATE COMPARISON
+                        if (
+                            selectedYear > currentYear ||
+                            (selectedYear === currentYear && selectedMonth > currentMonth)
+                        ) {
+                            hasFutureMonth = true;
+                        }
+                    }
+                });
+
+                if (hasFutureMonth && useDuration.checked) {
+                    durationContainer.classList.remove("d-none");
+                } else {
+                    durationContainer.classList.add("d-none");
+                }
+            }
+
+            // Month checkbox events
+            monthCheckboxes.forEach(cb => {
+                cb.addEventListener("change", checkFutureMonths);
+            });
+
+            // Year change event (IMPORTANT)
+            yearSelect.addEventListener("change", checkFutureMonths);
+
+            // Toggle duration usage
+            useDuration.addEventListener("change", checkFutureMonths);
+
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const rateInput = document.getElementById("invRate");
+            const advanceCheckbox = document.getElementById("advancePayment");
+            const totalInput = document.getElementById("invTotal");
+            const setDefaultBtn = document.getElementById("btnSetDefaultRate");
+            const modal = document.getElementById("createInvoiceModal");
+
+
+            let originalRate = parseFloat(rateInput.value) || 0;
+
+            function calculateTotal() {
+                let rate = parseFloat(rateInput.value) || 0;
+
+                const checkedMonths = document.querySelectorAll(".month-checkbox:checked");
+                const numberOfMonths = checkedMonths.length;
+
+                const total = rate * numberOfMonths;
+
+                totalInput.value = total > 0
+                    ? total.toLocaleString("en-PH")
+                    : "0";
+            }
+
+                    modal.addEventListener("shown.bs.modal", function () {
+            const savedRate = localStorage.getItem("defaultRate");
+
+            if (savedRate) {
+                rateInput.value = savedRate;
+                originalRate = parseFloat(savedRate);
+            } else {
+                originalRate = parseFloat(rateInput.value) || 0;
+            }
+
+            advanceCheckbox.checked = false;
+            setDefaultBtn.classList.add("d-none"); // reset button
+
+            calculateTotal();
+        });
+
+            rateInput.addEventListener("input", function () {
+
+            const currentRate = parseFloat(rateInput.value) || 0;
+
+            if (!advanceCheckbox.checked) {
+                originalRate = currentRate;
+            }
+
+            const savedRate = parseFloat(localStorage.getItem("defaultRate")) || originalRate;
+
+            if (currentRate !== savedRate) {
+                setDefaultBtn.classList.remove("d-none");
+            } else {
+                setDefaultBtn.classList.add("d-none");
+            }
+
+            calculateTotal();
+        });
+
+            advanceCheckbox.addEventListener("change", function () {
+
+                if (advanceCheckbox.checked) {
+                    const discounted = originalRate * 0.9;
+                    rateInput.value = discounted.toFixed(2);
+                } else {
+                    rateInput.value = originalRate;
+                }
+
+                calculateTotal();
+            });
+
+            setDefaultBtn.addEventListener("click", function () {
+                const newRate = parseFloat(rateInput.value);
+
+                if (!newRate || newRate <= 100) {
+                    alert("Please enter a valid rate. Must be more than PHP 100.");
+                    return;
+                }
+
+                localStorage.setItem("defaultRate", newRate);
+
+                alert("Default rate saved!");
+
+                originalRate = newRate;
+                setDefaultBtn.classList.add("d-none");
+            });
+
+            document.querySelectorAll(".month-checkbox").forEach(cb => {
+                cb.addEventListener("change", calculateTotal);
+            });
+
+        });
+    </script>
+
+    <script>
+        document.getElementById("editResidentModal")
+            .addEventListener("hidden.bs.modal", function () {
+                document.getElementById("residentMenu").style.display = "none";
+                clickedResidentId = null;
+                clickedRow = null;
+                document.querySelectorAll(".modal-backdrop").forEach(b => b.remove());
+                document.body.classList.remove("modal-open");
+                document.body.style = "";
+            });
+    </script>
+
+    <script>
+            function togglePasswordVisibility() {
+            const input = document.getElementById("editPassword");
+            const icon = document.getElementById("passwordEyeIcon");
+
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("bi-eye");
+                icon.classList.add("bi-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("bi-eye-slash");
+                icon.classList.add("bi-eye");
+            }
+        }
+    </script>
+
+    <script>
+        let selectedExpenseId = null;
+
+        document.querySelectorAll(".table-container table tbody tr").forEach(row => {
+            row.addEventListener("contextmenu", function (e) {
+                e.preventDefault();
+                document.querySelectorAll(".table-container tbody tr")
+                    .forEach(r => r.classList.remove("active-row"));
+
+                // highlight current row
+                this.classList.add("active-row");
+
+                selectedExpenseId = this.dataset.expenseId;
+
+                const menu = document.getElementById("expenseRowMenu");
+                menu.style.top = `${e.pageY}px`;
+                menu.style.left = `${e.pageX}px`;
+                menu.classList.add("show");
+            });
+        });
+        document.addEventListener("click", () => {
+            document.querySelectorAll(".table-container tbody tr")
+                .forEach(r => r.classList.remove("active-row"));
+
+            document.getElementById("expenseRowMenu")?.classList.remove("show");
+        });
+    </script>
+}
+

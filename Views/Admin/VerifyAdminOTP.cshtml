@@ -1,0 +1,93 @@
+﻿@{
+    ViewData["Title"] = "Verify Admin Login";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify Admin Login - Carlton Residences</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/startbootstrap-sb-admin-2@4.1.4/css/sb-admin-2.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f36f21;
+        }
+
+        .card {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 0.5rem 1rem 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary-custom {
+            background-color: #f36f21;
+            border-color: #f36f21;
+            color: white;
+            font-weight: bold;
+        }
+
+            .btn-primary-custom:hover {
+                background-color: #d65a10;
+                border-color: #d65a10;
+                color: white;
+            }
+    </style>
+</head>
+
+<body class="bg-gradient-primary" style="background-color: #f36f21; background-image: none;">
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-6 col-lg-7 col-md-9">
+                <div class="card o-hidden border-0 shadow-lg my-5">
+                    <div class="card-body p-0">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="p-5">
+                                    <div class="text-center">
+                                        <h1 class="h4 text-gray-900 mb-2">Two-Factor Authentication</h1>
+                                        <p class="mb-4">We sent a verification code to your admin email address. Please enter it below to access the dashboard.</p>
+                                    </div>
+
+                                    @if (ViewBag.Error != null)
+                                    {
+                                        <div class="alert alert-danger text-center">
+                                            @ViewBag.Error
+                                        </div>
+                                    }
+
+                                    <form class="user" method="post" action="@Url.Action("VerifyAdminOTP", "Admin")">
+                                        <div class="form-group">
+                                            <input type="text" name="Code" class="form-control form-control-user text-center"
+                                                   placeholder="Enter 4-Digit Code" required maxlength="4" style="font-size: 1.5rem; letter-spacing: 5px;">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary-custom btn-user btn-block">
+                                            Verify Login
+                                        </button>
+                                    </form>
+
+                                    <hr>
+                                    <div class="text-center">
+                                        <a class="small" href="@Url.Action("Login", "Admin")">Back to Login</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

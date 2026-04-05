@@ -1,0 +1,409 @@
+﻿@model List<Payment>
+@{
+    Layout = "~/Views/Shared/_ResidentLayout.cshtml";
+    ViewData["PageTitle"] = "Payment History";
+}
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]Carlton Residences</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/startbootstrap-sb-admin-2@4.1.4/css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8f9fc;
+            overflow: hidden;
+            margin: 0;
+            color: #333;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            min-width: 250px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            border-right: 1px solid #eee;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #000;
+            line-height: 1.2;
+            margin-bottom: 50px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            color: #888;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+            .nav-item i {
+                margin-right: 15px;
+                width: 20px;
+                text-align: center;
+            }
+
+            .nav-item:hover {
+                background-color: #fff3cd;
+                color: #f36f21;
+                text-decoration: none;
+            }
+
+            .nav-item.active {
+                background-color: #f36f21;
+                color: #fff;
+                box-shadow: 0 4px 10px rgba(243, 111, 33, 0.3);
+            }
+
+            /* --- LOGOUT BUTTON STYLES --- */
+            .nav-item.logout {
+                margin-top: auto;
+                margin-bottom: 40px;
+                background-color: #ffffff;
+                color: #e74a3b;
+                font-weight: 700;
+                border: 2px solid #f36f21;
+            }
+
+                .nav-item.logout:hover {
+                    background-color: #f36f21;
+                    color: #ffffff;
+                    border-color: #f36f21;
+                }
+
+        /* CONTENT */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+
+        .header-title h2 {
+            font-weight: 800;
+            color: #000;
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .header-title p {
+            color: #000;
+            margin: 5px 0 0;
+            font-size: 0.9rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            text-align: right;
+        }
+
+        .user-info {
+            margin-right: 15px;
+        }
+
+        .user-name {
+            font-weight: 700;
+            color: #000;
+            display: block;
+        }
+
+        .user-settings {
+            font-size: 0.8rem;
+            color: #888;
+            text-decoration: none;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            background-color: #f36f21;
+            border-radius: 50%;
+        }
+
+        /* CONTROLS & BUTTONS */
+        .search-input {
+            background-color: #e9ecef;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            width: 100%;
+        }
+
+        .filter-select {
+            background-color: #e9ecef;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 10px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .btn-orange-round {
+            background-color: #f36f21;
+            border-color: #f36f21;
+            color: white;
+            border-radius: 18px;
+            padding: 8px 24px;
+            font-weight: 700;
+            transition: all 0.2s;
+            border: none;
+        }
+
+            .btn-orange-round:hover {
+                background-color: #d65a10;
+                color: white;
+                text-decoration: none;
+            }
+
+        /* TABLE */
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+        }
+
+            .table-container table tbody tr:hover > td {
+                background-color: #F2F0EF !important;
+            }
+
+            .table-container table tbody tr.active-row > td {
+                background-color: #F2F0EF !important;
+            }
+
+            .table-container table tbody tr {
+                cursor: context-menu;
+                transition: background-color 0.15s ease;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #f36f21;
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            color: #333;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9fa;
+            cursor: context-menu;
+        }
+
+        .status-paid {
+            color: #28a745;
+            font-weight: 700;
+        }
+
+        .status-delinquent {
+            color: #dc3545;
+            font-weight: 700;
+        }
+
+        .status-inactive {
+            color: #858796;
+            font-weight: 700;
+            font-style: italic;
+        }
+
+        .username-link {
+            color: #f36f21;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+            .username-link:hover {
+                text-decoration: underline;
+                color: #d65a10;
+            }
+
+        .action-link {
+            color: #333;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+            .action-link:hover {
+                text-decoration: underline;
+            }
+
+        /* MODAL */
+        .modal-header {
+            background-color: #fff;
+            color: #333;
+            border-bottom: none;
+        }
+
+        .modal-title {
+            font-weight: 800;
+            font-size: 1.5rem;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-close {
+            filter: none;
+        }
+
+        .context-menu {
+            position: absolute;
+            display: none;
+            background: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            min-width: 140px;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 4px 0;
+        }
+
+            .context-menu a {
+                display: block;
+                padding: 8px 12px;
+                text-decoration: none;
+                color: #212529;
+                cursor: pointer;
+                font-size: 0.9rem;
+            }
+
+                .context-menu a:hover {
+                    background-color: #f36f21;
+                    color: white;
+                }
+    </style>
+</head>
+
+
+<!-- FILTERS -->
+<form method="get" class="row g-3 mb-3 align-items-end">
+
+    <div class="col-md-3">
+        <label>Month:</label>
+        <select class="form-select" name="payMonth" onchange="this.form.submit()">
+            <option value="">All</option>
+            @for (int m = 1; m <= 12; m++)
+            {
+                <option value="@m" selected="@(ViewBag.SelectedPayMonth == m)">
+                    @System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <label>Year:</label>
+        <select class="form-select" name="payYear" onchange="this.form.submit()">
+            <option value="">All</option>
+            @for (int y = DateTime.Now.Year; y >= 2015; y--)
+            {
+                <option value="@y" selected="@(ViewBag.SelectedPayYear == y)">
+                    @y
+                </option>
+            }
+        </select>
+    </div>
+    <div class="col-md-4"></div>
+
+    <div class="col-md-2 text-end">
+        <a href="/Resident/GeneratePaymentPDF"
+           class="btn btn-orange-round" target="_blank">
+            Generate via PDF
+        </a>
+
+    </div>
+
+</form>
+
+<!-- TABLE -->
+<div class="table-container table-responsive" style="max-height: 460px; overflow-y: auto;">
+    <table class="table text-nowrap">
+
+        <thead style="background-color: #f36f21; color: white;">
+            <tr>
+                <th style="background-color: #f36f21; color: white;">Invoice No.</th>
+                <th style="background-color: #f36f21; color: white;">Billing Period</th>
+                <th style="background-color: #f36f21; color: white;">OR No.</th>
+                <th style="background-color: #f36f21; color: white;">Date Paid</th>
+                <th style="background-color: #f36f21; color: white;">Amount</th>
+                <th style="background-color: #f36f21; color: white;">Method</th>
+                <th style="background-color: #f36f21; color: white;">Remarks</th>
+                <th style="background-color: #f36f21; color: white;">Issued By</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td>INV-@p.Invoice_No.ToString("00000")</td>
+                    <td>@p.Invoice?.Billing_Period.ToString("MMMM yyyy")</td>
+                    <td>@p.OR_No</td>
+                    <td>@p.Date_Issued.ToString("MM/dd/yyyy")</td>
+                    <td>PHP @p.Total_Amount.ToString("N2")</td>
+                    <td>@p.Method</td>
+                    <td>@p.Remarks</td>
+                    <td>@p.Admin?.FullName</td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+</div>
+
+<!-- TOTAL -->
+<div class="text-end fw-bold mt-2">
+    Payments Received:
+    PHP @Model.Sum(p => p.Total_Amount).ToString("N2")
+</div>

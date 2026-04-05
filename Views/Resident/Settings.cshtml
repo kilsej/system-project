@@ -1,0 +1,128 @@
+﻿@model Software_Engineering.Models.ResidentInfo
+
+@{
+    ViewData["PageTitle"] = "Account Settings";
+    Layout = "~/Views/Shared/_ResidentLayout.cshtml";
+}
+
+<head>
+    <title>@ViewData["Title"]Carlton Residences</title>
+</head>
+
+<div class="container-fluid">
+
+    @if (TempData["SettingsSuccess"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i> @TempData["SettingsSuccess"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["PasswordError"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i> @TempData["PasswordError"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row">
+
+        <div class="col-md-7 mb-4">
+            <div class="card shadow border-0 h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="m-0 font-weight-bold text-dark">Profile</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-controller="Resident" asp-action="UpdateProfile" method="post"
+                          onsubmit="return confirm('Are you sure you want to save these changes to your profile?');">
+
+                        <div class="mb-3">
+                            <label class="small text-muted mb-1">Full Name</label>
+                            <input type="text" class="form-control bg-light" value="@Model.FullName" readonly>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="small text-muted mb-1">Block</label>
+                                <input type="text" class="form-control bg-light text-center" value="@Model.Block" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="small text-muted mb-1">Lot</label>
+                                <input type="text" class="form-control bg-light text-center" value="@Model.Lot" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="small text-muted mb-1">Phase No.</label>
+                                <input type="text" class="form-control bg-light text-center" value="@Model.Phase_No" readonly>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="mb-3">
+                            <label class="fw-bold mb-1">Email Address</label>
+                            <div class="input-group">
+                                <input type="email" name="Email" class="form-control" value="@Model.Email" required>
+                                <span class="input-group-text bg-white"><i class="fas fa-pen text-gray-400"></i></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="fw-bold mb-1">Contact Number</label>
+                            <div class="input-group">
+                                <input type="text" name="ContactNo" class="form-control"
+                                       value="@Model.Contact_No"
+                                       pattern="[0-9]{11}"
+                                       maxlength="11"
+                                       title="Must be 11 digits" required>
+                                <span class="input-group-text bg-white"><i class="fas fa-pen text-gray-400"></i></span>
+                            </div>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn text-white px-4" style="background-color: #f36f21;">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5 mb-4">
+            <div class="card shadow border-0 h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="m-0 font-weight-bold text-dark">Change Password</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-controller="Resident" asp-action="ChangePassword" method="post"
+                          onsubmit="return confirm('Are you sure you want to change your password?');">
+
+                        <div class="mb-3">
+                            <label class="mb-1">Current Password</label>
+                            <input type="password" name="CurrentPassword" class="form-control bg-light" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="mb-1">New Password</label>
+                            <input type="password" name="NewPassword" class="form-control bg-light" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="mb-1">Confirm Password</label>
+                            <input type="password" name="ConfirmPassword" class="form-control bg-light" required>
+                        </div>
+
+                        <div class="text-end mt-auto">
+                            <button type="submit" class="btn text-white px-4" style="background-color: #f36f21;">
+                                Update Password
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

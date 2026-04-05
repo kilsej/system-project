@@ -1,0 +1,894 @@
+﻿@model DashboardViewModel
+@using System.Globalization
+@{
+    ViewData["PageTitle"] = "Dashboard";
+}
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]Carlton Residences</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/startbootstrap-sb-admin-2@4.1.4/css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8f9fc;
+            overflow: hidden;
+            margin: 0;
+            color: #333;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            min-width: 250px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            border-right: 1px solid #eee;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #000;
+            line-height: 1.2;
+            margin-bottom: 50px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            color: #888;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+            .nav-item i {
+                margin-right: 15px;
+                width: 20px;
+                text-align: center;
+            }
+
+            .nav-item:hover {
+                background-color: #fff3cd;
+                color: #f36f21;
+                text-decoration: none;
+            }
+
+            .nav-item.active {
+                background-color: #f36f21;
+                color: #fff;
+                box-shadow: 0 4px 10px rgba(243, 111, 33, 0.3);
+            }
+
+            /* --- LOGOUT BUTTON STYLES --- */
+            .nav-item.logout {
+                margin-top: auto;
+                margin-bottom: 40px;
+                background-color: #ffffff;
+                color: #e74a3b;
+                font-weight: 700;
+                border: 2px solid #f36f21;
+            }
+
+                .nav-item.logout:hover {
+                    background-color: #f36f21;
+                    color: #ffffff;
+                    border-color: #f36f21;
+                }
+
+        /* CONTENT */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+
+        .header-title h2 {
+            font-weight: 800;
+            color: #000;
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .header-title p {
+            color: #000;
+            margin: 5px 0 0;
+            font-size: 0.9rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            text-align: right;
+        }
+
+        .user-info {
+            margin-right: 15px;
+        }
+
+        .user-name {
+            font-weight: 700;
+            color: #000;
+            display: block;
+        }
+
+        .user-settings {
+            font-size: 0.8rem;
+            color: #888;
+            text-decoration: none;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            background-color: #f36f21;
+            border-radius: 50%;
+        }
+
+        /* CONTROLS & BUTTONS */
+        .search-input {
+            background-color: #e9ecef;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            width: 100%;
+        }
+
+        .filter-select {
+            background-color: #e9ecef;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 10px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .btn-orange-round {
+            background-color: #f36f21;
+            border-color: #f36f21;
+            color: white;
+            border-radius: 18px;
+            padding: 8px 24px;
+            font-weight: 700;
+            transition: all 0.2s;
+            border: none;
+        }
+
+            .btn-orange-round:hover {
+                background-color: #d65a10;
+                color: white;
+                text-decoration: none;
+            }
+
+        /* TABLE */
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #f36f21;
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            color: #333;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9fa;
+            cursor: context-menu;
+        }
+
+        .status-paid {
+            color: #28a745;
+            font-weight: 700;
+        }
+
+        .status-delinquent {
+            color: #dc3545;
+            font-weight: 700;
+        }
+
+        .status-inactive {
+            color: #858796;
+            font-weight: 700;
+            font-style: italic;
+        }
+
+        .username-link {
+            color: #f36f21;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+            .username-link:hover {
+                text-decoration: underline;
+                color: #d65a10;
+            }
+
+        .action-link {
+            color: #333;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+            .action-link:hover {
+                text-decoration: underline;
+            }
+
+        /* MODAL */
+        .modal-header {
+            background-color: #fff;
+            color: #333;
+            border-bottom: none;
+        }
+
+        .modal-title {
+            font-weight: 800;
+            font-size: 1.5rem;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-close {
+            filter: none;
+        }
+
+        .context-menu {
+            position: absolute;
+            display: none;
+            background: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            min-width: 140px;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 4px 0;
+        }
+
+            .context-menu a {
+                display: block;
+                padding: 8px 12px;
+                text-decoration: none;
+                color: #212529;
+                cursor: pointer;
+                font-size: 0.9rem;
+            }
+
+                .context-menu a:hover {
+                    background-color: #f36f21;
+                    color: white;
+                }
+    </style>
+</head>
+
+<style>
+    .map-tooltip {
+        position: absolute;
+        background: #fff;
+        border: 1px solid #ccc;
+        padding: 8px 12px;
+        border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.2);
+        pointer-events: none;
+        font-size: 13px;
+        z-index: 9999;
+    }
+
+    svg path {
+        fill: #e5e7eb;
+        stroke: #333;
+        cursor: pointer;
+    }
+
+        svg path:hover {
+            fill: #93c5fd;
+        }
+
+
+    #mapVisualization {
+        width: 100%;
+        height: auto;
+        min-height: 300px;
+    }
+
+</style>
+<!-- Filters -->
+<form method="get" asp-action="Dashboard" class="row mb-4">
+    <div class="col-md-3">
+        <select name="month" class="form-control" onchange="this.form.submit()">
+            @for (int m = 1; m <= 12; m++)
+            {
+                <option value="@m" selected="@(m == Model.SelectedMonth)">
+                    @CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <select name="year" class="form-control" onchange="this.form.submit()">
+            @foreach (var y in Model.Years)
+            {
+                <option value="@y" selected="@(y == Model.SelectedYear)">
+                    @y
+                </option>
+            }
+        </select>
+    </div>
+</form>
+
+
+<!-- Cards -->
+<div class="row mb-4">
+    <div class="col-12 col-sm-6 col-lg-3 mb-3">
+        <div class="card text-center shadow h-100">
+            <div class="card-body">
+                <h6>Total Residents</h6>
+                <h2 class="fw-bold">@Model.TotalResidents</h2>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-12 col-sm-6 col-lg-3 mb-3">
+        <div class="card text-center shadow h-100">
+            <div class="card-body">
+                <h6>Paid Residents</h6>
+                <h2 class="fw-bold">@Model.PaidResidents</h2>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-12 col-sm-6 col-lg-3 mb-3">
+        <div class="card text-center shadow h-100">
+            <div class="card-body">
+                <h6>Unpaid Residents</h6>
+                <h2 class="fw-bold">@Model.UnpaidResidents</h2>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-12 col-sm-6 col-lg-3 mb-3">
+        <div class="card text-center shadow h-100">
+            <div class="card-body">
+                <h6>Resident Payment Rate</h6>
+                <h2 class="fw-bold">@Model.PaymentRate%</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Map -->
+<div class="row justify-content-center">
+    <div class="col-12 col-md-6 col-lg-12 mb-3">
+        <div class="card shadow h-100 p-3">
+            <h5>Map Visualization</h5>
+            <div class="d-flex flex-wrap gap-3 mb-3 mt-2">
+
+                <div class="d-flex align-items-center">
+                    <span style="width:16px;height:16px;background:#22c55e;border-radius:3px;margin-right:6px;"></span>
+                    <small> 70% - 100% </small>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <span style="width:16px;height:16px;background:#facc15;border-radius:3px;margin-right:6px;"></span>
+                    <small> 40% - 69%  </small>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <span style="width:16px;height:16px;background:#ef4444;border-radius:3px;margin-right:6px;"></span>
+                    <small> 0% - 49% </small>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <span style="width:16px;height:16px;background:#1e90ff;border-radius:3px;margin-right:6px;"></span>
+                    <small>Open Spaces</small>
+                </div>
+
+            </div>
+
+            <svg id="mapVisualization" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 952 490" style="width:100%; height:auto;">
+                <!-- Block 1 Phase 1-->
+                <path data-block="1" data-phase="1"
+                      d="M0 0 L56 0 112 0 170 0 L205 79  L184 140 L169 140 L187 79  L 162 13 L14 13 L12 140 L -3 140 L-3 112 L-10 112 L -10 104 L-2 104 0 0 Z"
+                      transform="translate(650,42)" />
+
+                <!-- Block 2 Phase 1-->
+                <path data-block="2" data-phase="1"
+                      d="M0 0 L4 0 9 0 14 0  L33 48 32 53 30 59 L15 108 15 108 14 110 L9 110 4 110 0 110 0 0 Z"
+                      transform="translate(793,70)" />
+
+                <!-- Block 3 Phase 1 -->
+                <path data-block="3" data-phase="1"
+                      d="M0 0 L5.94 0 11.88 0 18 0 L18 36.3 18 72.6 18 110 L12.06 110 6.12 110 0 110 L0 73.7 0 37.4 0 0 Z"
+                      transform="translate(768,70)" />
+
+                <!-- Block 4 Phase 1 -->
+                <path data-block="4" data-phase="1"
+                      d="M0 0 L6.27 0 12.54 0 19 0 L19 36.3 19 72.6 19 110 L12.73 110 6.46 110 0 110 L0 73.7 0 37.4 0 0 Z"
+                      transform="translate(743,70)" />
+
+                <!-- Block 5 Phase 1 -->
+                <path data-block="5" data-phase="1"
+                      d="M0 0 L5.94 0 11.88 0 18 0 L18 36.3 18 72.6 18 110 L12.06 110 6.12 110 0 110 L0 73.7 0 37.4 0 0 Z"
+                      transform="translate(720,70)" />
+
+                <!-- Block 6 Phase 1 -->
+                <path data-block="6" data-phase="1"
+                      d="M0 0 L5.94 0 11.88 0 18 0 L18 36.3 18 72.6 18 110 L12.06 110 6.12 110 0 110 L0 73.7 0 37.4 0 0 Z"
+                      transform="translate(697,70)" />
+
+                <!-- Block 7 Phase 1 -->
+                <path data-block="7" data-phase="1"
+                      d="M0 0 L5.94 0 11.88 0 18 0 L18 36.3 18 72.6 18 110 L12.06 110 6.12 110 0 110 L0 73.7 0 37.4 0 0 Z"
+                      transform="translate(673,70)" />
+
+                <!-- Block 8 Phase 1 -->
+                <path data-block="8" data-phase="1"
+                      d="M0 0 L8 0 17 0 27 0  L22 18 21 24 L1 24 7 24 0 24 0 0 Z"
+                      transform="translate(774,191)" />
+
+                <!-- Block 9 Phase 1 -->
+                <path data-block="9" data-phase="1"
+                      d="M0 0 L5.94 0 11.88 0 18 0 L18 8.58 18 17.16 18 26 L12.06 26 6.12 26 0 26 L0 17.42 0 8.84 0 0 Z"
+                      transform="translate(775,220)" />
+
+                <!-- Block 10 Phase 1 -->
+                <path data-block="10" data-phase="1"
+                      d="M0 0 L5.94 0 11.88 0 18 0 L18 8.58 18 17.16 18 26 L12.06 26 6.12 26 0 26 L0 17.42 0 8.84 0 0 Z"
+                      transform="translate(775,251)" />
+
+                <!-- Block 11 Phase 1-->
+                <path data-block="11" data-phase="1"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 19.14 16 38.28 16 58 L10.72 58 5.44 58 0 58 L0 38.86 0 19.72 0 0 Z"
+                      transform="translate(749,198)" />
+
+                <!-- Block 12 Phase 1-->
+                <path data-block="12" data-phase="1"
+                      d="M0 0 L4.95 0 9.9 0 15 0 L15 18.48 15 36.96 15 56 L10.05 56 5.1 56 0 56 L0 37.52 0 19.04 0 0 Z"
+                      transform="translate(724,199)" />
+
+                <!-- Block 13 Phase 1 -->
+                <path data-block="13" data-phase="1"
+                      d="M0 0 L4.95 0 9.9 0 15 0 L15 18.48 15 36.96 15 56 L10.05 56 5.1 56 0 56 L0 37.52 0 19.04 0 0 Z "
+                      transform="translate(698,199)" />
+
+                <!-- Block 14 Phase 1-->
+                <path data-block="14" data-phase="1"
+                      d="M0 0 L4.95 0 9.9 0 15 0 L15 18.48 15 36.96 15 56 L10.05 56 5.1 56 0 56 L0 37.52 0 19.04 0 0 Z"
+                      transform="translate(672,199)" />
+
+                <!-- Block 15 Phase 1-->
+                <path data-block="15" data-phase="1"
+                      d="M0 0 L4.95 0 9.9 0 15 0 L15 18.48 15 36.96 15 56 L10.05 56 5.1 56 0 56 L0 37.52 0 19.04 0 0 Z"
+                      transform="translate(646,199)" />
+
+                <!-- Block 16 Phase 1-->
+                <path data-block="16" data-phase="1"
+                      d="M0 0 L4.95 0 9.9 0 15 0 L15 18.48 15 36.96 15 56 L10.05 56 5.1 56 0 56 L0 37.52 0 19.04 0 0 Z "
+                      transform="translate(620,199)" />
+
+                <!-- Block 17 Phase 1-->
+                <path data-block="17" data-phase="1"
+                      d="M0 0 L4.95 0 9.9 0 15 0 L15 18.48 15 36.96 15 56 L10.05 56 5.1 56 0 56 L0 37.52 0 19.04 0 0 Z "
+                      transform="translate(594,199)" />
+
+                <!-- Block 18 Phase 1-->
+                <path data-block="18" data-phase="1"
+                      d="M0 0 L4.95 0 9.9 0 15 0 L15 18.48 15 36.96 15 56 L10.05 56 5.1 56 0 56 L0 37.52 0 19.04 0 0 Z "
+                      transform="translate(568,199)" />
+
+                <!-- Block 19 Phase 1-->
+                <path data-block="19" data-phase="1"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 19.14 16 38.28 16 58 L10.72 58 5.44 58 0 58 L0 38.86 0 19.72 0 0 Z "
+                      transform="translate(542,198)" />
+
+                <!-- Block 20 Phase 1-->
+                <path data-block="20" data-phase="1"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 19.14 16 38.28 16 58 L10.72 58 5.44 58 0 58 L0 38.86 0 19.72 0 0 Z"
+                      transform="translate(516,198)" />
+
+                <!-- Block 21 Phase 1-->
+                <path data-block="21" data-phase="1"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 19.14 16 38.28 16 58 L10.72 58 5.44 58 0 58 L0 38.86 0 19.72 0 0 Z"
+                      transform="translate(490,198)" />
+
+                <!-- Block 22 Phase 1-->
+                <path data-block="22" data-phase="1"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 18.81 16 37.62 16 57 L10.72 57 5.44 57 0 57 L0 38.19 0 19.38 0 0 Z "
+                      transform="translate(464,199)" />
+
+                <!-- Block 23 Phase 1-->
+                <path data-block="23" data-phase="1"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 18.81 16 37.62 16 57 L10.72 57 5.44 57 0 57 L0 38.19 0 19.38 0 0 Z "
+                      transform="translate(438,199)" />
+
+                <!-- Block 24 Phase 1-->
+                <path data-block="24" data-phase="1"
+                      d="M0 0 L9.9 0 19.8 0 30 0 L30 2.64 30 5.28 30 8 L28.35 8 26.7 8 25 8 L25 16.58 25 25.16 25 34 L18.73 34 12.46 34 6 34 L6 25.09 6 16.18 6 7 L4.02 7 2.04 7 0 7 L0 4.69 0 2.38 0 0 Z "
+                      transform="translate(606,146)" />
+
+                <!-- Block 25 Phase 1-->
+                <path data-block="25" data-phase="1"
+                      d="M0 0 L8.25 0 16.5 0 25 0 L25 2.31 25 4.62 25 7 L23.68 7 22.36 7 21 7 L21 15.91 21 24.82 21 34 L16.05 34 11.1 34 6 34 L6 25.09 6 16.18 6 7 L4.02 7 2.04 7 0 7 L0 4.69 0 2.38 0 0 Z "
+                      transform="translate(578,146)" />
+
+                <!-- Block 26 Phase 1-->
+                <path data-block="26" data-phase="1"
+                      d="M0 0 L3.3 0 6.6 0 10 0 L10 11.22 10 22.44 10 34 L-55.01 34 -120.02 34 -187 34 L-187 29.38 -187 24.76 -187 20 L-125.29 20 -63.58 20 0 20 L0 13.4 0 6.8 0 0 Z "
+                      transform="translate(566,146)" />
+
+                <!-- Block 27 Phase 1-->
+                <path data-block="27" data-phase="1"
+                      d="M0 0 L13 4 27 9 41 14  L55 19 L69 24 L69 28 69 33 69 39  L-3 14 -3 14 -5 13 0 0 Z"
+                      transform="translate(307,141)" />
+
+                <!-- Block 28 Phase 1-->
+                <path data-block="28" data-phase="1"
+                      d="M0 0 L211 82 L206 94 L-5 14 0 0 Z"
+                      transform="translate(92,59)" />
+
+                <!-- Block 29 Phase 1-->
+                <path data-block="29" data-phase="1"
+                      d="M0 0 L0 5 0 11 0 17  L-14 15 -22 15 -30 22  L-76 54 -83 59 -90 64  L-101 47 L-32 6 0 0 Z"
+                      transform="translate(426,246)" />
+
+                <!-- Block 31 Phase 1-->
+                <path data-block="31" data-phase="1"
+                      d="M0 0 L180 56 L170 68 L-4 16 0 0 Z"
+                      transform="translate(45,327)" />
+
+                <!-- Block 32 Phase 1-->
+                <path data-block="32" data-phase="1"
+                      d="M0 0 L1 0 L  19 6 L3 86  L-26 106 0 0 Z"
+                      transform="translate(344,185)" />
+
+                <!-- Block 33 Phase 1-->
+                <path data-block="33" data-phase="1"
+                      d="M0 0 L23 9 25 10 28 11 L1 121 -0 125 -6 131  L-40 163 -41 164 0 0 Z"
+                      transform="translate(311,170)" />
+
+                <!-- Block 34 Phase 1-->
+                <path data-block="34" data-phase="1"
+                      d="M0 0 L12 4 L26 9 L-18 185  L -54 220 0 0 Z"
+                      transform="translate(280,157)" />
+
+                <!-- Block 35 Phase 1-->
+                <path data-block="35" data-phase="1"
+                      d="M0 0 L24 7 L20 23 L-32 215 -36 229 L-48 226 L-61 223 0 0 Z"
+                      transform="translate(252,145)" />
+
+                <!-- Block 36 Phase 1-->
+                <path data-block="36" data-phase="1"
+                      d="M0 0 L25 7 L-39 229 L -53 225  L-62 222 L-59 211 L1 0 0 Z"
+                      transform="translate(222,135)" />
+
+                <!-- Block 37 Phase 1-->
+                <path data-block="37" data-phase="1"
+                      d="M0 0 L23 6  L-37 226 -38 228 -39 231 L-62 222 -61 219 -60 215 0 0 Z"
+                      transform="translate(193,124)" />
+
+                <!-- Block 38 Phase 1-->
+                <path data-block="38" data-phase="1"
+                      d="M0 0 L2 0  L25 8 L-37 229 L-60 222 0 0 Z"
+                      transform="translate(163,116)" />
+
+                <!-- Block 39 Phase 1-->
+                <path data-block="39" data-phase="1"
+                      d="M0 0 L17 5  L-20 145 L-38 140 0 0 Z"
+                      transform="translate(116,189)" />
+
+                <!-- Block 40 Phase 1-->
+                <path data-block="40" data-phase="1"
+                      d="M0 0 L4 0 7 1 12 3 L-24 135 -25 137 -26 139  L-36 137 -36 137 -39 136 0 0 Z"
+                      transform="translate(97,188)" />
+
+                <!-- Block 41 Phase 1-->
+                <path data-block="41" data-phase="1"
+                      d="M0 0 L17 4 L7 43  L-11 40 0 0 Z"
+                      transform="translate(129,146)" />
+
+                <!-- Block 42 Phase 1-->
+                <path data-block="42" data-phase="1"
+                      d="M0 0 L11 2 L1 40 L-10 37 L -3 11 0 0 Z"
+                      transform="translate(147,105)" />
+
+                <!-- Block 1 Phase 2-->
+                <path data-block="1" data-phase="2"
+                      d="M0 0 L9 5  L 102 60  L60 148 L55 145  L-35 88  L-202 88 -232 88 -262 88 L-262 82 -262 77 -262 72  L-36 72  55 132  L82 66 83 64 84 62 L-3 8 L-1 2 -1 2 0 0 Z"
+                      transform="translate(802,280)" />
+
+                <!-- Block 2 Phase 2-->
+                <path data-block="2" data-phase="2"
+                      d="M0 0 L 15 10  L-7 59 L-22 48 0 0 Z"
+                      transform="translate(855,335)" />
+
+                <!-- Block 3 Phase 2-->
+                <path data-block="3" data-phase="2"
+                      d="M0 0  L22 14  L 2 62  L-18 50 0 0 Z"
+                      transform="translate(824,317)" />
+
+                <!-- Block 4 Phase 2-->
+                <path data-block="4" data-phase="2"
+                      d="M0 0 L22 13 25 15 28 17  L 12 66 L -8 53 0 0 Z"
+                      transform="translate(788,295)" />
+
+                <!-- Block 5 Phase 2-->
+                <path data-block="5" data-phase="2"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 27.39 16 54.78 16 83 L10.72 83 5.44 83 0 83 L0 55.61 0 28.22 0 0 Z "
+                      transform="translate(749,258)" />
+
+                <!-- Block 6 Phase 2-->
+                <path data-block="6" data-phase="2"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 27.06 16 54.12 16 82 L10.72 82 5.44 82 0 82 L0 54.94 0 27.88 0 0 Z "
+                      transform="translate(724,259)" />
+
+                <!-- Block 7 Phase 2-->
+                <path data-block="7" data-phase="2"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 27.06 16 54.12 16 82 L10.72 82 5.44 82 0 82 L0 54.94 0 27.88 0 0 Z "
+                      transform="translate(698,259)" />
+
+                <!-- Block 8 Phase 2-->
+                <path data-block="8" data-phase="2"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 27.39 16 54.78 16 83 L10.72 83 5.44 83 0 83 L0 55.61 0 28.22 0 0 Z "
+                      transform="translate(671,258)" />
+
+                <!-- Block 9 Phase 2-->
+                <path data-block="9" data-phase="2"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 27.06 16 54.12 16 82 L10.72 82 5.44 82 0 82 L0 54.94 0 27.88 0 0 Z "
+                      transform="translate(645,259)" />
+
+                <!-- Block 10 Phase 2-->
+                <path data-block="10" data-phase="2"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 27.06 16 54.12 16 82 L10.72 82 5.44 82 0 82 L0 54.94 0 27.88 0 0 Z "
+                      transform="translate(619,259)" />
+
+                <!-- Block 11 Phase 2-->
+                <path data-block="11" data-phase="2"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 27.06 16 54.12 16 82 L10.72 82 5.44 82 0 82 L0 54.94 0 27.88 0 0 Z "
+                      transform="translate(593,259)" />
+
+                <!-- Block 12 Phase 2-->
+                <path data-block="12" data-phase="2"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 27.39 16 54.78 16 83 L10.72 83 5.44 83 0 83 L0 55.61 0 28.22 0 0 Z "
+                      transform="translate(566,258)" />
+
+                <!-- Block 13 Phase 2-->
+                <path data-block="13" data-phase="2"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 27.06 16 54.12 16 82 L10.72 82 5.44 82 0 82 L0 54.94 0 27.88 0 0 Z "
+                      transform="translate(540,259)" />
+
+                <!-- Block 14 Phase 2-->
+                <path data-block="14" data-phase="2"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 27.06 16 54.12 16 82 L10.72 82 5.44 82 0 82 L0 54.94 0 27.88 0 0 Z "
+                      transform="translate(514,259)" />
+
+                <!-- Block 15 Phase 2-->
+                <path data-block="15" data-phase="2"
+                      d="M0 0 L5.61 0 11.22 0 17 0 L17 24.42 17 48.84 17 74 L11.39 74 5.78 74 0 74 L0 49.58 0 25.16 0 0 Z "
+                      transform="translate(514,349)" />
+
+                <!-- Block 16 Phase 2-->
+                <path data-block="16" data-phase="2"
+                      d="M0 0 L4.95 0 9.9 0 15 0 L15 22.77 15 45.54 15 69 L-1.17 69 -17.34 69 -34 69 L-35.65 66.03 -37.3 63.06 -39 60 L-26.13 60 -13.26 60 0 60 L0 40.2 0 20.4 0 0 Z "
+                      transform="translate(540,372)" />
+
+                <!-- Block 17 Phase 2-->
+                <path data-block="17" data-phase="2"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 27.06 16 54.12 16 82 L10.72 82 5.44 82 0 82 L0 54.94 0 27.88 0 0 Z "
+                      transform="translate(488,259)" />
+
+                <!-- Block 18 Phase 2-->
+                <path data-block="18" data-phase="2"
+                      d="M0 0 L5.61 0 11.22 0 17 0 L17 24.42 17 48.84 17 74 L11.39 74 5.78 74 0 74 L0 49.58 0 25.16 0 0 Z "
+                      transform="translate(490,349)" />
+
+                <!-- Block 19 Phase 2-->
+                <path data-block="19" data-phase="2"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 27.39 16 54.78 16 83 L10.72 83 5.44 83 0 83 L0 55.61 0 28.22 0 0 Z "
+                      transform="translate(464,259)" />
+
+                <!-- Block 20 Phase 2-->
+                <path data-block="20" data-phase="2"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 24.09 16 48.18 16 73 L10.72 73 5.44 73 0 73 L0 48.91 0 24.82 0 0 Z "
+                      transform="translate(464,350)" />
+
+                <!-- Block 21 Phase 2-->
+                <path data-block="21" data-phase="2"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 27.06 16 54.12 16 82 L10.72 82 5.44 82 0 82 L0 54.94 0 27.88 0 0 Z "
+                      transform="translate(438,259)" />
+
+                <!-- Block 22 Phase 2-->
+                <path data-block="22" data-phase="2"
+                      d="M0 0 L5.61 0 11.22 0 17 0 L17 24.42 17 48.84 17 74 L11.39 74 5.78 74 0 74 L0 49.58 0 25.16 0 0 Z "
+                      transform="translate(437,349)" />
+
+                <!-- Block 23 Phase 2-->
+                <path data-block="23" data-phase="2"
+                      d="M0 0 L-8 13 L -27 16  L-117 93  L-128 86 L-36 10 -32 7 0 0 Z"
+                      transform="translate(426,265)" />
+
+                <path data-block="23" data-phase="2"
+                      d="M0 0 L6.27 0 12.54 0 19 0 L19 36.3 19 72.6 19 110 L12.73 110 6.46 110 0 110 L0 73.7 0 37.4 0 0 Z "
+                      transform="translate(743,70)" />
+
+                <!-- Block 24 Phase 2-->
+                <path data-block="24" data-phase="2"
+                      d="M0 0 L0 19.14 0 38.28 0 58 L-5.94 58 -11.88 58 -18 58 L-18 41.83 -18 25.66 -18 9 L-1 0 -1 0 0 0 Z "
+                      transform="translate(426,283)" />
+
+                <!-- Block 25 Phase 2-->
+                <path data-block="25" data-phase="2"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 24.09 16 48.18 16 73 L10.72 73 5.44 73 0 73 L0 48.91 0 24.82 0 0 Z "
+                      transform="translate(411,350)" />
+
+                <!-- Block 26 Phase 2-->
+                <path data-block="26" data-phase="2"
+                      d="M0 0 L0 47 L -20 47 L-20 17 0 0 Z"
+                      transform="translate(404,294)" />
+
+                <!-- Block 27 Phase 2-->
+                <path data-block="27" data-phase="2"
+                      d="M0 0 L5.61 0 11.22 0 17 0 L17 24.42 17 48.84 17 74 L11.39 74 5.78 74 0 74 L0 49.58 0 25.16 0 0 Z "
+                      transform="translate(384,349)" />
+
+                <!-- Block 28 Phase 2-->
+                <path data-block="28" data-phase="2"
+                      d="M0 0 L1 0 L1 29 L-25 29 0 0 Z"
+                      transform="translate(377,312)" />
+                <!-- Block 29 Phase 2-->
+                <path data-block="29" data-phase="2"
+                      d="M0 0 L5.61 0 11.22 0 17 0 L17 24.42 17 48.84 17 74 L11.39 74 5.78 74 0 74 L0 49.58 0 25.16 0 0 Z "
+                      transform="translate(358,349)" />
+
+                <!-- Block 30 Phase 2-->
+                <path data-block="30" data-phase="2"
+                      d="M0 0 L5.28 0 10.56 0 16 0 L16 24.09 16 48.18 16 73 L10.72 73 5.44 73 0 73 L0 48.91 0 24.82 0 0 Z"
+                      transform="translate(332,350)" />
+                <!-- Open Space -->
+                <path d="M0 0 L8 8 C-44 60 -20 77 -19 83 C-45 88 -54 89 -71 99 L-99 120 L-112 111 -112 99 -99 105"
+                      style="fill:#1e90ff; stroke:none;"
+                      transform="translate(319,300)" />
+
+                <path d="M0 0 L58 8 L58 44 L-14 72"
+                      style="fill:#1e90ff; stroke:none;"
+                      transform="translate(368,191)" />
+
+                <path d="M0 0 L54 17 L51 30 48 43 45 57 L3 34 3 34 -5 29"
+                      style="fill:#1e90ff; stroke:none;"
+                      transform="translate(88,83)" />
+            </svg>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden data from DB -->
+@foreach (var block in Model.BlockSummaries)
+{
+    <input type="hidden"
+           class="block-data"
+           data-phase="@block.Phase"
+           data-block="@block.Block"
+           data-paid="@block.PaidCount"
+           data-unpaid="@block.UnpaidCount" />
+}
+
+<div id="mapTooltip" class="map-tooltip" style="display:none;"></div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const tooltip = document.getElementById("mapTooltip");
+
+        document.querySelectorAll("#mapVisualization path").forEach(path => {
+            // Skip free spaces (no block or phase assigned)
+            if (!path.dataset.phase || !path.dataset.block) return;
+
+            const phase = path.dataset.phase;
+            const block = path.dataset.block;
+
+            const data = document.querySelector(
+    `.block-data[data-phase='${phase}'][data-block='${block}']`
+    );
+
+            // DEFAULT VALUES (when no residents yet)
+            let paid = 0;
+            let unpaid = 0;
+
+            if (data) {
+                paid = parseInt(data.dataset.paid);
+                unpaid = parseInt(data.dataset.unpaid);
+            }
+
+            const total = paid + unpaid;
+            const majority = Math.floor(total / 2) + 1;
+
+            // COLOR LOGIC
+            if (total === 0) {
+                path.style.fill = "#9ca3af"; // Gray: no residents yet
+            }
+            else if (paid >= majority) {
+                path.style.fill = "#22c55e"; // Green
+            }
+            else if (paid === unpaid) {
+                path.style.fill = "#facc15"; // Yellow
+            }
+            else {
+                path.style.fill = "#ef4444"; // Red
+            }
+
+            // TOOLTIP (ALWAYS SHOW BLOCK + PHASE)
+            path.addEventListener("mouseenter", function (e) {
+                tooltip.innerHTML = `
+                    <strong>Block ${block} - Phase ${phase}</strong><br>
+                    Paid: ${paid}<br>
+                    Unpaid: ${unpaid}<br>
+                `;
+                tooltip.style.display = "block";
+            });
+
+            path.addEventListener("mousemove", function (e) {
+                tooltip.style.left = (e.pageX + 12) + "px";
+                tooltip.style.top = (e.pageY + 12) + "px";
+            });
+
+            path.addEventListener("mouseleave", function () {
+                tooltip.style.display = "none";
+            });
+        });
+    });
+</script>

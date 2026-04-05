@@ -1,0 +1,224 @@
+﻿@{
+    ViewData["Title"] = "Verify OTP";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify OTP - Carlton Residences</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800" rel="stylesheet">
+    <link href="~/lib/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+
+    <link href="~/css/sb-admin-2.min.css" rel="stylesheet">
+
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Nunito', sans-serif;
+            overflow: hidden; /* Prevents scrollbars */
+        }
+
+        .split-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* LEFT SIDE - FORM */
+        .left-panel {
+            flex: 1;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 40px 80px; /* Adjust padding for different screen sizes */
+            position: relative;
+        }
+
+        /* RIGHT SIDE - IMAGE */
+        .right-panel {
+            flex: 1;
+            /* Make sure this path is correct based on where you put the image */
+            background-image: url('/NewFolder/carltonresidence.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* Back Link */
+        .back-link {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+        }
+
+            .back-link:hover {
+                text-decoration: none;
+                color: #000;
+            }
+
+            .back-link i {
+                margin-right: 8px;
+            }
+
+        /* Typography */
+        h1 {
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        /* OTP Inputs Container */
+        .otp-input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        /* Individual OTP Box */
+        .otp-box {
+            width: 60px;
+            height: 60px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f8f9fa; /* Light gray background */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+            .otp-box:focus {
+                border-color: #f36f21;
+                background-color: #fff;
+                box-shadow: 0 0 0 4px rgba(243, 111, 33, 0.2);
+            }
+
+        /* Confirm Button */
+        .btn-confirm {
+            background-color: #f36f21; /* Specific Orange Color */
+            color: white;
+            font-weight: 600;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            width: 100%;
+            max-width: 300px;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+            .btn-confirm:hover {
+                background-color: #d65a10;
+                color: white;
+            }
+
+        /* Mobile Responsiveness */
+        @@media (max-width: 768px) {
+            .right-panel {
+                display: none; /* Hide image on mobile */
+            }
+
+            .left-panel {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="split-container">
+
+        <div class="left-panel">
+
+            <a href="@Url.Action("Login", "Admin")" class="back-link">
+                <i class="fas fa-arrow-left"></i> Carlton Residences
+            </a>
+
+            <div style="max-width: 400px;">
+                <h1>OTP Verification</h1>
+                <p>We have sent the verification code to your email address.</p>
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger mb-4">
+                        @ViewBag.Error
+                    </div>
+                }
+
+                <form method="post" action="@Url.Action("VerifyOTP", "Admin")" id="otpForm">
+
+                    <input type="hidden" name="Code" id="FinalCode" />
+
+                    <div class="otp-input-group">
+                        <input type="text" class="otp-box" maxlength="1" oninput="moveToNext(this, 0)" onkeydown="handleBackspace(event, 0)" autofocus />
+                        <input type="text" class="otp-box" maxlength="1" oninput="moveToNext(this, 1)" onkeydown="handleBackspace(event, 1)" />
+                        <input type="text" class="otp-box" maxlength="1" oninput="moveToNext(this, 2)" onkeydown="handleBackspace(event, 2)" />
+                        <input type="text" class="otp-box" maxlength="1" oninput="moveToNext(this, 3)" onkeydown="handleBackspace(event, 3)" />
+                    </div>
+
+                    <button type="submit" class="btn-confirm" onclick="combineCode()">
+                        Confirm
+                    </button>
+                </form>
+
+            </div>
+        </div>
+
+        <div class="right-panel">
+        </div>
+
+    </div>
+
+    <script>
+        // 1. Move focus to next box automatically
+        function moveToNext(element, index) {
+            if (element.value.length === 1) {
+                const boxes = document.querySelectorAll('.otp-box');
+                if (index < boxes.length - 1) {
+                    boxes[index + 1].focus();
+                }
+            }
+        }
+
+        // 2. Handle Backspace (Move to previous box)
+        function handleBackspace(event, index) {
+            if (event.key === "Backspace") {
+                const boxes = document.querySelectorAll('.otp-box');
+                if (boxes[index].value === "" && index > 0) {
+                    boxes[index - 1].focus();
+                }
+            }
+        }
+
+        // 3. Combine the 4 boxes into the hidden input before submitting
+        function combineCode() {
+            let code = "";
+            const boxes = document.querySelectorAll('.otp-box');
+            boxes.forEach(box => {
+                code += box.value;
+            });
+            document.getElementById('FinalCode').value = code;
+        }
+    </script>
+
+</body>
+</html>

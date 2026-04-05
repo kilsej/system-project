@@ -1,0 +1,162 @@
+﻿@model Software_Engineering.Models.Admin
+
+@{
+    ViewData["Title"] = "Admin Profile";
+    Layout = null;
+    bool isPrimary = Context.Session.GetString("IsPrimary") == "True";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Profile - Carlton Residences</title>
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/startbootstrap-sb-admin-2@4.1.4/css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8f9fc;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            min-width: 250px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            border-right: 1px solid #eee;
+            height: 100vh;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #000;
+            margin-bottom: 50px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            color: #888;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 10px;
+        }
+
+            .nav-item:hover, .nav-item.active {
+                background-color: #f36f21;
+                color: #fff;
+            }
+
+            .nav-item i {
+                margin-right: 15px;
+                width: 20px;
+                text-align: center;
+            }
+
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .btn-orange {
+            background-color: #f36f21;
+            color: white;
+            border-radius: 50px;
+            padding: 10px 25px;
+            font-weight: 700;
+            border: none;
+        }
+
+            .btn-orange:hover {
+                background-color: #d65a10;
+                color: white;
+            }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="sidebar">
+            <div class="brand">Carlton<br>Residences</div>
+            <a href="@Url.Action("Dashboard", "Admin")" class="nav-item"><i class="bi bi-pie-chart-fill"></i> Dashboard</a>
+            <a href="@Url.Action("Residents", "Admin")" class="nav-item"><i class="bi bi-people-fill"></i> Residents</a>
+            <a href="@Url.Action("Profile", "Admin")" class="nav-item active"><i class="bi bi-person-circle"></i> My Profile</a>
+            <a href="@Url.Action("Logout", "Admin")" class="nav-item" style="margin-top:auto;"><i class="bi bi-box-arrow-right"></i> Log Out</a>
+        </div>
+
+        <div class="main-content">
+            <h2 class="fw-bold mb-4 text-dark">My Profile</h2>
+
+            @if (TempData["ProfileSuccess"] != null)
+            {
+                <div class="alert alert-success">@TempData["ProfileSuccess"]</div>
+            }
+            @if (TempData["ProfileError"] != null)
+            {
+                <div class="alert alert-danger">@TempData["ProfileError"]</div>
+            }
+
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="card p-4 mb-4">
+                        <h5 class="fw-bold mb-3">Account Details</h5>
+                        <div class="mb-3">
+                            <label class="small text-muted">Full Name</label>
+                            <input type="text" class="form-control" value="@Model.FullName" readonly style="background-color:#f8f9fa;">
+                        </div>
+                        <div class="mb-3">
+                            <label class="small text-muted">Username</label>
+                            <input type="text" class="form-control" value="@Model.Username" readonly style="background-color:#f8f9fa;">
+                        </div>
+                        <div class="mb-3">
+                            <label class="small text-muted">Role</label>
+                            <input type="text" class="form-control" value="@(Model.Is_Primary ? "Primary Admin" : "Standard Admin")" readonly style="background-color: @(Model.Is_Primary ? "#fff3cd" : "#e2e6ea"); color: @(Model.Is_Primary ? "#856404" : "#333"); font-weight:bold;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-7">
+                    <div class="card p-4">
+                        <h5 class="fw-bold mb-3">Change Password</h5>
+                        <form method="post" action="@Url.Action("ChangeAdminPassword", "Admin")">
+                            <div class="mb-3">
+                                <label>Current Password</label>
+                                <input type="password" name="CurrentPassword" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label>New Password</label>
+                                <input type="password" name="NewPassword" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label>Confirm New Password</label>
+                                <input type="password" name="ConfirmPassword" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn-orange">Update Password</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

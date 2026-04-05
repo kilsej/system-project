@@ -1,0 +1,1058 @@
+﻿@model ExpenseListViewModel
+@using System.Globalization
+
+@{
+    ViewData["PageTitle"] = "Expenses";
+    var phCulture = new CultureInfo("en-PH");
+    var totalAmount = Model.Expenses.Sum(e => e.Total);
+}
+<head>
+<style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8f9fc;
+            overflow: hidden;
+            margin: 0;
+            color: #333;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            min-width: 250px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            border-right: 1px solid #eee;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #000;
+            line-height: 1.2;
+            margin-bottom: 50px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            color: #888;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+            .nav-item i {
+                margin-right: 15px;
+                width: 20px;
+                text-align: center;
+            }
+
+            .nav-item:hover {
+                background-color: #fff3cd;
+                color: #f36f21;
+                text-decoration: none;
+            }
+
+            .nav-item.active {
+                background-color: #f36f21;
+                color: #fff;
+                box-shadow: 0 4px 10px rgba(243, 111, 33, 0.3);
+            }
+
+            /* --- LOGOUT BUTTON STYLES --- */
+            .nav-item.logout {
+                margin-top: auto;
+                margin-bottom: 40px;
+                background-color: #ffffff;
+                color: #e74a3b;
+                font-weight: 700;
+                border: 2px solid #f36f21;
+            }
+
+                .nav-item.logout:hover {
+                    background-color: #f36f21;
+                    color: #ffffff;
+                    border-color: #f36f21;
+                }
+
+        /* CONTENT */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+
+        .header-title h2 {
+            font-weight: 800;
+            color: #000;
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .header-title p {
+            color: #000;
+            margin: 5px 0 0;
+            font-size: 0.9rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            text-align: right;
+        }
+
+        .user-info {
+            margin-right: 15px;
+        }
+
+        .user-name {
+            font-weight: 700;
+            color: #000;
+            display: block;
+        }
+
+        .user-settings {
+            font-size: 0.8rem;
+            color: #888;
+            text-decoration: none;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            background-color: #f36f21;
+            border-radius: 50%;
+        }
+
+        /* CONTROLS & BUTTONS */
+        .search-input {
+            background-color: #e9ecef;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            width: 100%;
+        }
+
+        .filter-select {
+            background-color: #e9ecef;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 10px;
+            font-weight: 600;
+            color: #333;
+        }
+    .expense-header th {
+        background-color: #f36f21;
+        color: #fff;
+    }
+
+    .addexpenseform {
+        background-color: #f36f21;
+        color: #fff;
+    }
+
+    .table-container {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 0 15px rgba(0,0,0,0.05);
+    }
+
+        .table-container table tbody tr:hover > td {
+            background-color: #F2F0EF !important;
+        }
+
+        .table-container table tbody tr.active-row > td {
+            background-color: #F2F0EF !important;
+        }
+
+        .table-container table tbody tr {
+            cursor: context-menu;
+            transition: background-color 0.15s ease;
+        }
+
+    .btn-orange {
+        background-color: #f36f21;
+        border-color: #f36f21;
+        color: white;
+        transition: all 0.2s;
+        font-weight: 700;
+        border: none;
+    }
+
+        .btn-orange:hover {
+            background-color: #d65a10;
+            color: white;
+            text-decoration: none;
+        }
+
+    .btn-orange-round {
+        background-color: #f36f21;
+        border-color: #f36f21;
+        color: white;
+        border-radius: 18px;
+        padding: 8px 24px;
+        font-weight: 700;
+        transition: all 0.2s;
+        border: none;
+    }
+
+        .btn-orange-round:hover {
+            background-color: #d65a10;
+            color: white;
+            text-decoration: none;
+        }
+
+    .custom-table {
+        max-height: 460px;
+        overflow-y: auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+
+        /* Header */
+        .custom-table thead th {
+            background-color: #f36f21;
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 14px 16px;
+            border: none;
+        }
+
+        .custom-table table {
+            table-layout: fixed;
+            width: 100%;
+            max-height: 460px;
+            overflow-y: auto;
+        }
+
+            .custom-table table tbody tr:hover {
+                background-color: #f5f5f5; /* Light grey highlight */
+                cursor: pointer; /* Makes it feel clickable */
+                transition: background-color 0.2s ease; /* Smooth fade */
+            }
+
+
+        /* Column widths */
+        .custom-table th:nth-child(1),
+        .custom-table td:nth-child(1) {
+            width: 15%;
+        }
+        /* Voucher */
+
+        .custom-table th:nth-child(2),
+        .custom-table td:nth-child(2) {
+            width: 25%;
+        }
+        /* Expense */
+
+        .custom-table th:nth-child(3),
+        .custom-table td:nth-child(3) {
+            width: 15%;
+        }
+        /* Month */
+
+        .custom-table th:nth-child(4),
+        .custom-table td:nth-child(4) {
+            width: 10%;
+        }
+        /* Year */
+
+        .custom-table th:nth-child(5),
+        .custom-table td:nth-child(5) {
+            width: 15%;
+        }
+        /* Date column */
+        .custom-table th:nth-child(5),
+        .custom-table td:nth-child(5) {
+            width: 18%;
+            padding-left: 70px; /* space from YEAR */
+            white-space: nowrap;
+        }
+        /* Amount column */
+        .custom-table th:last-child,
+        .custom-table td:last-child {
+            width: 240px; /* move it further right */
+            padding-left: 80px; /* space from DATE column */
+            white-space: nowrap;
+        }
+
+        /* Rounded header corners */
+        .custom-table thead th:first-child {
+            border-top-left-radius: 12px;
+        }
+
+        .custom-table thead th:last-child {
+            border-top-right-radius: 12px;
+        }
+
+        /* Body rows */
+        .custom-table tbody td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.85rem;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        /* Remove last row border */
+        .custom-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+    .amount-cell {
+        text-align: left;
+        font-weight: 500;
+    }
+        /* MODAL */
+        .modal-header {
+            background-color: #fff;
+            color: #333;
+            border-bottom: none;
+        }
+
+        .modal-title {
+            font-weight: 800;
+            font-size: 1.5rem;
+            width: 100%;
+            text-align: center;
+        }
+
+
+    .context-menu {
+        position: absolute;
+        display: none;
+        background: #ffffff;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        min-width: 140px;
+        z-index: 9999;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        padding: 4px 0;
+    }
+
+        .context-menu a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #212529;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+            .context-menu a:hover {
+                background-color: #f36f21;
+                color: white;
+            }
+
+
+</style>
+</head>
+
+<div class="">
+
+    <!-- ================= FILTER BAR ================= -->
+    <form method="get" asp-action="Expense" id="filterForm"
+          class="row g-3 mb-3 align-items-end">
+
+        <!-- Search -->
+        <div class="col-md-4">
+            <label class="form-label">Search:</label>
+            <input type="text" id="searchInput" name="search"
+                   value="@Model.SearchTerm"
+                   class="form-control"
+                   placeholder="Voucher or expense type..." />
+        </div>
+
+        <!-- Month -->
+        <div class="col-md-3">
+            <label class="form-label">Month:</label>
+            <select name="month" class="form-select"
+                    onchange="document.getElementById('filterForm').submit();">
+
+                <option value="0" selected="@(Model.Month == 0)">All</option>
+
+                @for (int m = 1; m <= 12; m++)
+                {
+                    <option value="@m" selected="@(Model.Month == m)">
+                        @CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)
+                    </option>
+                }
+            </select>
+        </div>
+
+
+        <!-- Year -->
+        <div class="col-md-3">
+            <label class="form-label">Year:</label>
+            <select name="year" class="form-select"
+                    onchange="document.getElementById('filterForm').submit();">
+
+                <option value="0" selected="@(Model.Year == 0)">All</option>
+
+                @for (int y = DateTime.Now.Year; y >= 2017; y--)
+                {
+                    <option value="@y" selected="@(Model.Year == y)">
+                        @y
+                    </option>
+                }
+            </select>
+        </div>
+
+        @using System.Text.Json
+
+        @if (TempData["ImportErrors"] != null)
+        {
+            var errors = JsonSerializer.Deserialize<List<string>>(TempData["ImportErrors"]!.ToString()!);
+
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Import Errors:</strong>
+                <ul class="mb-0 mt-2">
+                    @foreach (var e in errors)
+                    {
+                        <li>@e</li>
+                    }
+                </ul>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"></button>
+            </div>
+        }
+
+        @if (TempData["ImportSuccessDetails"] != null)
+        {
+            var success = JsonSerializer.Deserialize<List<string>>(TempData["ImportSuccessDetails"]!.ToString()!);
+
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>Imported Expenses:</strong>
+                <ul class="mb-0 mt-2">
+                    @foreach (var s in success)
+                    {
+                        <li>@s</li>
+                    }
+                </ul>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"></button>
+            </div>
+        }
+
+        @if (TempData["ImportResult"] != null)
+        {
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <strong>@TempData["ImportResult"]</strong>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"></button>
+            </div>
+        }
+
+
+        <!-- Button -->
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+
+            @if (Context.Session.GetString("CanManageExpenses") == "True" ||
+                        Context.Session.GetString("IsPrimary") == "True")
+            {
+                <button type="button"
+                        class="btn btn-orange-round"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addExpenseModal">
+                    <i class="fas fa-plus"></i>
+                    Add Expense
+                </button>
+            }
+
+            <div class="d-flex align-items-center gap-2 ms-auto">
+
+                <!-- Generate via PDF -->
+                <a asp-controller="Admin"
+                   asp-action="GenerateExpensePDF"
+                   asp-route-month="@Model.Month"
+                   asp-route-year="@Model.Year"
+                   class="btn btn-orange-round">
+                    Generate via PDF
+                </a>
+
+                @if (Context.Session.GetString("CanManageExpenses") == "True" ||
+                                Context.Session.GetString("IsPrimary") == "True")
+                {
+                    <button type="button"
+                            class="btn btn-orange-round"
+                            data-bs-toggle="modal"
+                            data-bs-target="#importExpenseCsvModal">
+                        Import CSV
+                    </button>
+                }
+
+                <a asp-controller="Template"
+                   asp-action="DownloadExpenseCsv"
+                   class="btn btn-orange d-flex align-items-center justify-content-center"
+                   title="Download Expense CSV"
+                   style="width:42px; height:42px;">
+                    <i class="bi bi-download"></i>
+                </a>
+
+            </div>
+        </div>
+    </form>
+
+    <!-- ================= TABLE ================= -->
+    <div class="table-container custom-table">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>VOUCHER NO.</th>
+                    <th>EXPENSE</th>
+                    <th>MONTH</th>
+                    <th>YEAR</th>
+                    <th>DATE</th>
+                    <th>AMOUNT</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (!Model.Expenses.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            No expenses found.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var e in Model.Expenses)
+                    {
+                        <tr data-id="@e.Expense_Id"
+                            data-voucher="@e.Voucher_No"
+                            data-type="@e.Expense_Type"
+                            data-date="@e.Expense_Date.ToString("yyyy-MM-dd")"
+                            data-total="@e.Total">
+
+                            <td>@e.Voucher_No</td>
+                            <td>@e.Expense_Type</td>
+                            <td>@CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(e.Expense_Month)</td>
+                            <td>@e.Expense_Year</td>
+                            <td>@e.Expense_Date.ToString("yyyy-MM-dd")</td>
+                            <td class="amount-cell">
+                                @e.Total.ToString("C", phCulture)
+                            </td>
+                        </tr>
+                    }
+
+                }
+            </tbody>
+        </table>
+        <div id="expenseRowMenu" class="context-menu" style="display: none; position:absolute;">
+            @if (Context.Session.GetString("CanEditExpense") == "True"
+                        || Context.Session.GetString("IsPrimary") == "True")
+            {
+                <a id="editExpense">Edit</a>
+
+                @if (Context.Session.GetString("IsPrimary") == "True")
+                {
+                    <a id="deleteExpense" class="text-danger">Delete</a>
+                }
+            }
+            else
+            {
+                <div class="px-3 py-2 small text-muted">
+                    No actions available
+                </div>
+            }
+        </div>
+
+
+    </div>
+
+    <div class="text-end fw-semibold mt-3">
+        Total Expenses: @totalAmount.ToString("C", phCulture)
+    </div>
+
+
+<!-- ================= ADD MODAL ================= -->
+    <div class="modal fade" id="addExpenseModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-4">
+
+                <h4 class="fw-bold text-center mb-3">Add Expense</h4>
+
+                <form method="post"
+                      asp-controller="Admin"
+                      asp-action="AddExpense"
+                      onsubmit="return confirmAddExpense();">
+
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label>Voucher No.</label>
+                        <input type="text"
+                               name="NewExpense.Voucher_No"
+                               class="form-control"
+                               oninput="this.value = this.value.replace(/[^0-9]/g,'')"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Expense Type</label>
+                        <select name="NewExpense.Expense_Type"
+                                class="form-select"
+                                required>
+                            <option value="">Select type</option>
+                            <option>Garbage</option>
+                            <option>CB</option>
+                            <option>Allowances</option>
+                            <option>Incentives</option>
+                            <option>Food</option>
+                            <option>Petty Cash</option>
+                            <option>Grayhaw</option>
+                            <option>T-shirt</option>
+                            <option>Sticker</option>
+                            <option>Project</option>
+                            <option>NLRC Settlement</option>
+                            <option>Medical / Office Supplies</option>
+                            <option>Maintenance</option>
+                            <option>Assistance Audit</option>
+                            <option>Meralco</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Expense Date</label>
+                        <input type="date"
+                               name="NewExpense.Expense_Date"
+                               class="form-control"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Total Amount *</label>
+                        <input type="number"
+                               step="0.01"
+                               name="NewExpense.Total"
+                               class="form-control"
+                               required />
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="btn btn-orange">
+                            Submit
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- EDIT EXPENSE MODAL -->
+    <div class="modal fade" id="editExpenseModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-4">
+
+                <h4 class="fw-bold text-center mb-3">Edit Expense</h4>
+
+                <form method="post"
+                      asp-controller="Admin"
+                      asp-action="EditExpense"
+                      onsubmit="return confirmEditExpense();">
+
+                    <!-- REQUIRED -->
+                    <input type="hidden" name="Expense_Id" id="editExpenseId" />
+
+                    <div class="mb-3">
+                        <label>Voucher No.</label>
+                        <input type="text"
+                               name="Voucher_No"
+                               id="editVoucherNo"
+                               class="form-control"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Expense Type</label>
+                        <select name="Expense_Type"
+                                id="editExpenseType"
+                                class="form-select"
+                                required>
+                            <option value="">Select type</option>
+                            <option>Garbage</option>
+                            <option>CB</option>
+                            <option>Allowances</option>
+                            <option>Incentives</option>
+                            <option>Food</option>
+                            <option>Petty Cash</option>
+                            <option>Grayhaw</option>
+                            <option>T-shirt</option>
+                            <option>Sticker</option>
+                            <option>Project</option>
+                            <option>NLRC Settlement</option>
+                            <option>Medical / Office Supplies</option>
+                            <option>Maintenance</option>
+                            <option>Assistance Audit</option>
+                            <option>Meralco</option>
+                        </select>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label>Expense Date</label>
+                        <input type="date"
+                               name="Expense_Date"
+                               id="editExpenseDate"
+                               class="form-control"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Total Amount *</label>
+                        <input type="number"
+                               step="0.01"
+                               name="Total"
+                               id="editTotal"
+                               class="form-control"
+                               required />
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="btn btn-orange">
+                            Save Changes
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="importExpenseCsvModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header text-white" style="background-color: #f36f21;">
+                    <h5 class="modal-title"><b>Import Expenses from CSV</b></h5>
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"></button>
+                </div>
+
+                <form asp-action="ImportExpenseCsv"
+                      asp-controller="Admin"
+                      method="post"
+                      enctype="multipart/form-data">
+
+                    <div class="modal-body">
+
+                        <label class="form-label d-block">
+                            <b>Required Fields:</b>
+                            <span class="d-block">
+                                Voucher_No, Expense_Type, Expense_Month, Expense_Year, Expense_Date, Total
+                            </span>
+                        </label>
+
+                        <input type="file"
+                               name="csvFile"
+                               accept=".csv"
+                               required
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="btn btn-orange">
+                            Confirm Import
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <form id="deleteExpenseForm"
+          method="post"
+          asp-controller="Admin"
+          asp-action="DeleteExpense"
+          style="display:none;"
+          onsubmit="return confirm('Are you sure you want to delete this expense?');">
+
+        <input type="hidden" name="id" id="deleteExpenseId" />
+    </form>
+
+    <div class="modal fade" id="addExpenseSuccessModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content p-4 text-center">
+
+                <h4 class="fw-bold text-success">Expense Added!</h4>
+                <p>@TempData["AddExpenseSuccess"]</p>
+
+                <button type="button"
+                        class="btn btn-success"
+                        data-bs-dismiss="modal">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="expenseEditSuccessModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content text-center p-4">
+                <h4 class="text-success fw-bold">Expense Updated</h4>
+                <p>The expense was updated successfully.</p>
+                <button class="btn btn-success" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="expenseDeleteSuccessModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content text-center p-4">
+                <h4 class="text-success fw-bold">Expense Deleted</h4>
+                <p>The expense was deleted successfully.</p>
+                <button class="btn btn-success" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="voucherErrorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content p-4 text-center">
+
+                <h4 class="fw-bold text-danger">Expense Error!</h4>
+                <p>@TempData["VoucherExists"]</p>
+
+                <button type="button"
+                        class="btn btn-danger"
+                        data-bs-dismiss="modal">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+        <script>
+            // SEARCH FUNCTION JS
+                   document.addEventListener("DOMContentLoaded", function () {
+
+                       const searchInput = document.querySelector("input[name='search']");
+                       const tableRows = document.querySelectorAll("tbody tr");
+
+                       if (!searchInput) return;
+
+                       searchInput.addEventListener("keyup", function () {
+                           const value = this.value.toLowerCase().trim();
+
+                           tableRows.forEach(row => {
+                               const text = row.innerText.toLowerCase();
+
+                               row.style.display = text.includes(value) ? "" : "none";
+                           });
+                       });
+
+                   });
+        </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+
+                var msg = "@(TempData["VoucherExists"] ?? "")";
+
+                if (msg !== "") {
+                    new bootstrap.Modal(
+                        document.getElementById("voucherErrorModal")
+                    ).show();
+                }
+
+            });
+        </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+
+                var success = "@(TempData["AddExpenseSuccess"] ?? "")";
+
+                if (success !== "") {
+                    var modal = new bootstrap.Modal(
+                        document.getElementById("addExpenseSuccessModal")
+                    );
+                    modal.show();
+                }
+
+            });
+        </script>
+        <script>
+            function confirmAddExpense() {
+                return confirm("Are you sure you want to add this expense?");
+            }
+        </script>
+
+        <script>
+            function confirmEditExpense() {
+                return confirm("Are you sure you want to save changes to this expense?");
+            }
+
+            document.getElementById("editExpense").onclick = function (e) {
+                e.stopPropagation();
+                document.getElementById("expenseRowMenu").style.display = "none";
+
+                const row = document.querySelector(`tr[data-id='${clickedId}']`);
+                if (!row) return;
+
+                document.getElementById("editExpenseId").value = row.dataset.id;
+                document.getElementById("editVoucherNo").value = row.dataset.voucher;
+                document.getElementById("editExpenseType").value = row.dataset.type;
+                document.getElementById("editExpenseDate").value = row.dataset.date;
+                document.getElementById("editTotal").value = row.dataset.total;
+
+                new bootstrap.Modal(
+                    document.getElementById("editExpenseModal")
+                ).show();
+            };
+        </script>
+
+        <script>
+            let clickedId = null;
+
+            document.addEventListener("contextmenu", function (e) {
+                const row = e.target.closest("tr[data-id]");
+                if (!row) return;
+
+                // Permission check
+                const canEdit =
+                    "@Context.Session.GetString("CanEditExpense")" === "True" ||
+                    "@Context.Session.GetString("IsPrimary")" === "True";
+
+                if (!canEdit) return;
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                clickedId = row.dataset.id;
+
+                const menu = document.getElementById("expenseRowMenu");
+                menu.style.left = e.pageX + "px";
+                menu.style.top = e.pageY + "px";
+                menu.style.display = "block";
+            });
+
+            // Hide menu when clicking anywhere
+            document.addEventListener("click", function () {
+                document.getElementById("expenseRowMenu").style.display = "none";
+            });
+
+
+            // DELETE
+                    document.getElementById("deleteExpense").onclick = function (e) {
+                e.stopPropagation();
+
+                if (!confirm("Are you sure you want to delete this expense?")) return;
+
+                document.getElementById("deleteExpenseId").value = clickedId;
+                document.getElementById("deleteExpenseForm").submit();
+            };
+
+        </script>
+        <script>
+            let selectedExpenseId = null;
+
+            document.querySelectorAll(".table-container table tbody tr").forEach(row => {
+                row.addEventListener("contextmenu", function (e) {
+                    e.preventDefault();
+                    document.querySelectorAll(".table-container tbody tr")
+                        .forEach(r => r.classList.remove("active-row"));
+
+                    // highlight current row
+                    this.classList.add("active-row");
+
+                    selectedExpenseId = this.dataset.expenseId;
+
+                    const menu = document.getElementById("expenseRowMenu");
+                    menu.style.top = `${e.pageY}px`;
+                    menu.style.left = `${e.pageX}px`;
+                    menu.classList.add("show");
+                });
+            });
+            document.addEventListener("click", () => {
+                document.querySelectorAll(".table-container tbody tr")
+                    .forEach(r => r.classList.remove("active-row"));
+
+                document.getElementById("expenseRowMenu")?.classList.remove("show");
+            });
+        </script>
+    @if (TempData["ExpenseEditSuccess"] != null)
+    {
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    new bootstrap.Modal(
+                        document.getElementById("expenseEditSuccessModal")
+                    ).show();
+                });
+            </script>
+    }
+
+    @if (TempData["ExpenseDeleteSuccess"] != null)
+    {
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    new bootstrap.Modal(
+                        document.getElementById("expenseDeleteSuccessModal")
+                    ).show();
+                });
+            </script>
+    }
+
+}
+    
+
+

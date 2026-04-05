@@ -1,0 +1,237 @@
+﻿@{
+    ViewData["Title"] = "Login";
+    Layout = null; // Standalone page
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Carlton Residences</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800" rel="stylesheet">
+    <link href="~/lib/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+
+    <link href="~/css/sb-admin-2.min.css" rel="stylesheet">
+
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Nunito', sans-serif;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .split-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* LEFT SIDE */
+        .left-panel {
+            flex: 1;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            padding: 40px 80px;
+            position: relative;
+            justify-content: center; /* Center form vertically */
+        }
+
+        /* Header at top left */
+        .brand-header {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        /* RIGHT SIDE - IMAGE */
+        .right-panel {
+            flex: 1;
+            /* Using the path from your previous setup */
+            background-image: url('/NewFolder/carltonresidence.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+            /* Optional: Orange overlay gradient on image bottom like the design */
+            .right-panel::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(to bottom, transparent 60%, rgba(243, 111, 33, 0.8) 100%);
+            }
+
+
+        /* Typography & Form Styles */
+        h1.welcome-title {
+            font-weight: 800;
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        p.welcome-sub {
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .form-control-custom {
+            height: 60px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding-left: 20px;
+
+            /* ADD THESE LINES TO FORCE WIDTH */
+            width: 100% !important; 
+            max-width: 100% !important;
+            box-sizing: border-box; /* Ensures padding doesn't mess up width */
+}
+        }
+
+            .form-control-custom:focus {
+                border-color: #f36f21;
+                box-shadow: 0 0 0 0.2rem rgba(243, 111, 33, 0.25);
+            }
+
+        /* Options Row (Remember Me / Forgot Pass) */
+        .options-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .forgot-link {
+            color: #666;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+            .forgot-link:hover {
+                color: #f36f21;
+                text-decoration: underline;
+            }
+
+        /* Sign In Button */
+        .btn-signin {
+            background-color: #f36f21;
+            color: white;
+            font-weight: 700;
+            padding: 15px;
+            border-radius: 8px;
+            border: none;
+            width: 100%;
+            font-size: 1.1rem;
+            transition: background 0.3s;
+        }
+
+            .btn-signin:hover {
+                background-color: #d65a10;
+                color: white;
+            }
+
+        /* Mobile Responsiveness */
+        @@media (max-width: 768px) {
+            .right-panel {
+                display: none;
+            }
+
+            .left-panel {
+                padding: 30px;
+            }
+
+            .brand-header {
+                top: 20px;
+                left: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="split-container">
+
+        <div class="left-panel">
+
+            <div class="brand-header">Carlton Residences</div>
+
+            <div style="max-width: 450px; margin: 0 auto; width: 100%;">
+
+                <h1 class="welcome-title">Welcome</h1>
+                <p class="welcome-sub">Please enter your details.</p>
+
+                @if (TempData["LoginError"] != null)
+                {
+                    <div class="alert alert-danger">
+                        @TempData["LoginError"]
+                    </div>
+                }
+                @if (TempData["LoginSuccess"] != null)
+                {
+                    <div class="alert alert-success">
+                        @TempData["LoginSuccess"]
+                    </div>
+                }
+
+
+                <form class="user" method="post" action="@Url.Action("Login", "Admin")">
+                    <div class="form-group">
+                        <label for="Username">Username</label>
+                        <input type="text" class="form-control form-control-custom"
+                               id="Username" name="Username" placeholder="enter your username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Password">Password</label>
+                        <input type="password" class="form-control form-control-custom"
+                               id="Password" name="Password" placeholder="•••••" required>
+                    </div>
+
+                    <div class="options-row">
+                        <div class="custom-control custom-checkbox small">
+                            <input type="checkbox" class="custom-control-input" id="customCheck">
+                            <label class="custom-control-label" for="customCheck">Remember for 30 Days</label>
+                        </div>
+                        <a href="#" class="forgot-link">Forgot password</a>
+                    </div>
+
+                    <button type="submit" class="btn-signin">
+                        Sign In
+                    </button>
+
+                </form>
+            </div>
+        </div>
+
+        <div class="right-panel">
+        </div>
+
+    </div>
+
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery-easing/jquery.easing.min.js"></script>
+    <script src="~/js/sb-admin-2.min.js"></script>
+
+</body>
+</html>

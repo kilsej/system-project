@@ -1,0 +1,1238 @@
+﻿@model ResidentProfileViewModel
+@{
+    ViewData["PageTitle"] = "Resident Profile";
+    ViewData["PageSubtitle"] = "";
+}
+
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]Carlton Residences</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/startbootstrap-sb-admin-2@4.1.4/css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8f9fc;
+            overflow: hidden;
+            margin: 0;
+            color: #333;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            min-width: 250px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            border-right: 1px solid #eee;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #000;
+            line-height: 1.2;
+            margin-bottom: 50px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            color: #888;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+            .nav-item i {
+                margin-right: 15px;
+                width: 20px;
+                text-align: center;
+            }
+
+            .nav-item:hover {
+                background-color: #fff3cd;
+                color: #f36f21;
+                text-decoration: none;
+            }
+
+            .nav-item.active {
+                background-color: #f36f21;
+                color: #fff;
+                box-shadow: 0 4px 10px rgba(243, 111, 33, 0.3);
+            }
+
+            /* --- LOGOUT BUTTON STYLES --- */
+            .nav-item.logout {
+                margin-top: auto;
+                margin-bottom: 40px;
+                background-color: #ffffff;
+                color: #e74a3b;
+                font-weight: 700;
+                border: 2px solid #f36f21;
+            }
+
+                .nav-item.logout:hover {
+                    background-color: #f36f21;
+                    color: #ffffff;
+                    border-color: #f36f21;
+                }
+        /* Make ALL tab text black */
+        .nav-tabs .nav-link {
+            color: black !important;
+        }
+
+            /* Keep active tab text black too */
+            .nav-tabs .nav-link.active {
+                color: black !important;
+            }
+
+            /* Optional: when hovering */
+            .nav-tabs .nav-link:hover {
+                color: black !important;
+            }
+
+
+        /* CONTENT */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+
+        .header-title h2 {
+            font-weight: 800;
+            color: #000;
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .header-title p {
+            color: #000;
+            margin: 5px 0 0;
+            font-size: 0.9rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            text-align: right;
+        }
+
+        .user-info {
+            margin-right: 15px;
+        }
+
+        .user-name {
+            font-weight: 700;
+            color: #000;
+            display: block;
+        }
+
+        .user-settings {
+            font-size: 0.8rem;
+            color: #888;
+            text-decoration: none;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            background-color: #f36f21;
+            border-radius: 50%;
+        }
+
+        /* CONTROLS & BUTTONS */
+        .search-input {
+            background-color: #e9ecef;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            width: 100%;
+        }
+
+        .filter-select {
+            background-color: #e9ecef;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 10px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .btn-orange-round {
+            background-color: #f36f21;
+            border-color: #f36f21;
+            color: white;
+            border-radius: 18px;
+            padding: 8px 24px;
+            font-weight: 700;
+            transition: all 0.2s;
+            border: none;
+        }
+
+            .btn-orange-round:hover {
+                background-color: #d65a10;
+                color: white;
+                text-decoration: none;
+            }
+
+        /* TABLE */
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+        }
+
+            .table-container table tbody tr:hover > td {
+                background-color: #F2F0EF !important;
+            }
+
+            .table-container table tbody tr.active-row > td {
+                background-color: #F2F0EF !important;
+            }
+
+            .table-container table tbody tr {
+                cursor: context-menu;
+                transition: background-color 0.15s ease;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #f36f21;
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            color: #333;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9fa;
+            cursor: context-menu;
+        }
+
+        .status-paid {
+            color: #28a745;
+            font-weight: 700;
+        }
+
+        .status-delinquent {
+            color: #dc3545;
+            font-weight: 700;
+        }
+
+        .status-inactive {
+            color: #858796;
+            font-weight: 700;
+            font-style: italic;
+        }
+
+        .username-link {
+            color: #f36f21;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+            .username-link:hover {
+                text-decoration: underline;
+                color: #d65a10;
+            }
+
+        .action-link {
+            color: #333;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+            .action-link:hover {
+                text-decoration: underline;
+            }
+
+        /* MODAL */
+        .modal-header {
+            background-color: #fff;
+            color: #333;
+            border-bottom: none;
+        }
+
+        .modal-title {
+            font-weight: 800;
+            font-size: 1.5rem;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-close {
+            filter: none;
+        }
+
+        .invoice-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .bg-orange {
+            background-color: #f36f21;
+        }
+
+        .import-csv-form {
+            flex-wrap: nowrap;
+        }
+
+        .csv-input {
+            width: 200px;
+            min-width: 200px;
+            height: 45px;
+            padding: 6px 10px;
+            font-size: 14px;
+            border-radius: 25px;
+        }
+
+        .back-link {
+            color: black;
+        }
+
+            .back-link:hover {
+                color: dimgray;
+                text-decoration: underline;
+            }
+
+        .btn-orange {
+            background-color: #f36f21;
+            border-color: #f36f21;
+            color: white;
+            transition: all 0.2s;
+            border: none;
+        }
+
+            .btn-orange:hover {
+                background-color: #d65a10;
+                color: white;
+                text-decoration: none;
+            }
+
+
+        .context-menu {
+            position: absolute;
+            display: none;
+            background: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            min-width: 140px;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 4px 0;
+        }
+
+            .context-menu a {
+                display: block;
+                padding: 8px 12px;
+                text-decoration: none;
+                color: #212529;
+                cursor: pointer;
+                font-size: 0.9rem;
+            }
+
+                .context-menu a:hover {
+                    background-color: #f36f21;
+                    color: white;
+                }
+    </style>
+</head>
+
+
+<div class="container mt-4">
+
+    <a href="/Admin/Residents" class="back-link">
+        &larr; Back to Residents
+    </a>
+
+
+
+    <!-- ================= TABS ON TOP =================-->
+    <ul class="nav nav-tabs justify-content-center fw-bold mb-4" id="myTab" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link "
+                    data-bs-toggle="tab"
+                    data-bs-target="#payments"
+                    onclick="setTab('payments')">
+
+                Payment History
+            </button>
+        </li>
+
+        <li class="nav-item">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#statements"
+                    onclick="setTab('statements')">
+
+                Statements
+            </button>
+        </li>
+
+        <li class="nav-item">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#invoices"
+                    onclick="setTab('invoices')">
+
+                Invoices
+            </button>
+        </li>
+    </ul>
+@using System.Text.Json
+
+@if (TempData["ImportResult"] != null)
+{
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["ImportResult"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+}
+
+@if (TempData["ImportErrors"] != null)
+{
+    var errs = JsonSerializer.Deserialize<List<string>>(TempData["ImportErrors"].ToString());
+
+        <div class="alert alert-danger alert-dismissible fade show">
+            <strong>Import Errors:</strong>
+            <ul class="mb-0 mt-2">
+                @foreach (var e in errs)
+                {
+                    <li>@e</li>
+                }
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+}
+
+    <!-- ================= RESIDENT INFO =================-->
+    <div class="mb-4 text-start">
+        <p><strong>Resident Name:</strong> @Model.Resident.FullName</p>
+        <p>
+            <strong>Block / Lot / Phase:</strong> Block @Model.Resident.Block,
+            Lot @Model.Resident.Lot, Phase @Model.Resident.Phase_No
+        </p>
+        <p><strong>Contact No.:</strong> @Model.Resident.Contact_No</p>
+        <p><strong>Email:</strong> @Model.Resident.Email</p>
+    </div>
+
+
+    <div class="tab-content">
+
+        <!-- ================ PAYMENT HISTORY TAB ================= -->
+        <div class="tab-pane fade " id="payments">
+
+            <form method="get" class="row g-3 mb-3">
+                <input type="hidden" name="id" value="@Model.Resident.Resident_Id" />
+                <input type="hidden" name="activeTab" value="payments" />
+
+
+                <div class="col-md-3">
+                    <label>Month:</label>
+                    <select class="form-select" name="payMonth" onchange="this.form.submit()">
+                        <option value="">All</option>
+                        @for (int m = 1; m <= 12; m++)
+                        {
+                            <option value="@m" selected="@(ViewBag.SelectedPayMonth == m)">
+                                @System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)
+                            </option>
+                        }
+                    </select>
+
+                </div>
+
+                <div class="col-md-3">
+                    <label>Year:</label>
+                    <select class="form-select" name="payYear" onchange="this.form.submit()">
+                        <option value="">All</option>
+                        @for (int y = DateTime.Now.Year; y >= 2015; y--)
+                        {
+                            <option value="@y" selected="@(ViewBag.SelectedPayYear == y)">
+                                @y
+                            </option>
+                        }
+                    </select>
+                </div>
+            </form>
+
+            <div class="invoice-header mb-3">
+                <h4 class="fw-bold m-0">Payment History</h4>
+
+                <div class="d-flex align-items-center gap-2">
+
+                    <a asp-controller="Admin"
+                       asp-action="GeneratePaymentPDF"
+                       asp-route-id="@Model.Resident.Resident_Id"
+                       asp-route-payMonth="@ViewBag.SelectedPayMonth"
+                       asp-route-payYear="@ViewBag.SelectedPayYear"
+                       class="btn btn-orange-round">
+                        Generate via PDF
+                    </a>
+                    <div class="d-flex align-items-center gap-2 ms-auto">
+                    @if (Context.Session.GetString("CanImportPayment") == "True" || Context.Session.GetString("IsPrimary") == "True")
+                    {
+                    <button class="btn btn-orange-round"
+                            data-bs-toggle="modal"
+                            data-bs-target="#importPaymentCsvModal">
+                        Import CSV
+                    </button>
+                    }
+                        <a asp-controller="Template"
+                           asp-action="DownloadPaymentHistoryCsv"
+                           asp-route-residentId="@Model.Resident.Resident_Id"
+                           class="btn btn-orange d-flex align-items-center justify-content-center"
+                           title="Download Payment History CSV"
+                           style="width:42px; height:42px;">
+                            <i class="bi bi-download"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container" style="max-height: 460px; overflow-y: auto;">
+                <table class="table">
+                    <thead style="background-color: #f36f21; color: white;">
+                        <tr>
+                            <th style="background-color: #f36f21; color: white;">Invoice No.</th>
+                            <th style="background-color: #f36f21; color: white;">Billing Period</th>
+                            <th style="background-color: #f36f21; color: white;">OR no.</th>
+                            <th style="background-color: #f36f21; color: white;">Date Paid</th>
+                            <th style="background-color: #f36f21; color: white;">Amount</th>
+                            <th style="background-color: #f36f21; color: white;">Method</th>
+                            <th style="background-color: #f36f21; color: white;">Remarks</th>
+                            <th style="background-color: #f36f21; color: white;">Issued By</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var p in Model.Payments)
+                        {
+                            <tr>
+                                <td>INV-@p.Invoice_No.ToString("00000")</td>
+                                <td>@p.Invoice?.Billing_Period.ToString("MMMM yyyy")</td>
+                                <td>@p.OR_No</td>
+                                <td>@p.Date_Issued.ToString("MM/dd/yyyy")</td>
+                                <td>PHP @p.Total_Amount.ToString("N2")</td>
+                                <td>@p.Method</td>
+                                <td>@p.Remarks</td>
+                                <td>@p.Admin?.FullName</td>
+                            </tr>
+                        }
+                    </tbody>
+
+
+                </table>
+            </div>
+
+            <!-- TOTAL -->
+            <div class="text-end fw-bold">
+                Payments Received: PHP @Model.Payments.Sum(p => p.Total_Amount).ToString("N2")
+            </div>
+        </div>
+
+
+        <!-- ================ STATEMENTS TAB ================= -->
+        <div class="tab-pane fade" id="statements">
+            <form method="get" class="row g-3 mb-3">
+                <input type="hidden" name="id" value="@Model.Resident.Resident_Id" />
+                <input type="hidden" name="activeTab" value="statements" />
+
+
+                <div class="col-md-3">
+                    <label>Month:</label>
+                    <select class="form-select" name="soaMonth" onchange="this.form.submit()">
+                        <option value="">All</option>
+                        @for (int m = 1; m <= 12; m++)
+                        {
+                            <option value="@m" selected="@(ViewBag.SelectedSoaMonth == m)">
+                                @System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)
+                            </option>
+                        }
+                    </select>
+
+                </div>
+
+                <div class="col-md-3">
+                    <label>Year:</label>
+                    <select class="form-select" name="soaYear" onchange="this.form.submit()">
+                        <option value="">All</option>
+                        @for (int y = DateTime.Now.Year; y >= 2015; y--)
+                        {
+                            <option value="@y" selected="@(ViewBag.SelectedSoaYear == y)">
+                                @y
+                            </option>
+                        }
+                    </select>
+                </div>
+            </form>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold m-0">Statements of Account</h4>
+
+                <!-- Button group -->
+                <div class="d-flex align-items-center gap-2">
+                    <a asp-controller="Admin"
+                       asp-action="GenerateSOAPDF"
+                       asp-route-id="@Model.Resident.Resident_Id"
+                       asp-route-soaMonth="@ViewBag.SelectedSoaMonth"
+                       asp-route-soaYear="@ViewBag.SelectedSoaYear"
+                       class="btn btn-orange-round">
+                        Generate via PDF
+                    </a>
+
+                    <a asp-controller="Template"
+                       asp-action="DownloadSOACsv"
+                       asp-route-residentId="@Model.Resident.Resident_Id"
+                       class="btn btn-orange d-flex align-items-center justify-content-center"
+                       title="Download SOA CSV"
+                       style="width:42px; height:42px;">
+                        <i class="bi bi-download"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="table-container" style="max-height: 460px; overflow-y: auto;">
+                <table class="table">
+                    <thead style="background-color: #f36f21; color: white;">
+                        <tr>
+                            <th style="background-color: #f36f21; color: white;">Invoice No.</th>
+                            <th style="background-color: #f36f21; color: white;">Billing Period</th>
+                            <th style="background-color: #f36f21; color: white;">Date Issued</th>
+                            <th style="background-color: #f36f21; color: white;">Description</th>
+                            <th style="background-color: #f36f21; color: white;">Receipt No.</th>
+                            <th style="background-color: #f36f21; color: white;">Debit</th>     <!-- Charge -->
+                            <th style="background-color: #f36f21; color: white;">Credit</th>    <!-- Payment -->
+                            <th style="background-color: #f36f21; color: white;">Balance</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @{
+                            decimal runningBalance = 0;
+                            var ordered = Model.Statements.OrderBy(i => i.Billing_Period).ToList();
+
+                        }
+
+
+                        @foreach (var inv in ordered)
+                        {
+                            var payments = inv.Payments?.ToList() ?? new List<Payment>();
+
+                            decimal debit = inv.Total_Amount;
+                            decimal credit = payments.Sum(p => p.Total_Amount);
+
+                            // UPDATE RUNNING BALANCE
+                            runningBalance += debit;   // add charge
+                            runningBalance -= credit;  // subtract payment
+
+                            string creditText = credit > 0 ? $"PHP {credit:N2}" : "---";
+                            string receipt = payments.Any() ? payments.Last().OR_No : "---";
+
+
+                            <tr>
+                                <td>INV-@inv.Invoice_No.ToString("00000")</td>
+                                <td>@inv.Billing_Period.ToString("MMMM yyyy")</td>
+                                <td>@inv.Date_Issued?.ToString("MM/dd/yyyy")</td>
+                                <td>@inv.Description</td>
+                                <td>@receipt</td>
+                                <td>PHP @debit.ToString("N2")</td>
+                                <td>@creditText</td>
+                                <td>PHP @runningBalance.ToString("N2")</td>
+                            </tr>
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- TOTAL -->
+            <div class="text-end fw-bold">
+                Total Amount Due: PHP @runningBalance.ToString("N2")
+            </div>
+
+        </div>
+
+        <!-- ================ INVOICES TAB ================= -->
+        <div class="tab-pane fade" id="invoices">
+            <form method="get" class="row g-3 mb-3">
+                <input type="hidden" name="id" value="@Model.Resident.Resident_Id" />
+                <input type="hidden" name="activeTab" value="invoices" />
+
+
+                <div class="col-md-3">
+                    <label>Month:</label>
+                    <select class="form-select" name="invMonth" onchange="this.form.submit()">
+                        <option value="">All</option>
+                        @for (int m = 1; m <= 12; m++)
+                        {
+                            <option value="@m" selected="@(ViewBag.SelectedInvMonth == m)">
+                                @System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)
+                            </option>
+                        }
+                    </select>
+
+                </div>
+
+                <div class="col-md-3">
+                    <label>Year:</label>
+                    <select class="form-select" name="invYear" onchange="this.form.submit()">
+                        <option value="">All</option>
+                        @for (int y = DateTime.Now.Year; y >= 2015; y--)
+                        {
+                            <option value="@y" selected="@(ViewBag.SelectedInvYear == y)">
+                                @y
+                            </option>
+                        }
+                    </select>
+                </div>
+            </form>
+            <div class="invoice-header mb-3">
+                <h4 class="fw-bold m-0">Invoices</h4>
+
+                <div class="d-flex align-items-center gap-2">
+
+                    <a class="btn btn-orange-round"
+                       asp-controller="Admin"
+                       asp-action="GenerateInvoicePDF"
+                       asp-route-id="@Model.Resident.Resident_Id"
+                       asp-route-invMonth="@ViewBag.SelectedInvMonth"
+                       asp-route-invYear="@ViewBag.SelectedInvYear">
+                        Generate via PDF
+                    </a>
+
+                    <button class="btn btn-orange-round"
+                            data-bs-toggle="modal"
+                            data-bs-target="#sendEmailModal">
+                        Send Email
+                    </button>
+                    @if (Context.Session.GetString("CanImportInvoice") == "True" || Context.Session.GetString("IsPrimary") == "True")
+                    {
+
+                    <button class="btn btn-orange-round"
+                            data-bs-toggle="modal"
+                            data-bs-target="#importInvoiceCsvModal">
+                        Import CSV
+                    </button>
+                    }
+                    <!-- Download CSV -->
+                    <a asp-controller="Template"
+                       asp-action="DownloadInvoiceCsv"
+                       asp-route-residentId="@Model.Resident.Resident_Id"
+                       class="btn btn-orange d-flex align-items-center justify-content-center"
+                       title="Download Invoice CSV"
+                       style="width:42px; height:42px;">
+                        <i class="bi bi-download"></i>
+                    </a>
+                </div>
+            </div>
+
+
+            <div class="table-container" style="max-height: 460px; overflow-y: auto;">
+                <table class="table">
+                    <thead style="background-color: #f36f21; color: white;" class="table-warning text-dark fw-bold">
+                        <tr>
+                            <th style="background-color: #f36f21; color: white;">Invoice No.</th>
+                            <th style="background-color: #f36f21; color: white;">Billing Period</th>
+                            <th style="background-color: #f36f21; color: white;">Date Issued</th>
+                            <th style="background-color: #f36f21; color: white;">Due Date</th>
+                            <th style="background-color: #f36f21; color: white;">Description</th>
+                            <th style="background-color: #f36f21; color: white;">Total Amount</th>
+                            <th style="background-color: #f36f21; color: white;">Status</th>
+                            <th style="background-color: #f36f21; color: white;">Age</th>
+                            <th style="background-color: #f36f21; color: white;">Issued By</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var inv in Model.Invoices.OrderByDescending(i => i.Billing_Period))
+                        {
+                            // STATUS COLOR
+                            string statusColor = inv.Status == "Paid" ? "text-success" : "text-danger";
+
+                            // AGE CALCULATION
+                            string age = "---";
+                            if (inv.Status == "Unpaid")
+                            {
+                                int days = (DateTime.Now - inv.Due_Date).Days;
+                                age = days > 0 ? $"{days} days" : "0 days";
+                            }
+
+                            <tr data-id="@inv.Invoice_No"
+                                data-status="@inv.Status"
+                                data-description="@inv.Description"
+                                data-amount="@inv.Total_Amount">
+
+                                <td>INV-@inv.Invoice_No.ToString("00000")</td>
+                                <td>@inv.Billing_Period.ToString("MMMM yyyy")</td>
+                                <td>@inv.Date_Issued?.ToString("MM/dd/yyyy")</td>
+                                <td>@inv.Due_Date.ToString("MM/dd/yyyy")</td>
+                                <td>@inv.Description</td>
+                                <td>PHP @inv.Total_Amount.ToString("N2")</td>
+                                <td class="@statusColor">@inv.Status</td>
+                                <td>@age</td>
+                                <td>@(inv.Admin?.FullName ?? inv.Issued_By)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-end fw-bold">
+                Total Amount Due: PHP @Model.Invoices.Where(i => i.Status == "Unpaid").Sum(i => i.Total_Amount).ToString("N2")
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SEND EMAIL MODAL -->
+    <div class="modal fade" id="sendEmailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content p-4">
+
+                <h4 class="fw-bold text-center mb-3">Send Reminder Email</h4>
+
+                <form method="post" asp-controller="Admin" asp-action="SendInvoiceEmail"
+                      onsubmit="return confirm('Send this email to the resident?');">
+
+                    <input type="hidden" name="ResidentId" value="@Model.Resident.Resident_Id" />
+
+                    <!-- SUBJECT -->
+                    <div class="mb-3">
+                        <label class="fw-bold">Subject</label>
+                        <input type="text"
+                               name="Subject"
+                               class="form-control"
+                               value="Reminder: Monthly Dues – Carlton Residences"
+                               required />
+                    </div>
+
+                    <!-- MESSAGE -->
+                    <div class="mb-3">
+                        <label class="fw-bold">Message</label>
+                        <textarea name="EmailBody"
+                                  class="form-control"
+                                  rows="14"
+                                  required>@ViewBag.EmailTemplate</textarea>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-orange">
+                            Send Email
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="importInvoiceCsvModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header bg-orange text-white d-flex align-items-center position-relative">
+                    <h5 class="modal-title w-100 text-center fw-bold">Import Invoices from CSV</h5>
+
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+                </div>
+
+                <form asp-action="ImportInvoicesCsv"
+                      asp-controller="Admin"
+                      method="post"
+                      enctype="multipart/form-data">
+
+                    <div class="modal-body">
+
+                        <input type="hidden" name="residentId" value="@Model.Resident.Resident_Id" />
+
+                        <label class="form-label"><b>Required Fields: </b>DateIssued, Description, Total_Amount</label>
+                        <input type="file"
+                               name="csvFile"
+                               accept=".csv"
+                               required
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-orange">
+                            Confirm Import
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="importPaymentCsvModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header bg-orange text-white">
+                    <h5 class="modal-title">Import Payments from CSV</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <form asp-action="ImportPaymentsCsv"
+                      asp-controller="Admin"
+                      method="post"
+                      enctype="multipart/form-data">
+
+                    <div class="modal-body">
+
+                        <input type="hidden" name="residentId" value="@Model.Resident.Resident_Id" />
+
+                        <label class="form-label d-block">
+                            <b>Required Fields:</b>
+                            <span class="d-block">
+                                PaymentDate, Total_Amount, InvoiceMonth, OR_No, Method, Remarks
+                            </span>
+                        </label>
+
+                        <input type="file"
+                               name="csvFile"
+                               accept=".csv"
+                               required
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-orange">
+                            Confirm Import
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="rowMenu" class="context-menu">
+        @if (Context.Session.GetString("CanEditInvoice") == "True" || Context.Session.GetString("IsPrimary") == "True")
+        {
+            <a id="editRow">Edit</a>
+        }
+        @if (Context.Session.GetString("IsPrimary") == "True")
+        {
+            <a id="deleteRow">Delete</a>
+        }
+    </div>
+
+
+
+
+    <script>
+        let clickedId = null;
+
+                document.addEventListener("contextmenu", function (e) {
+            const row = e.target.closest("tr[data-id]");
+            if (!row) return;
+
+            if (row.dataset.status === "Paid") return;
+
+            const canEdit = "@Context.Session.GetString("CanEditInvoice")" === "True";
+            const isPrimary = "@Context.Session.GetString("IsPrimary")" === "True";
+
+            if (!canEdit && !isPrimary) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            clickedId = row.dataset.id;
+
+            const menu = document.getElementById("rowMenu");
+            menu.style.left = e.pageX + "px";
+            menu.style.top = e.pageY + "px";
+            menu.style.display = "block";
+        });
+
+
+        document.addEventListener("click", function () {
+            document.getElementById("rowMenu").style.display = "none";
+        });
+
+        document.getElementById("editRow").onclick = function (e) {
+            e.stopPropagation();
+
+            document.getElementById("rowMenu").style.display = "none";
+
+            const row = document.querySelector(`tr[data-id='${clickedId}']`);
+
+            document.getElementById("editInvoiceId").value = clickedId;
+            document.getElementById("editInvoiceNo").value = row.children[0].innerText;
+            document.getElementById("editBillingPeriod").value = row.children[1].innerText;
+            document.getElementById("editAmount").value = row.dataset.amount;
+            document.getElementById("editDescription").value = row.dataset.description;
+
+            const modal = new bootstrap.Modal(
+                document.getElementById("editInvoiceModal")
+            );
+            modal.show();
+        };
+
+
+            document.getElementById("deleteRow").onclick = function (e) {
+            e.stopPropagation();
+
+            if (!confirm("Are you sure you want to delete this unpaid invoice?")) return;
+
+            document.getElementById("deleteInvoiceId").value = clickedId;
+            document.getElementById("deleteInvoiceForm").action = "/Admin/DeleteInvoice";
+            document.getElementById("deleteInvoiceForm").submit();
+        };
+    </script>
+
+
+    <!-- EDIT INVOICE MODAL -->
+    <div class="modal fade" id="editInvoiceModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-4">
+
+                <h4 class="fw-bold text-center mb-3">Edit Invoice</h4>
+                <form method="post" action="/Admin/EditInvoice" onsubmit="return confirmEditInvoice();">
+
+                    <!-- REQUIRED HIDDEN FIELDS -->
+                    <input type="hidden" name="Invoice_No" id="editInvoiceId">
+                    <input type="hidden" name="ResidentId" value="@Model.Resident.Resident_Id">
+
+                    <!-- READ ONLY -->
+                    <div class="mb-3">
+                        <label>Invoice No.</label>
+                        <input type="text" id="editInvoiceNo" class="form-control" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Billing Period</label>
+                        <input type="text" id="editBillingPeriod" class="form-control" readonly>
+                    </div>
+
+                    <!-- EDITABLE -->
+                    <div class="mb-3">
+                        <label>Total Amount *</label>
+                        <input type="number" step="0.01" name="Total_Amount"
+                               id="editAmount" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Description</label>
+                        <textarea name="Description"
+                                  id="editDescription"
+                                  class="form-control"></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-orange">
+                            Save Changes
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="invoiceEditSuccessModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content text-center p-4">
+                <h4 class="text-success fw-bold">Invoice Updated</h4>
+                <p>The invoice was updated successfully.</p>
+                <button class="btn btn-success" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="emailSuccessModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content text-center p-4">
+                <h4 class="text-success fw-bold">Email Sent</h4>
+                <p>The email was sent successfully.</p>
+                <button class="btn btn-success" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="emailErrorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content text-center p-4">
+                <h4 class="text-danger fw-bold">Email Error!</h4>
+                <p>@TempData["EmailError"]</p>
+                <button class="btn btn-danger" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const activeTab = "@ViewBag.ActiveTab";
+
+            if (activeTab) {
+                const trigger = document.querySelector(`[data-bs-target="#${activeTab}"]`);
+                if (trigger) new bootstrap.Tab(trigger).show();
+            }
+        });
+    </script>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const editSuccess = "@(TempData["InvoiceEditSuccess"] ?? "")";
+
+            if (editSuccess !== "") {
+                new bootstrap.Modal(
+                    document.getElementById("invoiceEditSuccessModal")
+                ).show();
+            }
+        });
+    </script>
+
+    <form id="deleteInvoiceForm" method="post" style="display:none;">
+        <input type="hidden" name="id" id="deleteInvoiceId" />
+        <input type="hidden" name="residentId" value="@Model.Resident.Resident_Id" />
+    </form>
+
+    <!-- INVOICE DELETE SUCCESS MODAL -->
+    <div class="modal fade" id="invoiceDeleteSuccessModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content text-center p-4">
+                <h4 class="text-success fw-bold">Invoice Deleted</h4>
+                <p>The invoice was deleted successfully.</p>
+                <button class="btn btn-success" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function confirmEditInvoice() {
+            return confirm("Are you sure you want to save changes to this invoice?");
+        }
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const deleteSuccess = "@(TempData["InvoiceDeleteSuccess"] ?? "")";
+
+            if (deleteSuccess !== "") {
+                new bootstrap.Modal(
+                    document.getElementById("invoiceDeleteSuccessModal")
+                ).show();
+            }
+
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const success = "@(TempData["EmailSuccess"] ?? "")";
+            if (success !== "") {
+                new bootstrap.Modal(
+                    document.getElementById("emailSuccessModal")
+                ).show();
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const error = "@(TempData["EmailError"] ?? "")";
+            if (error !== "") {
+                new bootstrap.Modal(
+                    document.getElementById("emailErrorModal")
+                ).show();
+            }
+        });
+    </script>
+    <script>
+        let selectedExpenseId = null;
+
+        document.querySelectorAll(".table-container table tbody tr").forEach(row => {
+            row.addEventListener("contextmenu", function (e) {
+                e.preventDefault();
+                document.querySelectorAll(".table-container tbody tr")
+                    .forEach(r => r.classList.remove("active-row"));
+
+                // highlight current row
+                this.classList.add("active-row");
+
+                selectedExpenseId = this.dataset.expenseId;
+
+                const menu = document.getElementById("expenseRowMenu");
+                menu.style.top = `${e.pageY}px`;
+                menu.style.left = `${e.pageX}px`;
+                menu.classList.add("show");
+            });
+        });
+        document.addEventListener("click", () => {
+            document.querySelectorAll(".table-container tbody tr")
+                .forEach(r => r.classList.remove("active-row"));
+
+            document.getElementById("expenseRowMenu")?.classList.remove("show");
+        });
+    </script>
+

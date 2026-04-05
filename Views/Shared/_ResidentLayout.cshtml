@@ -1,0 +1,329 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/startbootstrap-sb-admin-2@4.1.4/css/sb-admin-2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8f9fc;
+            overflow: hidden;
+            margin: 0;
+            color: #333;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            min-width: 250px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            border-right: 1px solid #eee;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #000;
+            line-height: 1.2;
+            margin-bottom: 50px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            color: #888;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+            .nav-item i {
+                margin-right: 15px;
+                width: 20px;
+                text-align: center;
+            }
+
+            .nav-item:hover {
+                background-color: #fff3cd;
+                color: #f36f21;
+                text-decoration: none;
+            }
+
+            .nav-item.active {
+                background-color: #f36f21;
+                color: #fff;
+                box-shadow: 0 4px 10px rgba(243, 111, 33, 0.3);
+            }
+
+            /* --- LOGOUT BUTTON STYLES --- */
+            .nav-item.logout {
+                margin-top: auto;
+                margin-bottom: 40px;
+                background-color: #ffffff;
+                color: #e74a3b;
+                font-weight: 700;
+                border: 2px solid #f36f21;
+            }
+
+                .nav-item.logout:hover {
+                    background-color: #f36f21;
+                    color: #ffffff;
+                    border-color: #f36f21;
+                }
+
+        /* CONTENT */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+
+        .header-title h2 {
+            font-weight: 800;
+            color: #000;
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .header-title p {
+            color: #000;
+            margin: 5px 0 0;
+            font-size: 0.9rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            text-align: right;
+        }
+
+        .user-info {
+            margin-right: 15px;
+        }
+
+        .user-name {
+            font-weight: 700;
+            color: #000;
+            display: block;
+        }
+
+        .user-settings {
+            font-size: 0.8rem;
+            color: #888;
+            text-decoration: none;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            background-color: #f36f21;
+            border-radius: 50%;
+        }
+
+        /* mobile responsiveness */
+        @@media (max-width: 768px) {
+
+            .sidebar {
+                position: fixed;
+                left: -250px; /* Hide off-screen */
+                top: 0;
+                bottom: 0;
+                transition: 0.3s;
+                box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+            }
+                /* 2. Class to slide sidebar IN when button is clicked */
+                .sidebar.show {
+                    left: 0;
+                }
+            /* 3. Make Main Content full width */
+            .main-content {
+                padding: 20px;
+                width: 100%;
+            }
+            /* 4. Adjust Header Text Size */
+            .header-title h2 {
+                font-size: 1.4rem;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="wrapper">
+
+        <div class="sidebar">
+            <div class="brand">Carlton<br>Residences</div>
+            <a href="@Url.Action("Dashboard", "Resident")"
+               class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")">
+                <i class="fas fa-chart-pie"></i> Dashboard
+            </a>
+
+            <a href="@Url.Action("PaymentHistory", "Resident")"
+               class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "PaymentHistory" ? "active" : "")">
+                <i class="fas fa-users"></i> Payment History
+            </a>
+
+            <a href="@Url.Action("Statements", "Resident")"
+               class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Statements" ? "active" : "")">
+                <i class="fas fa-chart-line"></i> Statement of Account
+            </a>
+
+            <a href="@Url.Action("Invoices", "Resident")"
+               class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Invoices" ? "active" : "")">
+                <i class="fas fa-list"></i> Invoices
+            </a>
+            <a href="@Url.Action("Settings", "Resident")"
+               class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Settings" ? "active" : "")">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+            <a href="@Url.Action("Logout", "Resident")" class="nav-item logout" onclick="return confirm('Are you sure you want to log out?');">
+                <i class="fas fa-sign-out-alt"></i> Log Out
+            </a>
+        </div>
+
+        <!-- ========== MAIN CONTENT ========== -->
+        <main class="main-content">
+
+            <!-- GLOBAL HEADER -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <button class="btn btn-primary d-md-none me-3" onclick="toggleSidebar()" style="background-color: #f36f21; border:none;">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <!-- PAGE TITLE -->
+                <div>
+                    <h2 class="mb-1">@ViewData["PageTitle"]</h2>
+                    <small id="pageSubtitle" class="text-muted"></small>
+                </div>
+
+                <!-- RESIDENT INFO -->
+                <div class="d-flex align-items-center gap-2">
+
+                    <div class="text-end">
+                        <div class="fw-bold">
+                            @Context.Session.GetString("ResidentName")
+                        </div>
+                        <small class="text-muted">
+                            @Context.Session.GetString("ResidentUsername")
+                        </small>
+                    </div>
+
+                    <div class="rounded-circle bg-warning text-white d-flex justify-content-center align-items-center"
+                         style="width:40px;height:40px;font-weight:bold;">
+                        @Context.Session.GetString("ResidentName")?.Substring(0, 1)
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- PAGE CONTENT -->
+            @RenderBody()
+
+        </main>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
+
+    <script>
+        function toggleSidebar() {
+            $(".sidebar").toggleClass("show");
+        }
+
+        // 2. CLOSE SIDEBAR WHEN CLICKING OUTSIDE
+        $(document).click(function(event) {
+            if ($(window).width() < 768 && $(".sidebar").hasClass("show")) {
+                if (!$(event.target).closest('.sidebar').length && !$(event.target).closest('.btn-primary').length) {
+                    $(".sidebar").removeClass("show");
+                }
+            }
+        });
+
+        function updatePageSubtitle() {
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true,
+                timeZone: 'Asia/Manila',
+                timeZoneName: 'short'
+            };
+
+            document.getElementById("pageSubtitle").textContent =
+                now.toLocaleString('en-US', options);
+        }
+
+        updatePageSubtitle();
+        setInterval(updatePageSubtitle, 1000);
+                // SESSION TIMEOUT
+        let inactivityTimer;
+        const timeoutLimit = 15 * 60 * 1000;
+
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(forceLogout, timeoutLimit);
+        }
+
+        function forceLogout() {
+            alert("Your session has expired due to inactivity. For your security, you have been logged out.");
+            window.location.href = '/Resident/Logout';
+        }
+        window.onload = resetInactivityTimer;
+        document.onmousemove = resetInactivityTimer;
+        document.onkeypress = resetInactivityTimer;
+        document.onscroll = resetInactivityTimer;
+        document.onclick = resetInactivityTimer;
+        function toggleSidebar() {
+            $(".sidebar").toggleClass("show");
+        }
+
+    </script>
+
+</body>
+</html>
