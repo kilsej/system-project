@@ -49,7 +49,7 @@
         card h2,
         .card h5 {
             white-space: nowrap;
-            font-size: 1.6rem; /* adjust if needed */
+            font-size: 1.6rem; 
             line-height: 1.2;
         }
     }
@@ -95,7 +95,7 @@
         overflow: hidden;
     }
 
-    /* top-right button */
+
     .flip-toggle {
         position: absolute;
         top: 8px;
@@ -144,7 +144,7 @@
             color: #000;
             
         }
-    /* MODAL */
+
     .modal-header {
         background-color: #fff;
         color: #333;
@@ -240,7 +240,7 @@
 
     .history-table-wrapper {
         width: 100%;
-        max-width: 520px; /* 👈 controls how square it feels */
+        max-width: 520px;
     }
 
     .table-container {
@@ -250,7 +250,6 @@
         box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
     }
 
-        /* Hover effects */
         .table-container table tbody tr {
             cursor: context-menu;
             transition: background-color 0.15s ease;
@@ -261,7 +260,6 @@
                 background-color: #F2F0EF !important;
             }
 
-        /* Optional: tighter columns */
         .table-container th,
         .table-container td {
             padding: 12px 14px;
@@ -270,9 +268,6 @@
   
 </style>
 
-
-
-<!-- ================= FILTERS (MONTH + YEAR) ================= -->
 @if (!isPdf)
 {
     <form method="get" asp-action="FinancialReport" class="mb-4">
@@ -306,7 +301,6 @@
     </form>
 }
 
-<!-- ================= TABS ================= -->
 <ul class="nav nav-tabs justify-content-center fw-bold mb-4">
     <li class="nav-item">
         <button class="nav-link active no-print" data-bs-toggle="tab" data-bs-target="#monthly">
@@ -322,7 +316,6 @@
 
 <div class="tab-content">
 
-    <!-- ================= MONTHLY TAB ====================== -->
     <div class="tab-pane fade show active" id="monthly">
         <div class="d-flex justify-content-start mb-4">
             <a asp-action="GenerateMonthlyPdf"
@@ -333,7 +326,7 @@
             </a>
         </div>
 
-        <!-- Cards-->
+  
         <div class="row mb-4">
             <div class="col-12 col-sm-6 col-lg-3 mb-3">
                 <div class="card text-center shadow h-100">
@@ -421,7 +414,7 @@
                 </div>
             </div>
         </div>
-        <!-- MONTHLY PROGRESS BAR -->
+       
         <div class="card p-3 mt-3">
             <h6>Monthly Collection Progress</h6>
             <div class="progress" style="height:25px">
@@ -437,7 +430,7 @@
             </div>
         </div>
 
-        <!-- MONTHLY CHARTS -->
+        
         <div class="row mt-4 g-3">
             <div class="col-lg-8">
                 <div class="card p-3 h-100">
@@ -458,10 +451,6 @@
             </div>
         </div>
     </div>
-
-    <!-- ===================================================== -->
-    <!-- ================= YEARLY TAB ======================= -->
-    <!-- ===================================================== -->
     <div class="tab-pane fade" id="yearly">
         <div class="d-flex justify-content-start mb-4">
             <a asp-action="GenerateYearlyPdf"
@@ -481,12 +470,12 @@
             <div class="col-md-4">
                 <div class="card shadow-sm p-3 position-relative yearly-card">
 
-                    <!-- flip button (browser only) -->
+             
                     <button class="btn btn-sm btn-light position-absolute top-0 end-0 m-2 flip-btn">
                         ↻
                     </button>
 
-                    <!-- Gross -->
+          
                     <div class="gross">
                         <h6>Yearly Gross Collected</h6>
                         <h4 class="fw-bold" style="color:#333;">
@@ -496,7 +485,7 @@
 
                     <hr class="net-separator" />
 
-                    <!-- Net -->
+              
                     <div class="net">
                         <h6>Yearly Net Collected</h6>
                         <h4 class="fw-bold" style="color:#333;">
@@ -515,7 +504,7 @@
             </div>
         </div>
 
-        <!-- YEARLY CHARTS -->
+ 
         <div class="row mt-4 g-3">
             <div class="col-lg-8">
                 <div class="card p-3 h-100">
@@ -538,7 +527,6 @@
     </div>
 </div>
 
-<!-- ================= EDIT TARGET MODAL ================= -->
 @if (!isPdf)
 {
     <div class="modal fade" id="editTargetModal" tabindex="-1">
@@ -551,7 +539,7 @@
 
                 <form asp-action="UpdateTarget" method="post">
 
-                    <!-- REQUIRED -->
+                    
                     <input type="hidden" name="month" value="@Model.Month" />
                     <input type="hidden" name="year" value="@Model.Year" />
 
@@ -588,7 +576,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 target-history-modal">
 
-                <!-- MODAL HEADER -->
+
                 <div class="modal-header px-4 py-3"
                      style="background:#F97316;">
                     <h5 class="fw-bold mx-auto mb-0 text-white">
@@ -600,10 +588,10 @@
                             aria-label="Close"></button>
                 </div>
 
-                <!-- FILTERS -->
+             
                 <div class="row g-3 px-4 pt-3 pb-2 align-items-end">
 
-                    <!-- MONTH FILTER -->
+              
                     <div class="col-md-6 col-lg-4">
                         <label for="historyMonth" class="fw-semibold">Month</label>
                         <select id="historyMonth"
@@ -625,7 +613,7 @@
                         </select>
                     </div>
 
-                    <!-- YEAR FILTER -->
+         
                     <div class="col-md-6 col-lg-4">
                         <label for="historyYear" class="fw-semibold">Year</label>
                         <select id="historyYear"
@@ -649,7 +637,7 @@
 
                 </div>
 
-                <!-- MODAL BODY -->
+               
                 <div class="modal-body px-4 pb-4">
 
                     <div class="d-flex justify-content-center mt-1">
@@ -711,7 +699,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // ================= GLOBAL FUNCTIONS =================
             function filterHistory() {
         const month = document.getElementById('historyMonth').value;
         const year = document.getElementById('historyYear').value;
@@ -734,7 +721,6 @@
         if(loader) loader.classList.add('d-none');
     }
 
-    // ================= DOM CONTENT LOADED =================
     document.addEventListener('DOMContentLoaded', function() {
 
         const commonOptions = {
@@ -743,7 +729,6 @@
             plugins: { legend: { position: 'bottom' } }
         };
 
-        // ================= RESTORE ACTIVE TAB =================
         const urlParams = new URLSearchParams(window.location.search);
         const savedTab = urlParams.get('tab') || localStorage.getItem('activeTab') || 'monthly';
 
@@ -763,7 +748,7 @@
             });
         });
 
-        // ================= AUTO-OPEN MODAL IF FILTERED =================
+      
         if (urlParams.has('historyMonth') || urlParams.has('historyYear')) {
             const historyModalEl = document.getElementById('viewTargetsModal');
             if (historyModalEl) {
@@ -772,7 +757,6 @@
             }
         }
 
-        // ================= MONTHLY BAR CHART =================
         const monthLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyChart.Select(x => x.Month).ToList()));
         const monthlyCollected = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyChart.Select(x => x.Collection).ToList()));
         const monthlyTargets = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyChart.Select(x => x.Target).ToList()));
@@ -807,8 +791,6 @@
                 }
             }
         });
-
-        // ================= MONTHLY PIE CHART =================
         const monthlyPie = new Chart(document.getElementById('monthlyPie'), {
             type: 'pie',
             data: {
@@ -838,8 +820,6 @@
                 }
             }
         });
-
-        // ================= YEARLY BAR CHART =================
         const yearLabels = @Html.Raw(Json.Serialize(Model.YearlyChart.Select(x => x.Year)));
         const yearlyCollected = @Html.Raw(Json.Serialize(Model.YearlyChart.Select(x => x.Collection)));
 
@@ -868,7 +848,6 @@
             }
         });
 
-        // ================= YEARLY PIE CHART =================
         const yearlyPie = new Chart(document.getElementById('yearlyPie'), {
             type: 'pie',
             data: {
@@ -899,7 +878,7 @@
             }
         });
 
-        // ================= TAB RESIZE FIX =================
+
         document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tabEl => {
             tabEl.addEventListener('shown.bs.tab', () => {
                 setTimeout(() => {
@@ -911,7 +890,7 @@
             });
         });
 
-        // ================= PDF BUTTONS =================
+  
         document.querySelectorAll('.btn-orange-round').forEach(btn => {
             if(btn.href.includes('Pdf')) {
                 btn.addEventListener('click', showPdfLoader);

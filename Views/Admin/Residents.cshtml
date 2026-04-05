@@ -864,11 +864,9 @@
                     </div>
                 </div>
 
-                <!-- TOGGLE DURATION -->
                 <div class="form-check mt-2">
 
 
-                    <!-- actual checkbox -->
                     <input class="form-check-input"
                            type="checkbox"
                            id="useDuration"
@@ -876,7 +874,6 @@
                            value="true"
                            checked>
 
-                    <!-- hidden for false -->
                     <input type="hidden" name="UseDuration" value="false" />
 
                     <label class="form-check-label" for="useDuration">
@@ -891,7 +888,6 @@
 
                     <div class="row mt-2" style="max-width: 400px;">
 
-                        <!-- NUMBER -->
                         <div class="col-5">
                             <input type="number"
                                    id="invDuration"
@@ -901,7 +897,6 @@
                                    value="1">
                         </div>
 
-                        <!-- UNIT -->
                         <div class="col-7">
                             <select id="invDurationUnit"
                                     name="DurationUnit"
@@ -917,7 +912,6 @@
 
                
 
-                <!-- DATE ISSUED -->
                 <div class="mb-3 mt-2">
                     <label>Date Issued: *</label>
                     <input type="text" id="invDate" name="DateIssued" class="form-control keep" readonly />
@@ -925,7 +919,7 @@
 
                 <div class="row">
 
-                    <!-- RATE -->
+          
                     <div class="col-md-6 mb-3">
                         <label>Rate/Month: *</label>
                         <input type="number" id="invRate" name="Rate"
@@ -943,7 +937,7 @@
                         </div>
                     </div>
 
-                    <!-- TOTAL -->
+       
                     <div class="col-md-6 mb-3">
                         <label>Total Amount:</label>
                         <div class="input-group">
@@ -951,7 +945,7 @@
                             <input type="text" id="invTotal" class="form-control" readonly />
                         </div>
 
-                        <!-- ADVANCE PAYMENT -->
+            
                         <div class="mt-2" style="height: 24px;">
                             <div class="form-check m-0">
                                 <input class="form-check-input" type="checkbox" id="advancePayment">
@@ -964,13 +958,13 @@
 
                 </div>
 
-                <!-- DESCRIPTION -->
+         
                 <div class="mb-3">
                     <label>Description:</label>
                     <textarea name="Description" class="form-control" rows="2"></textarea>
                 </div>
 
-                <!-- ISSUED BY -->
+           
                 <div class="mb-3">
                     <label>Issued By: </label>
                     <input type="text" id="invIssuedBy" name="IssuedBy" class="form-control keep" value="@ViewBag.AdminName" readonly />
@@ -987,7 +981,7 @@
     </div>
 </div>
 
-<!-- ADD PAYMENT MODAL -->
+
 <div class="modal fade" id="addPaymentModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content p-4">
@@ -999,14 +993,14 @@
 
                 <div class="row mt-3">
 
-                    <!-- BLOCK -->
+          
                     <div class="col-md-3 mb-3">
                         <label>Block: *</label>
                         <input type="text" id="payBlock" name="Block" class="form-control"
                                required pattern="[0-9]+">
                     </div>
 
-                    <!-- LOT -->
+ 
                     <div class="col-md-3 mb-3">
                         <label>Lot: *</label>
                         <input type="text" id="payLot" name="Lot" class="form-control"
@@ -1020,31 +1014,29 @@
                     </div>
 
 
-                    <!-- NAME -->
+               
                     <div class="col-md-6 mb-3">
                         <label>Name:</label>
                         <input type="text" id="payName" class="form-control" readonly>
                     </div>
 
-                    <!-- INVOICE NO -->
+    
                     <div class="col-md-12 mb-3">
                         <label>Select Invoice(s) to Pay: *</label>
 
-                        <!-- Container where JS injects invoice checkboxes -->
+      
                         <div id="payInvoiceContainer"
                              class="border rounded p-2"
                              style="max-height: 200px; overflow-y: auto; min-height: 45px;">
-                            <!-- JS will insert checkboxes here -->
                         </div>
                     </div>
 
-                    <!-- DATE OF PAYMENT -->
                     <div class="col-md-6 mb-3">
                         <label>Date of Payment:</label>
                         <input type="date" id="payDate" name="DatePaid" class="form-control keep" readonly>
                     </div>
 
-                    <!-- PAYMENT METHOD -->
+ 
                     <div class="col-md-6 mb-3">
                         <label>Method: *</label>
                         <select id="payMethod" name="Method" class="form-select" required>
@@ -1053,7 +1045,7 @@
                         </select>
                     </div>
 
-                    <!-- OR NUMBER -->
+              
                     <div class="col-md-6 mb-3">
                         <label>OR No.:</label>
                         <input type="text"
@@ -1067,19 +1059,19 @@
                                placeholder="5-digit OR No.">
                     </div>
 
-                    <!-- TOTAL AMOUNT AUTO -->
+          
                     <div class="col-md-6 mb-3">
                         <label>Total Amount:</label>
                         <input type="text" id="payAmount" name="Amount" class="form-control" readonly>
                     </div>
 
-                    <!-- REMARKS -->
+             
                     <div class="col-md-12 mb-3">
                         <label>Remarks:</label>
                         <textarea name="Remarks" class="form-control" rows="2"></textarea>
                     </div>
 
-                    <!-- ISSUED BY -->
+               
                     <div class="col-md-6 mb-3">
                         <label>Issued By:</label>
                         <input type="text" id="payIssuedBy" name="IssuedBy" class="form-control keep" value="@ViewBag.AdminName" readonly>
@@ -1099,7 +1091,7 @@
     </div>
 </div>
 
-<!-- SUCCESS POPUP MODAL -->
+
 <div class="modal fade" id="successModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content p-4">
@@ -1173,7 +1165,7 @@
         </div>
     </div>
 </div>
-<!-- PAYMENT SUCCESS MODAL -->
+
 <div class="modal fade" id="paymentSuccessModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content p-4 text-center">
@@ -1201,7 +1193,7 @@
     </div>
 </div>
 
-<!-- EDIT RESIDENT MODAL -->
+
 <div class="modal fade" id="editResidentModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content p-4">
@@ -1213,7 +1205,7 @@
                   asp-action="EditResident"
                   onsubmit="return confirmEditResident();">
 
-                <!-- READ-ONLY ID -->
+    
                 <div class="mb-3">
                     <label>Resident ID</label>
                     <input type="text" id="editResidentIdDisplay" class="form-control" readonly>
@@ -1222,7 +1214,7 @@
 
                 <div class="row">
 
-                    <!-- FIRST NAME -->
+         
                     <div class="col-md-4 mb-3">
                         <label>First Name *</label>
                         <input type="text"
@@ -1234,7 +1226,7 @@
                                title="Letters only">
                     </div>
 
-                    <!-- LAST NAME -->
+      
                     <div class="col-md-4 mb-3">
                         <label>Last Name *</label>
                         <input type="text"
@@ -1246,7 +1238,7 @@
                                title="Letters only">
                     </div>
 
-                    <!-- MIDDLE NAME -->
+        
                     <div class="col-md-4 mb-3">
                         <label>Middle Name</label>
                         <input type="text"
@@ -1257,7 +1249,7 @@
                                title="Letters only">
                     </div>
 
-                    <!-- BLOCK -->
+        
                     <div class="col-md-4 mb-3">
                         <label>Block *</label>
                         <input type="text"
@@ -1270,7 +1262,7 @@
                                title="Numbers only">
                     </div>
 
-                    <!-- LOT -->
+      
                     <div class="col-md-4 mb-3">
                         <label>Lot *</label>
                         <input type="text"
@@ -1283,7 +1275,7 @@
                                title="Numbers only">
                     </div>
 
-                    <!-- PHASE -->
+          
                     <div class="col-md-4 mb-3">
                         <label>Phase *</label>
                         <input type="text"
@@ -1296,7 +1288,7 @@
                                title="Numbers only">
                     </div>
 
-                    <!-- YEAR -->
+         
                     <div class="col-md-4 mb-3">
                         <label>Year of Residency *</label>
                         <input type="number"
@@ -1308,7 +1300,7 @@
                                max="2100">
                     </div>
 
-                    <!-- STATUS -->
+               
                     <div class="col-md-4 mb-3">
                         <label>Status *</label>
                         <select id="editStatus" name="Status" class="form-select" required>
@@ -1317,7 +1309,7 @@
                         </select>
                     </div>
 
-                    <!-- USERNAME (READ ONLY) -->
+                 
                     <div class="col-md-6 mb-3">
                         <label>Username</label>
                         <input type="text"
@@ -1346,7 +1338,7 @@
                     </div>
 
 
-                    <!-- EMAIL -->
+                
                     <div class="col-md-6 mb-3">
                         <label>Email</label>
                         <input type="email"
@@ -1355,7 +1347,7 @@
                                class="form-control">
                     </div>
 
-                    <!-- CONTACT -->
+                
                     <div class="col-md-6 mb-3">
                         <label>Contact No.</label>
                         <input type="text"
@@ -1388,15 +1380,13 @@
     
     <a id="editResident">View/Edit</a>
     
-    @* 2. Deactivate is strictly for Primary Super Admin ONLY *@
+
     @if (Context.Session.GetString("IsPrimary") == "True")
     {
         <a id="toggleResidentStatus"></a>
     }
 </div>
 
-
-<!-- RESIDENT EDIT SUCCESS MODAL -->
 <div class="modal fade" id="residentEditSuccessModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content text-center p-4">
@@ -1458,7 +1448,6 @@
     </div>
 </div>
 
-<!-- ======================== SCRIPTS ======================== -->
 @{
     var simpleList = Model.Select(r => new
     {
@@ -1512,7 +1501,6 @@
                 }
             });
 
-            // force-select current year
             [...select.options].forEach(opt => {
                 if (parseInt(opt.value) === currentYear) {
                     opt.selected = true;
@@ -1551,7 +1539,7 @@
                 return;
             }
 
-            // Fetch resident by address
+
             const res = await fetch(`/Admin/GetResidentByAddress?block=${block}&lot=${lot}&phase=${phase}`);
             const resident = await res.json();
 
@@ -1562,7 +1550,7 @@
 
             document.getElementById("payName").value = resident.fullName;
 
-            // Fetch unpaid invoices of that resident
+        
             const invres = await fetch(`/Admin/GetUnpaidInvoices?residentId=${resident.residentId}`);
             const invoices = await invres.json();
 
@@ -1656,10 +1644,10 @@
 
     <script>
         function resetInvoiceUI() {
-            // Clear name & email
+          
             document.getElementById("invName").value = "";
 
-            // Reset all month checkboxes
+        
             document.querySelectorAll(".month-checkbox").forEach(cb => {
                 cb.disabled = false;
                 cb.checked = false;
@@ -1674,13 +1662,13 @@
             const phase = document.getElementById("invPhase").value.trim();
             const year = document.getElementById("invYear").value;
 
-            // If any field missing → reset and stop
+          
             if (!block || !lot || !phase || !year) {
                 resetInvoiceUI();
                 return;
             }
 
-            // 🔎 GET RESIDENT
+       
             const res = await fetch(`/Admin/GetResidentByAddress?block=${block}&lot=${lot}&phase=${phase}`);
             const resident = await res.json();
 
@@ -1689,22 +1677,21 @@
                 return;
             }
 
-            // Fill name/email
+      
             document.getElementById("invName").value = resident.fullName;
   
 
-            // 📅 GET DISABLED MONTHS
+   
             const mres = await fetch(`/Admin/GetExistingInvoiceMonths?block=${block}&lot=${lot}&phase=${phase}&year=${year}`);
             const disabledMonths = await mres.json();
 
-            // Reset first
+            
             document.querySelectorAll(".month-checkbox").forEach(cb => {
                 cb.disabled = false;
                 cb.checked = false;
                 cb.closest(".form-check").style.opacity = "1";
             });
 
-            // Disable existing months
             disabledMonths.forEach(m => {
                 const checkbox = document.querySelector(`.month-checkbox[value='${m}']`);
                 if (checkbox) {
@@ -1719,10 +1706,9 @@
             ["invBlock", "invLot", "invPhase"].forEach(id => {
                 const el = document.getElementById(id);
 
-                // As soon as user TYPES → reset instantly
+                
                 el.addEventListener("input", resetInvoiceUI);
 
-                // When they leave the field → try load
                 el.addEventListener("blur", loadResidentAndMonths);
             });
 
@@ -1776,7 +1762,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
-            // ✓ SUCCESS POPUP FOR INVOICE
+        
             var inv = "@(TempData["InvoiceSuccess"] ?? "")";
 
             if (inv !== "") {
@@ -1803,7 +1789,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
-            // ✓ PAYMENT SUCCESS POPUP
+
             var pay = "@(TempData["PaymentSuccess"] ?? "")";
 
             if (pay !== "") {
@@ -1829,7 +1815,6 @@
 
 
     <script>
-        // SEARCH FUNCTION JS
                document.addEventListener("DOMContentLoaded", function () {
 
                    const searchInput = document.querySelector("input[name='search']");
@@ -1900,9 +1885,7 @@
             let firstName = "";
             let middleName = "";
 
-            // Expected formats:
-            // "Lastname, Firstname Middlename"
-            // "Lastname, Firstname"
+
             if (fullName.includes(",")) {
                 const [last, rest] = fullName.split(",");
                 lastName = last.trim();
@@ -1913,7 +1896,7 @@
                     ? nameParts.slice(1).join(" ")
                     : "";
             } else {
-                // Fallback: "Firstname Middlename Lastname"
+    
                 const parts = fullName.split(" ");
                 firstName = parts[0] || "";
                 lastName = parts.length > 1 ? parts[parts.length - 1] : "";
@@ -1974,7 +1957,7 @@
             let clickedResidentId = null;
             let clickedRow = null;
 
-            // RIGHT CLICK MENU
+      
             document.addEventListener("contextmenu", function (e) {
                 const row = e.target.closest("tr[data-id]");
                 if (!row) return;
@@ -1995,18 +1978,18 @@
                 menu.style.display = "block";
             });
 
-            // HIDE MENU
+      
             document.addEventListener("click", function () {
                 document.getElementById("residentMenu").style.display = "none";
             });
 
-            // EDIT
+           
             document.getElementById("editResident").addEventListener("click", function (e) {
                 e.stopPropagation();
                 openEditResidentModal(clickedRow);
             });
 
-            // ENABLE / DISABLE
+           
             document.getElementById("toggleResidentStatus").addEventListener("click", function (e) {
                 e.stopPropagation();
 
@@ -2042,7 +2025,7 @@
                     if (cb.checked) {
                         const selectedMonth = parseInt(cb.value);
 
-                        // ✅ FULL DATE COMPARISON
+                       
                         if (
                             selectedYear > currentYear ||
                             (selectedYear === currentYear && selectedMonth > currentMonth)
@@ -2059,15 +2042,15 @@
                 }
             }
 
-            // Month checkbox events
+        
             monthCheckboxes.forEach(cb => {
                 cb.addEventListener("change", checkFutureMonths);
             });
 
-            // Year change event (IMPORTANT)
+            
             yearSelect.addEventListener("change", checkFutureMonths);
 
-            // Toggle duration usage
+          
             useDuration.addEventListener("change", checkFutureMonths);
 
         });
@@ -2206,7 +2189,7 @@
                 document.querySelectorAll(".table-container tbody tr")
                     .forEach(r => r.classList.remove("active-row"));
 
-                // highlight current row
+             
                 this.classList.add("active-row");
 
                 selectedExpenseId = this.dataset.expenseId;

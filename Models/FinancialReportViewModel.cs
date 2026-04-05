@@ -6,7 +6,7 @@
         public int Year { get; set; }
         public List<int> Years { get; set; } = new();
 
-        // ===== MONTHLY =====
+   
         public decimal MonthlyTarget { get; set; }
         public decimal PreviousTarget { get; set; }
 
@@ -23,13 +23,13 @@
         public int UpdatedResidents { get; set; }
         public int DelinquentResidents { get; set; }
 
-        // ===== YEARLY =====
+   
         public decimal YearlyTarget { get; set; }
         public decimal YearlyGrossCollection { get; set; }
         public decimal YearlyNetCollection { get; set; }
         public decimal YearlyRate { get; set; }
 
-        // ===== YEARLY STATUS =====
+      
         public int YearlyUpdatedResidents { get; set; }
         public int YearlyDelinquentResidents { get; set; }
 

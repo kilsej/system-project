@@ -253,9 +253,9 @@
         }
 
             .custom-table table tbody tr:hover {
-                background-color: #f5f5f5; /* Light grey highlight */
-                cursor: pointer; /* Makes it feel clickable */
-                transition: background-color 0.2s ease; /* Smooth fade */
+                background-color: #f5f5f5; 
+                cursor: pointer; 
+                transition: background-color 0.2s ease; 
             }
 
 
@@ -292,14 +292,14 @@
         .custom-table th:nth-child(5),
         .custom-table td:nth-child(5) {
             width: 18%;
-            padding-left: 70px; /* space from YEAR */
+            padding-left: 70px; 
             white-space: nowrap;
         }
         /* Amount column */
         .custom-table th:last-child,
         .custom-table td:last-child {
-            width: 240px; /* move it further right */
-            padding-left: 80px; /* space from DATE column */
+            width: 240px; 
+            padding-left: 80px; 
             white-space: nowrap;
         }
 
@@ -321,7 +321,6 @@
             white-space: nowrap;
         }
 
-        /* Remove last row border */
         .custom-table tbody tr:last-child td {
             border-bottom: none;
         }
@@ -377,11 +376,11 @@
 
 <div class="">
 
-    <!-- ================= FILTER BAR ================= -->
+
     <form method="get" asp-action="Expense" id="filterForm"
           class="row g-3 mb-3 align-items-end">
 
-        <!-- Search -->
+ 
         <div class="col-md-4">
             <label class="form-label">Search:</label>
             <input type="text" id="searchInput" name="search"
@@ -390,7 +389,7 @@
                    placeholder="Voucher or expense type..." />
         </div>
 
-        <!-- Month -->
+ 
         <div class="col-md-3">
             <label class="form-label">Month:</label>
             <select name="month" class="form-select"
@@ -407,8 +406,6 @@
             </select>
         </div>
 
-
-        <!-- Year -->
         <div class="col-md-3">
             <label class="form-label">Year:</label>
             <select name="year" class="form-select"
@@ -479,8 +476,6 @@
             </div>
         }
 
-
-        <!-- Button -->
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
 
             @if (Context.Session.GetString("CanManageExpenses") == "True" ||
@@ -497,7 +492,7 @@
 
             <div class="d-flex align-items-center gap-2 ms-auto">
 
-                <!-- Generate via PDF -->
+  
                 <a asp-controller="Admin"
                    asp-action="GenerateExpensePDF"
                    asp-route-month="@Model.Month"
@@ -529,7 +524,7 @@
         </div>
     </form>
 
-    <!-- ================= TABLE ================= -->
+
     <div class="table-container custom-table">
         <table class="table mb-0">
             <thead>
@@ -603,7 +598,6 @@
     </div>
 
 
-<!-- ================= ADD MODAL ================= -->
     <div class="modal fade" id="addExpenseModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content p-4">
@@ -683,7 +677,7 @@
             </div>
         </div>
     </div>
-    <!-- EDIT EXPENSE MODAL -->
+   
     <div class="modal fade" id="editExpenseModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content p-4">
@@ -695,7 +689,7 @@
                       asp-action="EditExpense"
                       onsubmit="return confirmEditExpense();">
 
-                    <!-- REQUIRED -->
+              
                     <input type="hidden" name="Expense_Id" id="editExpenseId" />
 
                     <div class="mb-3">
@@ -884,7 +878,7 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
         <script>
-            // SEARCH FUNCTION JS
+        
                    document.addEventListener("DOMContentLoaded", function () {
 
                        const searchInput = document.querySelector("input[name='search']");
@@ -968,7 +962,7 @@
                 const row = e.target.closest("tr[data-id]");
                 if (!row) return;
 
-                // Permission check
+            
                 const canEdit =
                     "@Context.Session.GetString("CanEditExpense")" === "True" ||
                     "@Context.Session.GetString("IsPrimary")" === "True";
@@ -986,13 +980,13 @@
                 menu.style.display = "block";
             });
 
-            // Hide menu when clicking anywhere
+        
             document.addEventListener("click", function () {
                 document.getElementById("expenseRowMenu").style.display = "none";
             });
 
 
-            // DELETE
+   
                     document.getElementById("deleteExpense").onclick = function (e) {
                 e.stopPropagation();
 
@@ -1012,7 +1006,7 @@
                     document.querySelectorAll(".table-container tbody tr")
                         .forEach(r => r.classList.remove("active-row"));
 
-                    // highlight current row
+      
                     this.classList.add("active-row");
 
                     selectedExpenseId = this.dataset.expenseId;

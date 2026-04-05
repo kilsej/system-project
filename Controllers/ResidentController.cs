@@ -19,8 +19,6 @@ public class ResidentController : Controller
     {
         _context = context;
     }
-
-    // ENTRY POINT
     public IActionResult Index()
     {
         if (HttpContext.Session.GetInt32("ResidentId") != null)
@@ -306,7 +304,7 @@ public class ResidentController : Controller
         if (resident == null)
             return NotFound();
 
-        // Oldest to newest
+       
         var invoices = resident.Invoices
             .OrderBy(i => i.Billing_Period)
             .ToList();
@@ -317,7 +315,6 @@ public class ResidentController : Controller
             PdfWriter.GetInstance(doc, ms);
             doc.Open();
 
-            // ========================== FONTS ==========================
             var titleFont = FontFactory.GetFont(FontFactory.TIMES_BOLD, 20);
             var sectionFont = FontFactory.GetFont(FontFactory.TIMES_BOLD, 12);
             var normalFont = FontFactory.GetFont(FontFactory.TIMES, 11);
@@ -328,7 +325,7 @@ public class ResidentController : Controller
             logo.ScaleToFit(60f, 60f);
             logo.Alignment = Element.ALIGN_LEFT;
 
-            // ========================== HEADER =========================
+
             PdfPTable header = new PdfPTable(2) { WidthPercentage = 100 };
             header.SetWidths(new float[] { 60f, 40f });
 
@@ -343,14 +340,14 @@ public class ResidentController : Controller
             right.WidthPercentage = 100;
             right.DefaultCell.Border = Rectangle.NO_BORDER;
 
-            // LOGO CELL
+     
             PdfPCell logoCell = new PdfPCell(logo);
             logoCell.Border = Rectangle.NO_BORDER;
             logoCell.VerticalAlignment = Element.ALIGN_TOP;
             logoCell.HorizontalAlignment = Element.ALIGN_LEFT;
             right.AddCell(logoCell);
 
-            // ADDRESS CELL
+       
             PdfPTable address = new PdfPTable(1);
             address.DefaultCell.Border = Rectangle.NO_BORDER;
             address.AddCell(new Phrase("Carlton Residence Home Owner's Association", sectionFont));
@@ -368,7 +365,7 @@ public class ResidentController : Controller
             doc.Add(header);
             doc.Add(new Paragraph("\n"));
 
-            // ====================== RESIDENT INFO ======================
+         
             PdfPTable info = new PdfPTable(1)
             {
                 WidthPercentage = 100
@@ -385,7 +382,7 @@ public class ResidentController : Controller
             doc.Add(info);
             doc.Add(new Paragraph("\n"));
 
-            // ========================== TABLE ==========================
+       
             PdfPTable table = new PdfPTable(8)
             {
                 WidthPercentage = 100
@@ -408,7 +405,7 @@ public class ResidentController : Controller
                 });
             }
 
-            // ================= RUNNING BALANCE =================
+            
             decimal runningBalance = 0;
 
             foreach (var inv in invoices)
@@ -437,7 +434,7 @@ public class ResidentController : Controller
 
             doc.Add(table);
 
-            // ====================== TOTAL DUE ======================
+   
             doc.Add(new Paragraph("\n"));
             PdfPTable total = new PdfPTable(1) { WidthPercentage = 100 };
             total.AddCell(new PdfPCell(
@@ -451,7 +448,7 @@ public class ResidentController : Controller
 
             doc.Close();
 
-            // File name: Lastname_SOA.pdf
+           
             var lastName = resident.FullName.Split(',')[0];
             var fileName = $"{lastName}_SOA.pdf";
 
@@ -462,7 +459,7 @@ public class ResidentController : Controller
     [HttpGet]
     public async Task<IActionResult> GenerateInvoicePDF()
     {
-        // 🔐 Resident session
+     
         int? residentId = HttpContext.Session.GetInt32("ResidentId");
         if (residentId == null)
             return RedirectToAction("Login");
@@ -490,7 +487,6 @@ public class ResidentController : Controller
             PdfWriter.GetInstance(doc, ms);
             doc.Open();
 
-            // ========================== FONTS ==========================
             var titleFont = FontFactory.GetFont(FontFactory.TIMES_BOLD, 20);
             var sectionFont = FontFactory.GetFont(FontFactory.TIMES_BOLD, 12);
             var normalFont = FontFactory.GetFont(FontFactory.TIMES, 11);
@@ -501,7 +497,7 @@ public class ResidentController : Controller
             logo.ScaleToFit(60f, 60f);
             logo.Alignment = Element.ALIGN_LEFT;
 
-            // ========================== HEADER =========================
+           
             PdfPTable header = new PdfPTable(2) { WidthPercentage = 100 };
             header.SetWidths(new float[] { 60f, 40f });
 
@@ -516,14 +512,14 @@ public class ResidentController : Controller
             right.WidthPercentage = 100;
             right.DefaultCell.Border = Rectangle.NO_BORDER;
 
-            // LOGO CELL
+     
             PdfPCell logoCell = new PdfPCell(logo);
             logoCell.Border = Rectangle.NO_BORDER;
             logoCell.VerticalAlignment = Element.ALIGN_TOP;
             logoCell.HorizontalAlignment = Element.ALIGN_LEFT;
             right.AddCell(logoCell);
 
-            // ADDRESS CELL
+           
             PdfPTable address = new PdfPTable(1);
             address.DefaultCell.Border = Rectangle.NO_BORDER;
             address.AddCell(new Phrase("Carlton Residence Home Owner's Association", sectionFont));
@@ -541,7 +537,7 @@ public class ResidentController : Controller
             doc.Add(header);
             doc.Add(new Paragraph("\n"));
 
-            // ====================== RESIDENT INFO ======================
+          
             PdfPTable info = new PdfPTable(1)
             {
                 WidthPercentage = 100
@@ -558,7 +554,7 @@ public class ResidentController : Controller
             doc.Add(info);
             doc.Add(new Paragraph("\n"));
 
-            // ========================== TABLE ==========================
+    
             PdfPTable table = new PdfPTable(8);
             table.WidthPercentage = 100;
             table.SetWidths(new float[]
@@ -596,7 +592,6 @@ public class ResidentController : Controller
 
             doc.Add(table);
 
-            // ====================== TOTAL AMOUNT DUE ======================
             doc.Add(new Paragraph("\n"));
 
             PdfPTable totalTable = new PdfPTable(1)
@@ -630,7 +625,7 @@ public class ResidentController : Controller
 
     public async Task<IActionResult> GeneratePaymentPDF()
     {
-        // 🔐 Ensure resident is logged in
+ 
         int? residentId = HttpContext.Session.GetInt32("ResidentId");
         if (residentId == null)
             return RedirectToAction("Login");
@@ -656,7 +651,7 @@ public class ResidentController : Controller
             PdfWriter.GetInstance(doc, ms);
             doc.Open();
 
-            // ====================== FONTS ======================
+     
             var titleFont = FontFactory.GetFont(FontFactory.TIMES_BOLD, 20);
             var sectionFont = FontFactory.GetFont(FontFactory.TIMES_BOLD, 12);
             var normalFont = FontFactory.GetFont(FontFactory.TIMES, 11);
@@ -667,7 +662,7 @@ public class ResidentController : Controller
             logo.ScaleToFit(60f, 60f);
             logo.Alignment = Element.ALIGN_LEFT;
 
-            // ====================== HEADER ======================
+  
             PdfPTable header = new PdfPTable(2) { WidthPercentage = 100 };
             header.SetWidths(new float[] { 60f, 40f });
 
@@ -683,14 +678,14 @@ public class ResidentController : Controller
             right.WidthPercentage = 100;
             right.DefaultCell.Border = Rectangle.NO_BORDER;
 
-            // LOGO CELL
+       
             PdfPCell logoCell = new PdfPCell(logo);
             logoCell.Border = Rectangle.NO_BORDER;
             logoCell.VerticalAlignment = Element.ALIGN_TOP;
             logoCell.HorizontalAlignment = Element.ALIGN_LEFT;
             right.AddCell(logoCell);
 
-            // ADDRESS CELL
+       
             PdfPTable address = new PdfPTable(1);
             address.DefaultCell.Border = Rectangle.NO_BORDER;
             address.AddCell(new Phrase("Carlton Residence Home Owner's Association", sectionFont));
@@ -710,7 +705,6 @@ public class ResidentController : Controller
             doc.Add(header);
             doc.Add(new Paragraph("\n"));
 
-            // ====================== RESIDENT INFO ======================
             PdfPTable info = new PdfPTable(1)
             {
                 WidthPercentage = 100
@@ -727,7 +721,6 @@ public class ResidentController : Controller
             doc.Add(info);
             doc.Add(new Paragraph("\n"));
 
-            // ====================== TABLE ======================
             PdfPTable table = new PdfPTable(8);
             table.WidthPercentage = 100;
             table.SetWidths(new float[]
@@ -779,7 +772,6 @@ public class ResidentController : Controller
 
             doc.Add(table);
 
-            // ====================== TOTAL PAYMENTS ======================
             doc.Add(new Paragraph("\n"));
 
             decimal totalPayments = payments.Sum(p => p.Total_Amount);

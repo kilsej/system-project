@@ -13,7 +13,6 @@ namespace Software_Engineering.Models
         public string? Contact_No { get; set; }
         public string? Email { get; set; }
 
-        // ✔ Add these two missing navigation properties
         public ResidentAccount ResidentAccount { get; set; }
         public ICollection<Invoice> Invoices { get; set; }
     }

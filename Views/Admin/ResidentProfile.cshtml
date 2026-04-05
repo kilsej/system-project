@@ -32,7 +32,6 @@
             overflow: hidden;
         }
 
-        /* SIDEBAR */
         .sidebar {
             width: 250px;
             min-width: 250px;
@@ -83,7 +82,6 @@
                 box-shadow: 0 4px 10px rgba(243, 111, 33, 0.3);
             }
 
-            /* --- LOGOUT BUTTON STYLES --- */
             .nav-item.logout {
                 margin-top: auto;
                 margin-bottom: 40px;
@@ -98,17 +96,14 @@
                     color: #ffffff;
                     border-color: #f36f21;
                 }
-        /* Make ALL tab text black */
         .nav-tabs .nav-link {
             color: black !important;
         }
 
-            /* Keep active tab text black too */
             .nav-tabs .nav-link.active {
                 color: black !important;
             }
 
-            /* Optional: when hovering */
             .nav-tabs .nav-link:hover {
                 color: black !important;
             }
@@ -206,7 +201,6 @@
                 text-decoration: none;
             }
 
-        /* TABLE */
         .table-container {
             background: white;
             border-radius: 10px;
@@ -399,8 +393,6 @@
     </a>
 
 
-
-    <!-- ================= TABS ON TOP =================-->
     <ul class="nav nav-tabs justify-content-center fw-bold mb-4" id="myTab" role="tablist">
         <li class="nav-item">
             <button class="nav-link "
@@ -457,8 +449,6 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
 }
-
-    <!-- ================= RESIDENT INFO =================-->
     <div class="mb-4 text-start">
         <p><strong>Resident Name:</strong> @Model.Resident.FullName</p>
         <p>
@@ -472,7 +462,6 @@
 
     <div class="tab-content">
 
-        <!-- ================ PAYMENT HISTORY TAB ================= -->
         <div class="tab-pane fade " id="payments">
 
             <form method="get" class="row g-3 mb-3">
@@ -577,14 +566,12 @@
                 </table>
             </div>
 
-            <!-- TOTAL -->
             <div class="text-end fw-bold">
                 Payments Received: PHP @Model.Payments.Sum(p => p.Total_Amount).ToString("N2")
             </div>
         </div>
 
 
-        <!-- ================ STATEMENTS TAB ================= -->
         <div class="tab-pane fade" id="statements">
             <form method="get" class="row g-3 mb-3">
                 <input type="hidden" name="id" value="@Model.Resident.Resident_Id" />
@@ -621,7 +608,6 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold m-0">Statements of Account</h4>
 
-                <!-- Button group -->
                 <div class="d-flex align-items-center gap-2">
                     <a asp-controller="Admin"
                        asp-action="GenerateSOAPDF"
@@ -652,8 +638,8 @@
                             <th style="background-color: #f36f21; color: white;">Date Issued</th>
                             <th style="background-color: #f36f21; color: white;">Description</th>
                             <th style="background-color: #f36f21; color: white;">Receipt No.</th>
-                            <th style="background-color: #f36f21; color: white;">Debit</th>     <!-- Charge -->
-                            <th style="background-color: #f36f21; color: white;">Credit</th>    <!-- Payment -->
+                            <th style="background-color: #f36f21; color: white;">Debit</th>     
+                            <th style="background-color: #f36f21; color: white;">Credit</th>    
                             <th style="background-color: #f36f21; color: white;">Balance</th>
                         </tr>
                     </thead>
@@ -673,9 +659,8 @@
                             decimal debit = inv.Total_Amount;
                             decimal credit = payments.Sum(p => p.Total_Amount);
 
-                            // UPDATE RUNNING BALANCE
-                            runningBalance += debit;   // add charge
-                            runningBalance -= credit;  // subtract payment
+                            runningBalance += debit;   
+                            runningBalance -= credit; 
 
                             string creditText = credit > 0 ? $"PHP {credit:N2}" : "---";
                             string receipt = payments.Any() ? payments.Last().OR_No : "---";
@@ -704,7 +689,6 @@
 
         </div>
 
-        <!-- ================ INVOICES TAB ================= -->
         <div class="tab-pane fade" id="invoices">
             <form method="get" class="row g-3 mb-3">
                 <input type="hidden" name="id" value="@Model.Resident.Resident_Id" />
@@ -766,7 +750,6 @@
                         Import CSV
                     </button>
                     }
-                    <!-- Download CSV -->
                     <a asp-controller="Template"
                        asp-action="DownloadInvoiceCsv"
                        asp-route-residentId="@Model.Resident.Resident_Id"
@@ -798,10 +781,9 @@
                     <tbody>
                         @foreach (var inv in Model.Invoices.OrderByDescending(i => i.Billing_Period))
                         {
-                            // STATUS COLOR
+
                             string statusColor = inv.Status == "Paid" ? "text-success" : "text-danger";
 
-                            // AGE CALCULATION
                             string age = "---";
                             if (inv.Status == "Unpaid")
                             {
@@ -836,7 +818,6 @@
         </div>
     </div>
 
-    <!-- SEND EMAIL MODAL -->
     <div class="modal fade" id="sendEmailModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content p-4">
@@ -848,7 +829,6 @@
 
                     <input type="hidden" name="ResidentId" value="@Model.Resident.Resident_Id" />
 
-                    <!-- SUBJECT -->
                     <div class="mb-3">
                         <label class="fw-bold">Subject</label>
                         <input type="text"
@@ -858,7 +838,6 @@
                                required />
                     </div>
 
-                    <!-- MESSAGE -->
                     <div class="mb-3">
                         <label class="fw-bold">Message</label>
                         <textarea name="EmailBody"
@@ -1047,7 +1026,7 @@
     </script>
 
 
-    <!-- EDIT INVOICE MODAL -->
+
     <div class="modal fade" id="editInvoiceModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content p-4">
@@ -1055,11 +1034,10 @@
                 <h4 class="fw-bold text-center mb-3">Edit Invoice</h4>
                 <form method="post" action="/Admin/EditInvoice" onsubmit="return confirmEditInvoice();">
 
-                    <!-- REQUIRED HIDDEN FIELDS -->
+
                     <input type="hidden" name="Invoice_No" id="editInvoiceId">
                     <input type="hidden" name="ResidentId" value="@Model.Resident.Resident_Id">
 
-                    <!-- READ ONLY -->
                     <div class="mb-3">
                         <label>Invoice No.</label>
                         <input type="text" id="editInvoiceNo" class="form-control" readonly>
@@ -1070,7 +1048,6 @@
                         <input type="text" id="editBillingPeriod" class="form-control" readonly>
                     </div>
 
-                    <!-- EDITABLE -->
                     <div class="mb-3">
                         <label>Total Amount *</label>
                         <input type="number" step="0.01" name="Total_Amount"
@@ -1157,7 +1134,6 @@
         <input type="hidden" name="residentId" value="@Model.Resident.Resident_Id" />
     </form>
 
-    <!-- INVOICE DELETE SUCCESS MODAL -->
     <div class="modal fade" id="invoiceDeleteSuccessModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content text-center p-4">

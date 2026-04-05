@@ -40,7 +40,7 @@ public class MonthlyBillingService : BackgroundService
         if (!alreadyProcessed)
         {
             await ProcessMonthlyBilling();
-            // RECORD THAT SYSTEM RAN
+    
             context.SystemRun.Add(new SystemRun
             {
                 Run_Month = month,
@@ -70,14 +70,14 @@ public class MonthlyBillingService : BackgroundService
 
         foreach (var r in residents)
         {
-            // Check if invoice already exists
+          
             var invoice = await context.Invoice
                 .FirstOrDefaultAsync(i =>
                     i.Resident_Id == r.Resident_Id &&
                     i.Billing_Period.Month == month &&
                     i.Billing_Period.Year == year);
             
-            // Create if not exists
+         
             if (invoice == null)
             {
                 invoice = new Invoice
@@ -95,7 +95,7 @@ public class MonthlyBillingService : BackgroundService
                 context.Invoice.Add(invoice);
             }
 
-            // EMAIL ONLY IF CURRENT MONTH IS UNPAID
+          
             if (invoice.Status == "Unpaid" &&
                 !string.IsNullOrWhiteSpace(r.Email))
             {
@@ -161,7 +161,7 @@ Carlton Residences HOA Office</p>
         message.To.Add(toAddress);
         message.Subject = subject;
         message.Body = body;
-        message.IsBodyHtml = true; // VERY IMPORTANT
+        message.IsBodyHtml = true; 
 
         smtp.Send(message);
 

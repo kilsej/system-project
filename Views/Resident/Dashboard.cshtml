@@ -15,14 +15,14 @@
         position: relative;
     }
 
-    /* === Layout === */
+
     .chart-container {
         width: 100%;
         height: 280px;
         position: relative;
     }
 
-    /* === Cards === */
+
     .summary-card,
     .status-card,
     .pie_card {
@@ -89,7 +89,7 @@
     }
 
 
-    /* mobile responsiveness*/
+   
 
     @@media (max-width: 768px) {
         .welcome-section {
@@ -119,7 +119,6 @@
             width: 100px;
             height: 100px;
         }
-        /* Add spacing between stacked cards */
         .col-12 {
             margin-bottom: 15px;
         }
@@ -193,7 +192,7 @@
         let updated = @Model.UpdatedResidents;
         let delinquent = @Model.DelinquentResidents;
 
-        // If no data yet, show placeholder slice
+
         let isEmpty = false;
         if (updated === 0 && delinquent === 0) {
             updated = 1;

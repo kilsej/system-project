@@ -31,7 +31,7 @@
             overflow: hidden;
         }
 
-        /* SIDEBAR */
+      
         .sidebar {
             width: 250px;
             min-width: 250px;
@@ -82,7 +82,7 @@
                 box-shadow: 0 4px 10px rgba(243, 111, 33, 0.3);
             }
 
-            /* --- LOGOUT BUTTON STYLES --- */
+         
             .nav-item.logout {
                 margin-top: auto;
                 margin-bottom: 40px;
@@ -98,7 +98,7 @@
                     border-color: #f36f21;
                 }
 
-        /* CONTENT */
+       
         .main-content {
             flex-grow: 1;
             padding: 40px;
@@ -155,7 +155,7 @@
             border-radius: 50%;
         }
 
-        /* CONTROLS & BUTTONS */
+     
         .search-input {
             background-color: #e9ecef;
             border: none;
@@ -190,7 +190,7 @@
                 text-decoration: none;
             }
 
-        /* TABLE */
+        
         .table-container {
             background: white;
             border-radius: 10px;
@@ -267,7 +267,6 @@
                 text-decoration: underline;
             }
 
-        /* MODAL */
         .modal-header {
             background-color: #fff;
             color: #333;
@@ -344,7 +343,6 @@
     }
 
 </style>
-<!-- Filters -->
 <form method="get" asp-action="Dashboard" class="row mb-4">
     <div class="col-md-3">
         <select name="month" class="form-control" onchange="this.form.submit()">
@@ -370,7 +368,6 @@
 </form>
 
 
-<!-- Cards -->
 <div class="row mb-4">
     <div class="col-12 col-sm-6 col-lg-3 mb-3">
         <div class="card text-center shadow h-100">
@@ -412,7 +409,6 @@
     </div>
 </div>
 
-<!-- Map -->
 <div class="row justify-content-center">
     <div class="col-12 col-md-6 col-lg-12 mb-3">
         <div class="card shadow h-100 p-3">
@@ -816,7 +812,6 @@
     </div>
 </div>
 
-<!-- Hidden data from DB -->
 @foreach (var block in Model.BlockSummaries)
 {
     <input type="hidden"
@@ -835,7 +830,6 @@
         const tooltip = document.getElementById("mapTooltip");
 
         document.querySelectorAll("#mapVisualization path").forEach(path => {
-            // Skip free spaces (no block or phase assigned)
             if (!path.dataset.phase || !path.dataset.block) return;
 
             const phase = path.dataset.phase;
@@ -845,7 +839,6 @@
     `.block-data[data-phase='${phase}'][data-block='${block}']`
     );
 
-            // DEFAULT VALUES (when no residents yet)
             let paid = 0;
             let unpaid = 0;
 
@@ -859,19 +852,18 @@
 
             // COLOR LOGIC
             if (total === 0) {
-                path.style.fill = "#9ca3af"; // Gray: no residents yet
+                path.style.fill = "#9ca3af"; 
             }
             else if (paid >= majority) {
-                path.style.fill = "#22c55e"; // Green
+                path.style.fill = "#22c55e"; 
             }
             else if (paid === unpaid) {
-                path.style.fill = "#facc15"; // Yellow
+                path.style.fill = "#facc15";
             }
             else {
-                path.style.fill = "#ef4444"; // Red
+                path.style.fill = "#ef4444"; 
             }
 
-            // TOOLTIP (ALWAYS SHOW BLOCK + PHASE)
             path.addEventListener("mouseenter", function (e) {
                 tooltip.innerHTML = `
                     <strong>Block ${block} - Phase ${phase}</strong><br>

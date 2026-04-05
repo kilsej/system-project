@@ -31,7 +31,6 @@ namespace Software_Engineering.Models
         public DateTime? LastOtpVerification { get; set; }
 
 
-        // ✅ NEW: Tracks login frequency for OTP logic
         public int LoginCount { get; set; }
         public ICollection<Invoice> Invoices { get; set; }
         public ICollection<Payment> Payments { get; set; }

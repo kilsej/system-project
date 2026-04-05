@@ -10,9 +10,6 @@ namespace Software_Engineering.Data
         {
         }
 
-        // ==============================
-        // DATABASE TABLES (DbSet)
-        // ==============================
         public DbSet<ResidentInfo> ResidentInfo { get; set; }
         public DbSet<ResidentAccount> ResidentAccount { get; set; }
         public DbSet<Admin> Admin { get; set; }
@@ -25,11 +22,6 @@ namespace Software_Engineering.Data
 
         public DbSet<TargetHistoryVM> MonthlyTargets { get; set; }
 
-
-
-        // ==============================
-        // RELATIONSHIP CONFIGURATION
-        // ==============================
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -95,9 +87,6 @@ namespace Software_Engineering.Data
 
 
 
-            // -----------------------------------------
-            // PRIMARY KEYS
-            // -----------------------------------------
             modelBuilder.Entity<ResidentInfo>()
                 .HasKey(r => r.Resident_Id);
 
@@ -116,46 +105,41 @@ namespace Software_Engineering.Data
             modelBuilder.Entity<AdminLog>()
                 .HasKey(l => l.Log_Id);
 
-            // -----------------------------------------
-            // RELATIONSHIPS
-            // -----------------------------------------
-
-            // 1️⃣ ResidentInfo ↔ ResidentAccount (1:1)
+     
             modelBuilder.Entity<ResidentAccount>()
                 .HasOne(a => a.ResidentInfo)
                 .WithOne(r => r.ResidentAccount)
                 .HasForeignKey<ResidentAccount>(a => a.Resident_Id)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // 2️⃣ ResidentInfo → Invoice (1:N)
+ 
             modelBuilder.Entity<Invoice>()
                 .HasOne(i => i.ResidentInfo)
                 .WithMany(r => r.Invoices)
                 .HasForeignKey(i => i.Resident_Id)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // 3️⃣ Admin → Invoice (1:N)
             modelBuilder.Entity<Invoice>()
                 .HasOne(i => i.Admin)
                 .WithMany(a => a.Invoices)
                 .HasForeignKey(i => i.Admin_Id)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // 4️⃣ Invoice → Payment (1:N)
+      
             modelBuilder.Entity<Payment>()
                 .HasOne(p => p.Invoice)
                 .WithMany(i => i.Payments)
                 .HasForeignKey(p => p.Invoice_No)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // 5️⃣ Admin → Payment (1:N)
+      
             modelBuilder.Entity<Payment>()
                 .HasOne(p => p.Admin)
                 .WithMany(a => a.Payments)
                 .HasForeignKey(p => p.Admin_Id)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // 6️⃣ Admin → AdminLog (1:N)
+          
             modelBuilder.Entity<AdminLog>()
                 .HasOne(l => l.Admin)
                 .WithMany(a => a.AdminLogs)

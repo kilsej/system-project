@@ -69,18 +69,18 @@
         }
 
         .input-group .form-control {
-            height: 48px; /* your input height */
+            height: 48px; 
         }
 
         .input-group-text.eye-box {
-            height: 48px; /* force same height */
+            height: 48px; 
             padding: 0 12px;
         }
 
 
         .eye-box {
             cursor: pointer;
-            background: #e9f2ff; /* same as input color */
+            background: #e9f2ff; 
             border: 1px solid #ced4da;
             border-left: 0;
             display: flex;
@@ -371,7 +371,6 @@
             }
         });
 
-        // ✅ Updated Logic: Only send Username
         function sendResetOtp() {
             var u = $('#resetUsername').val();
             if(!u) { $('#fpError1').text("Username is required."); return; }
@@ -418,30 +417,30 @@
             const toggleBtn = document.getElementById("togglePasswordBtn");
             const icon = toggleBtn.querySelector("i");
 
-            // Function to show password
+   
             function showPassword() {
                 passwordInput.type = "text";
                 icon.classList.remove("fa-eye");
                 icon.classList.add("fa-eye-slash");
             }
 
-            // Function to hide password
+        
             function hidePassword() {
                 passwordInput.type = "password";
                 icon.classList.remove("fa-eye-slash");
                 icon.classList.add("fa-eye");
             }
 
-            // --- MOUSE EVENTS (Desktop) ---
+         
             toggleBtn.addEventListener("mousedown", function(e) {
-                e.preventDefault(); // Prevents focus loss
+                e.preventDefault(); 
                 showPassword();
             });
 
             toggleBtn.addEventListener("mouseup", hidePassword);
             toggleBtn.addEventListener("mouseleave", hidePassword);
 
-            // --- TOUCH EVENTS (Mobile) ---
+      
             toggleBtn.addEventListener("touchstart", function(e) {
                 e.preventDefault();
                 showPassword();
@@ -470,7 +469,6 @@
             }
         });
 
-        // ✅ Updated Logic: Only send Username
         function sendResetOtp() {
             var u = $('#resetUsername').val();
             if(!u) { $('#fpError1').text("Username is required."); return; }
@@ -517,30 +515,29 @@
             const toggleBtn = document.getElementById("togglePasswordBtn");
             const icon = toggleBtn.querySelector("i");
 
-            // Function to show password
+       
             function showPassword() {
                 passwordInput.type = "text";
                 icon.classList.remove("fa-eye");
                 icon.classList.add("fa-eye-slash");
             }
 
-            // Function to hide password
+    
             function hidePassword() {
                 passwordInput.type = "password";
                 icon.classList.remove("fa-eye-slash");
                 icon.classList.add("fa-eye");
             }
 
-            // --- MOUSE EVENTS (Desktop) ---
             toggleBtn.addEventListener("mousedown", function(e) {
-                e.preventDefault(); // Prevents focus loss
+                e.preventDefault(); 
                 showPassword();
             });
 
             toggleBtn.addEventListener("mouseup", hidePassword);
             toggleBtn.addEventListener("mouseleave", hidePassword);
 
-            // --- TOUCH EVENTS (Mobile) ---
+          
             toggleBtn.addEventListener("touchstart", function(e) {
                 e.preventDefault();
                 showPassword();
@@ -551,7 +548,7 @@
     </script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Get elements
+   
         const newPass = document.getElementById("newPassword");
         const confirmPass = document.getElementById("confirmPassword");
         const errorLabel = document.getElementById("passwordMatchError");
@@ -561,7 +558,7 @@
             const val1 = newPass.value;
             const val2 = confirmPass.value;
 
-            // 1. If confirm box is empty, reset styles and keep disabled
+        
             if (val2 === "") {
                 confirmPass.classList.remove("is-invalid", "is-valid");
                 errorLabel.style.display = "none";
@@ -569,23 +566,22 @@
                 return;
             }
 
-            // 2. Check if they match
+        
             if (val1 === val2) {
-                // MATCH: Green border, hide error, enable button
+            
                 confirmPass.classList.remove("is-invalid");
-                confirmPass.classList.add("is-valid"); // Bootstrap green border
+                confirmPass.classList.add("is-valid"); 
                 errorLabel.style.display = "none";
                 saveBtn.disabled = false;
             } else {
-                // MISMATCH: Red border, show error, disable button
+           
                 confirmPass.classList.remove("is-valid");
-                confirmPass.classList.add("is-invalid"); // Bootstrap red border
+                confirmPass.classList.add("is-invalid"); 
                 errorLabel.style.display = "block";
                 saveBtn.disabled = true;
             }
         }
 
-        // Listen for typing in BOTH fields (so if they change the first one, it re-validates)
         newPass.addEventListener("input", validatePasswords);
         confirmPass.addEventListener("input", validatePasswords);
     });

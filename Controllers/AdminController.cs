@@ -83,13 +83,11 @@ namespace Software_Engineering.Controllers
                     return View();
                 }
 
-                // Success - Reset Strikes
                 admin.FailedLoginAttempts = 0;
                 admin.LockoutEnd = null;
                 _context.Admin.Update(admin);
                 await _context.SaveChangesAsync();
 
-                // Setup & OTP Logic
                 if (string.IsNullOrWhiteSpace(admin.Email))
                 {
                     HttpContext.Session.SetInt32("PendingAdminId", admin.Admin_Id);
@@ -127,16 +125,12 @@ namespace Software_Engineering.Controllers
                 return await PerformLogin(admin);
             }
 
-            // ==========================================
-            // 2. RESIDENT LOGIN FLOW
-            // ==========================================
             var resident = await _context.ResidentAccount
                 .Include(r => r.ResidentInfo)
                 .FirstOrDefaultAsync(r => r.Username == Username && r.Status == "Active");
 
             if (resident != null)
             {
-                // Check Lockout
                 if (resident.LockoutEnd.HasValue && resident.LockoutEnd.Value > DateTime.Now)
                 {
                     var timeRemaining = (int)(resident.LockoutEnd.Value - DateTime.Now).TotalMinutes;
@@ -145,7 +139,6 @@ namespace Software_Engineering.Controllers
                     return View();
                 }
 
-                // Check Password
                 if (resident.Password != Password)
                 {
                     resident.FailedLoginAttempts++;
@@ -164,19 +157,15 @@ namespace Software_Engineering.Controllers
                     return View();
                 }
 
-                // Success - Reset Strikes
                 resident.FailedLoginAttempts = 0;
                 resident.LockoutEnd = null;
                 _context.ResidentAccount.Update(resident);
                 await _context.SaveChangesAsync();
 
-                // RESIDENT OTP & LOGIN LOGIC (UPDATED)
                 string email = resident.ResidentInfo?.Email;
 
-                // ONLY trigger OTP if it's the 5th login AND they actually have an email linked
                 bool requireResidentOtp = !resident.LastOtpVerification.HasValue || (DateTime.Now - resident.LastOtpVerification.Value).TotalDays >= 5;
 
-                // mat-trigger lang if lumampas na 5 days and may email na linked sa account
                 if (requireResidentOtp && !string.IsNullOrWhiteSpace(email))
 
                 {
@@ -195,12 +184,10 @@ namespace Software_Engineering.Controllers
                 }
                 else
                 {
-                    // NORMAL LOGIN (Handles regular logins AND 5th-logins for residents with no email)
                     HttpContext.Session.SetInt32("ResidentId", resident.Resident_Id);
                     HttpContext.Session.SetString("ResidentName", resident.ResidentInfo?.FullName ?? "Resident");
                     HttpContext.Session.SetString("UserType", "Resident");
 
-                    // Optional: Give them a friendly nudge to add their email!
                     if (string.IsNullOrWhiteSpace(email))
                     {
                         TempData["Success"] = "Logged in securely. Please update your profile with an email address for better account recovery!";
@@ -212,8 +199,6 @@ namespace Software_Engineering.Controllers
                     return RedirectToAction("Index", "Resident");
                 }
             }
-
-            // If neither Admin nor Resident is found
             TempData["LoginError"] = "Invalid username or password.";
             return View();
         }
@@ -274,17 +259,17 @@ namespace Software_Engineering.Controllers
             int selectedMonth = month ?? DateTime.Now.Month;
             int selectedYear = year ?? DateTime.Now.Year;
 
-            // Base resident query (NOT materialized yet)
+
             var residentQuery = _context.ResidentInfo
                 .Where(r => r.Year_Of_Residency <= selectedYear);
 
-            // Invoice query for selected period only
+
             var invoiceQuery = _context.Invoice
                 .Where(i =>
                     i.Billing_Period.Month == selectedMonth &&
                     i.Billing_Period.Year == selectedYear);
 
-            // Join residents with invoice for selected month
+
             var residentWithInvoice = from r in residentQuery
                                       join i in invoiceQuery
                                       on r.Resident_Id equals i.Resident_Id into invoiceGroup
@@ -297,10 +282,9 @@ namespace Software_Engineering.Controllers
                                           InvoiceStatus = i != null ? i.Status : null
                                       };
 
-            // TOTAL residents
+
             int totalResidents = residentQuery.Count();
 
-            // PAID residents
             int paidResidents = residentWithInvoice
                 .Where(x => x.InvoiceStatus == "Paid")
                 .Select(x => x.Resident_Id)
@@ -313,7 +297,7 @@ namespace Software_Engineering.Controllers
                 ? 0
                 : Math.Round((decimal)paidResidents / totalResidents * 100, 2);
 
-            // Block + Phase Summary (Fully SQL Executed)
+
             var blockSummaries = residentWithInvoice
                 .GroupBy(x => new { x.Phase_No, x.Block })
                 .Select(g => new
@@ -323,7 +307,7 @@ namespace Software_Engineering.Controllers
                     Total = g.Count(),
                     Paid = g.Count(x => x.InvoiceStatus == "Paid")
                 })
-                .AsEnumerable() // switch to memory for percentage + status
+                .AsEnumerable() 
                 .Select(g =>
                 {
                     int unpaid = g.Total - g.Paid;
@@ -351,7 +335,6 @@ namespace Software_Engineering.Controllers
                 .ThenBy(b => b.Block)
                 .ToList();
 
-            // Year filter
             int startYear = 2017;
             int currentYear = DateTime.Now.Year;
 
@@ -445,10 +428,8 @@ namespace Software_Engineering.Controllers
 
             if (resident == null) return NotFound();
 
-            // ================= ACTIVE TAB =================
             ViewBag.ActiveTab = activeTab ?? "payments";
 
-            // ================= PAYMENTS FILTER =================
             var paymentsQuery = _context.Payment
                 .Include(p => p.Invoice).ThenInclude(i => i.Payments)
                 .Include(p => p.Admin)
@@ -467,7 +448,6 @@ namespace Software_Engineering.Controllers
             ViewBag.SelectedPayMonth = payMonth;
             ViewBag.SelectedPayYear = payYear;
 
-            // ================= INVOICES FILTER =================
             var invoicesQuery = resident.Invoices.AsQueryable();
 
             if (invMonth != null)
@@ -483,7 +463,6 @@ namespace Software_Engineering.Controllers
             ViewBag.SelectedInvMonth = invMonth;
             ViewBag.SelectedInvYear = invYear;
 
-            // ================= STATEMENTS FILTER =================
             var statementsQuery = resident.Invoices.AsQueryable();
 
             if (soaMonth != null)
@@ -499,7 +478,6 @@ namespace Software_Engineering.Controllers
             ViewBag.SelectedSoaMonth = soaMonth;
             ViewBag.SelectedSoaYear = soaYear;
 
-            // ================= EMAIL TEMPLATE (UNCHANGED) =================
             decimal totalOutstanding = resident.Invoices
                 .Where(i => i.Status == "Unpaid")
                 .Sum(i => i.Total_Amount);
@@ -575,7 +553,6 @@ admin@carltonresidences.com";
             return Json(new { success = true, data = cleanedAdmins });
         }
 
-        // 4. UPDATE EXISTING SUB-ADMIN
         [HttpPost]
         public async Task<IActionResult> UpdateSubAdmin(
 int AdminId, string FullName, string Username, string Password,
@@ -634,18 +611,15 @@ bool CanImportResident, bool CanImportInvoice, bool CanImportPayment, bool CanMa
                 username = admin.Username,
                 fullName = admin.FullName,
 
-                // Resident Module
-                // Resident Module
                 canAddResident = admin.CanAddResident,
-                canEditResident = admin.CanEditResident,     // <-- FIXED
+                canEditResident = admin.CanEditResident,   
                 canImportResident = admin.CanImportResident,
 
-                // Invoice Module
                 canCreateInvoice = admin.CanCreateInvoice,
-                canEditInvoice = admin.CanEditInvoice,       // <-- FIXED
+                canEditInvoice = admin.CanEditInvoice,       
                 canImportInvoice = admin.CanImportInvoice,
 
-                // Payment Module
+
                 canAddPayment = admin.CanAddPayment,
                 canImportPayment = admin.CanImportPayment,
 
@@ -655,13 +629,10 @@ bool CanImportResident, bool CanImportInvoice, bool CanImportPayment, bool CanMa
             });
         }
 
-        // ==========================================
-        // 4. DELETE ADMIN
-        // ==========================================
         [HttpPost]
         public async Task<IActionResult> DeleteSubAdmin(int id)
         {
-            // 1. Check Session & Security
+
             var currentUserId = HttpContext.Session.GetInt32("AdminId");
             var isPrimary = HttpContext.Session.GetString("IsPrimary");
 
@@ -669,14 +640,11 @@ bool CanImportResident, bool CanImportInvoice, bool CanImportPayment, bool CanMa
             {
                 return Json(new { success = false, message = "Access Denied: Only the Primary Admin can perform this action." });
             }
-
-            // 2. Prevent Self-Deletion
             if (id == currentUserId)
             {
                 return Json(new { success = false, message = "You cannot delete your own account." });
             }
 
-            // 3. Perform the Delete
             try
             {
                 var adminToDelete = await _context.Admin.FindAsync(id);
@@ -686,20 +654,18 @@ bool CanImportResident, bool CanImportInvoice, bool CanImportPayment, bool CanMa
                     return Json(new { success = false, message = "Admin not found." });
                 }
 
-                // Prevent deleting the Primary Admin via this method
                 if (adminToDelete.Is_Primary)
                 {
                     return Json(new { success = false, message = "The Primary Admin account cannot be deleted." });
                 }
 
-                // Capture data before deletion
+
                 string deleterName = HttpContext.Session.GetString("AdminName") ?? "System Administrator";
                 string deletedUser = adminToDelete.Username ?? "Unknown Admin";
 
-                // 4. Remove and Log
+
                 _context.Admin.Remove(adminToDelete);
 
-                // Pass the full sentence as one string to match your LogActivity(string act)
                 await LogActivity($"{deleterName} deleted {deletedUser}'s account");
 
                 await _context.SaveChangesAsync();
@@ -708,12 +674,10 @@ bool CanImportResident, bool CanImportInvoice, bool CanImportPayment, bool CanMa
             }
             catch (Exception ex)
             {
-                // Helpful for debugging DBNull or casting errors
                 return Json(new { success = false, message = "Database Error: " + ex.Message });
             }
         }
 
-        // invoice email
         [HttpPost]
         public async Task<IActionResult> SendInvoiceEmail(int ResidentId, string Subject, string EmailBody)
         {
@@ -797,7 +761,7 @@ bool CanImportResident, bool CanImportInvoice, bool CanImportPayment, bool CanMa
             _context.Invoice.Add(invoice);
             await _context.SaveChangesAsync();
 
-            // email resident
+
             var resident = await _context.ResidentInfo
                 .FirstOrDefaultAsync(r => r.Resident_Id == residentId);
 
@@ -861,7 +825,6 @@ Carlton Residences HOA
             string ContactNo,
             string Email)
         {
-            // 1️ CHECK FOR DUPLICATE BLOCK + LOT + PHASE BEFORE ANYTHING ELSE
             bool exists = await _context.ResidentInfo
                 .AnyAsync(r => r.Block == Block && r.Lot == Lot && r.Phase_No == PhaseNo);
             ViewBag.AdminName = HttpContext.Session.GetString("AdminName");
@@ -877,10 +840,8 @@ Carlton Residences HOA
             }
 
 
-            // 2️ Combine full name
             string fullName = $"{LastName}, {FirstName} {MiddleName}".Trim();
 
-            // 3️ Save ResidentInfo
             var resident = new ResidentInfo
             {
                 FullName = fullName,
@@ -895,7 +856,6 @@ Carlton Residences HOA
             _context.ResidentInfo.Add(resident);
             await _context.SaveChangesAsync();   
 
-            // 4️ Username + Password generation
             string cleanLast = LastName.Replace(" ", "").ToLower();
             string properLast = char.ToUpper(cleanLast[0]) + cleanLast.Substring(1);
 
@@ -909,7 +869,6 @@ Carlton Residences HOA
 
             string password = $"{properLast}{digits}{special}";
 
-            // 5️ Save account
             var account = new ResidentAccount
             {
                 Resident_Id = resident.Resident_Id,
@@ -925,7 +884,6 @@ Carlton Residences HOA
             TempData["NewPassword"] = password;
             await LogActivity($"Added new resident: {resident.FullName} [(Block {resident.Block} Lot {resident.Lot} Phase {resident.Phase_No})]");
 
-            // TRIGGER IMMEDIATE BILLING
             await CreateCurrentMonthInvoiceIfMissing(
                 resident.Resident_Id,
                 HttpContext.Session.GetInt32("AdminId"),
@@ -1038,7 +996,6 @@ Carlton Residences HOA
                     };
 
                     _context.ResidentAccount.Add(account);
-                    // TRIGGER IMMEDIATE BILLING
                     await CreateCurrentMonthInvoiceIfMissing(
                         resident.Resident_Id,
                         HttpContext.Session.GetInt32("AdminId"),
@@ -1228,11 +1185,11 @@ Carlton Residences HOA
             {
                 rowNumber++;
 
-                // Trim messy CSV inputs
+
                 r.OR_No = r.OR_No?.Trim();
                 r.Method = r.Method?.Trim();
 
-                // Required fields
+
                 if (!r.PaymentDate.HasValue ||
                     !r.Total_Amount.HasValue || r.Total_Amount.Value <= 0 ||
                     string.IsNullOrWhiteSpace(r.InvoiceMonth) ||
@@ -1244,7 +1201,6 @@ Carlton Residences HOA
                     continue;
                 }
 
-                // OR must be exactly 5 digits
                 if (!System.Text.RegularExpressions.Regex.IsMatch(r.OR_No, @"^\d{5}$"))
                 {
                     failed++;
@@ -1254,7 +1210,6 @@ Carlton Residences HOA
 
                 try
                 {
-                    // Parse "January 2026"
                     var parts = r.InvoiceMonth.Split(' ');
                     int month = DateTime.ParseExact(parts[0], "MMMM", CultureInfo.InvariantCulture).Month;
                     int year = int.Parse(parts[1]);
@@ -1274,12 +1229,10 @@ Carlton Residences HOA
                         continue;
                     }
 
-                    // Check current payments for this invoice
                     var totalPaidSoFar = await _context.Payment
                         .Where(p => p.Invoice_No == invoice.Invoice_No)
                         .SumAsync(p => (decimal?)p.Total_Amount) ?? 0;
 
-                    // Already fully paid
                     if (totalPaidSoFar >= invoice.Total_Amount)
                     {
                         failed++;
@@ -1287,7 +1240,6 @@ Carlton Residences HOA
                         continue;
                     }
 
-                    // Overpayment
                     if (totalPaidSoFar + r.Total_Amount.Value > invoice.Total_Amount)
                     {
                         failed++;
@@ -1295,7 +1247,6 @@ Carlton Residences HOA
                         continue;
                     }
 
-                    // Create payment
                     var payment = new Payment
                     {
                         Invoice_No = invoice.Invoice_No,
@@ -1304,7 +1255,7 @@ Carlton Residences HOA
                         Date_Issued = r.PaymentDate.Value,
                         OR_No = r.OR_No,
                         Remarks = r.Remarks,
-                        Admin_Id = adminId.Value // set if you track logged admin
+                        Admin_Id = adminId.Value
                     };
 
                     _context.Payment.Add(payment);
@@ -1357,14 +1308,12 @@ Carlton Residences HOA
             bool UseDuration,
             string Description)
         {
-            // MONTHS REQUIRED
             if (Months == null || Months.Count == 0)
             {
                 TempData["InvoiceError"] = "Please select at least one billing month.";
                 return RedirectToAction("Residents");
             }
 
-            // Find RESIDENT using Block + Lot
             var resident = await _context.ResidentInfo
             .Include(r => r.ResidentAccount)
             .FirstOrDefaultAsync(r =>
@@ -1393,7 +1342,7 @@ Carlton Residences HOA
                 return RedirectToAction("Residents");
             }
 
-            // Find CURRENT ADMIN
+
             ViewBag.AdminName = HttpContext.Session.GetString("AdminName");
 
             var admin = await _context.Admin
@@ -1401,7 +1350,6 @@ Carlton Residences HOA
             int? adminId = HttpContext.Session.GetInt32("AdminId");
 
 
-            // CHECK ALL MONTHS FOR DUPLICATION FIRST
             List<string> duplicateMonths = new List<string>();
 
 
@@ -1487,87 +1435,69 @@ Carlton Residences HOA
         [HttpGet]
         public async Task<JsonResult> GetNextAdminData()
         {
-            // 1. Security Check: Only Primary Admin can do this
             if (HttpContext.Session.GetString("IsPrimary") != "True")
             {
                 return Json(new { success = false, message = "Unauthorized" });
             }
-
-            // 2. Generate Username (Count admins + 1)
             int count = await _context.Admin.CountAsync();
-            string nextUsername = $"Admin{(count + 1):D2}"; // Formats as Admin02, Admin03...
+            string nextUsername = $"Admin{(count + 1):D2}"; 
 
-            // 3. Generate Random Password
-            string password = Guid.NewGuid().ToString().Substring(0, 8); // 8-char random string
+
+            string password = Guid.NewGuid().ToString().Substring(0, 8); 
 
             return Json(new { success = true, username = nextUsername, password = password });
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateSubAdmin( // Apply same to CreateSubAdmin
+        public async Task<IActionResult> CreateSubAdmin( 
     int AdminId, string FullName, string Username, string Password,
-    List<string> SelectedPermissions, // Catches Add/Create
+    List<string> SelectedPermissions, 
     bool CanEditResident, bool CanEditInvoice,
     bool CanImportResident, bool CanImportInvoice, bool CanImportPayment)
         {
-            // 1. Security Check
             if (HttpContext.Session.GetString("IsPrimary") != "True")
             {
                 TempData["Error"] = "Only the Primary Admin can create accounts.";
                 return RedirectToAction("Dashboard");
             }
-            // 2. Validate Username
             if (await _context.Admin.AnyAsync(a => a.Username == Username))
             {
                 TempData["Error"] = "Username already exists.";
                 return RedirectToAction("Dashboard");
             }
-
-            // 3. Handle the OLD permissions (List based)
             bool addRes = SelectedPermissions != null && SelectedPermissions.Contains("AddResident");
             bool addPay = SelectedPermissions != null && SelectedPermissions.Contains("AddPayment");
             bool addInv = SelectedPermissions != null && SelectedPermissions.Contains("CreateInvoice");
                 
-            // 4. Create the Admin Object
             var newAdmin = new Admin
             {
                 FullName = FullName,
                 Username = Username,
-                Password = Password, // Consider hashing this for security!
+                Password = Password, 
                 Email = "",
                 Status = "Active",
                 Is_Primary = false,
                 LoginCount = 0,
 
-                // OLD Permissions
                 CanAddResident = addRes,
                 CanAddPayment = addPay,
                 CanCreateInvoice = addInv,
-
-                // NEW Permissions (Direct from parameters)
                 CanEditResident = CanEditResident,
                 CanEditInvoice = CanEditInvoice,
-
-                // PROFESSOR'S SECURITY RULE: Force Import to false if Add is false
                 CanImportResident = addRes ? CanImportResident : false,
                 CanImportInvoice = addInv ? CanImportInvoice : false,
                 CanImportPayment = addPay ? CanImportPayment : false
             };
 
-            // 5. Save to Database
             _context.Admin.Add(newAdmin);
             await _context.SaveChangesAsync();
 
             TempData["Success"] = $"Admin {Username} created successfully!";
-            // Log the creation
             string creatorName = HttpContext.Session.GetString("AdminName") ?? "System Administrator";
-            // The 'act' string will be the full sentence saved to the 'Activity' column
             await LogActivity($"{HttpContext.Session.GetString("AdminName")} created a new Admin \"{newAdmin.Username}\"");
             return RedirectToAction("Dashboard");
         }
 
-
-        // 🔎 Find resident by Block + Lot + Phase
         [HttpGet]
         public async Task<IActionResult> GetResidentByAddress(string block, string lot, string phase)
         {
@@ -1647,7 +1577,6 @@ Carlton Residences HOA
                 return RedirectToAction("Residents");
             }
 
-            // ✅ CHECK FIRST
             if (invoices.Any(i => i.Status == "Paid"))
             {
                 TempData["PaymentError"] = "One or more selected invoices are already paid.";
@@ -1657,7 +1586,6 @@ Carlton Residences HOA
             int? adminId = HttpContext.Session.GetInt32("AdminId");
             DateTime paidDate = DateTime.Parse(DatePaid);
 
-            // CHECK OR NUMBER UNIQUENESS
             bool orExists = await _context.Payment
                 .AnyAsync(p => p.OR_No == OR_No);
 
@@ -1810,7 +1738,6 @@ Carlton Residences HOA
             if (Status != "Active" && Status != "Inactive")
                 Status = "Active";
 
-            // DUPLICATE CHECK
             bool duplicateExists = await _context.ResidentInfo.AnyAsync(r =>
                 r.Resident_Id != Resident_Id &&
                 r.Block == Block &&
@@ -1825,7 +1752,6 @@ Carlton Residences HOA
                 return RedirectToAction("Residents");
             }
 
-            // UPDATE NAME
             resident.FullName = string.Join(" ",
                 new[] { LastName + ",", FirstName, MiddleName }
                 .Where(s => !string.IsNullOrWhiteSpace(s)));
@@ -1859,7 +1785,6 @@ Carlton Residences HOA
             if (resident.ResidentAccount == null)
                 return BadRequest("Resident account not found.");
 
-            // Toggle status
             resident.ResidentAccount.Status =
                 resident.ResidentAccount.Status == "Inactive"
                 ? "Active"
@@ -1887,11 +1812,8 @@ Carlton Residences HOA
             }
             return RedirectToAction("Residents");
         }
-
-        //FINANCIAL REPORTS & PUPPETEER
         private FinancialReportViewModel BuildFinancialReportVM(int month, int year)
         {
-            // ================= NORMALIZE INPUT =================
             month = Math.Clamp(month, 1, 12);
             year = Math.Clamp(year, 2017, DateTime.Now.Year);
 
@@ -1901,14 +1823,12 @@ Carlton Residences HOA
             DateTime yearStart = new DateTime(year, 1, 1);
             DateTime yearEnd = yearStart.AddYears(1);
 
-            // ================= VALID RESIDENTS =================
             var validResidents = _context.ResidentInfo
                 .AsNoTracking()
                 .Where(r => r.Year_Of_Residency <= year)
                 .Select(r => r.Resident_Id)
                 .ToList();
 
-            // ================= PRELOAD DATA (YEAR SCOPE) =================
             var targets = _context.CollectionTarget
                 .AsNoTracking()
                 .Where(t => t.Year == year)
@@ -1938,9 +1858,6 @@ Carlton Residences HOA
     .Where(i => validResidents.Contains(i.Resident_Id))
     .Where(i => i.Billing_Period < yearEnd)
     .ToList();
-            // ============================================================
-            // ================= MONTHLY SUMMARY CARDS ====================
-            // ============================================================
 
             decimal target = targets
     .Where(t => t.Month == month)
@@ -1959,13 +1876,10 @@ Carlton Residences HOA
 
             decimal netCollected = collected - totalExpenses;
 
-            // DEFICIT (positive number when net is negative)
             decimal deficit = netCollected < 0 ? Math.Abs(netCollected) : 0;
 
-            // REMAINING 
             decimal remainingToTarget = Math.Max(0, target - collected);
 
-            // RATE must be based on GROSS, not NET
             double rate = target > 0
                 ? Math.Round((double)(collected / target * 100), 2)
                 : 0;
@@ -1979,10 +1893,6 @@ Carlton Residences HOA
                 .Select(t => (decimal?)t.Target_Amount)
                 .FirstOrDefault() ?? 0;
 
-            // ============================================================
-            // ================= MONTHLY CHART =============================
-            // ============================================================
-
             var monthlyChart = new List<MonthlyChartData>();
 
             for (int m = 1; m <= 12; m++)
@@ -1994,7 +1904,7 @@ Carlton Residences HOA
 
                 decimal mExpenses = expenses
                     .Where(e => e.Expense_Month == m &&
-                                e.Expense_Year == year) // MUST MATCH 2026
+                                e.Expense_Year == year) 
                     .Sum(e => e.Total);
 
                 decimal mNetCollected = Math.Max(0, mGrossCollected - mExpenses);
@@ -2009,10 +1919,6 @@ Carlton Residences HOA
                         .FirstOrDefault()
                 });
             }
-
-            // ============================================================
-            // ================= YEARLY SECTION ============================
-            // ============================================================
 
             int startYear = 2017;
             int endYear = year;
@@ -2031,7 +1937,6 @@ Carlton Residences HOA
 
             yearlyRate = Math.Min(100.0, yearlyRate);
 
-            // ===== YEARLY CHART (NET per year is OK)
             for (int y = startYear; y <= endYear; y++)
             {
                 decimal yPayments = _context.Payment
@@ -2055,11 +1960,6 @@ Carlton Residences HOA
                     Collection = yPayments - yExpenses
                 });
             }
-
-
-            // ============================================================
-            // ================= DELINQUENCY (UNCHANGED) ==================
-            // ============================================================
 
             DateTime delinquentCutoff = monthStart.AddMonths(-3);
 
@@ -2091,16 +1991,12 @@ Carlton Residences HOA
         (i.Status == "Unpaid" && i.Billing_Period < delinquentCutoff)
     ));
 
-            // Count updated residents
             int yearlyUpdatedResidents = invoicesUpToYear
                 .GroupBy(i => i.Resident_Id)
                 .Count(g => !g.Any(i =>
                     i.Status == "Delinquent" ||
                     (i.Status == "Unpaid" && i.Billing_Period < delinquentCutoff)
                 ));
-            // ============================================================
-            // ================= RETURN VIEWMODEL ==========================
-            // ============================================================
 
             return new FinancialReportViewModel
             {
@@ -2132,8 +2028,6 @@ Carlton Residences HOA
                 YearlyDelinquentResidents = yearlyDelinquentResidents
             };
         }
-
-        // ================= MAIN PAGE =================
         public IActionResult FinancialReport(int? month, int? year, int? historyMonth, int? historyYear)
         {
             int selectedYear = Math.Clamp(year ?? DateTime.Now.Year, 2017, DateTime.Now.Year);
@@ -2259,11 +2153,10 @@ Carlton Residences HOA
         {
             var vm = model.NewExpense;
 
-            // Total validation
+
             if (vm.Total <= 0)
                 ModelState.AddModelError("NewExpense.Total", "Amount must be greater than 0.");
 
-            // Prevent duplicate voucher number
             if (!string.IsNullOrWhiteSpace(vm.Voucher_No))
             {
                 bool exists = _context.Expense.Any(e => e.Voucher_No == vm.Voucher_No);
@@ -2289,7 +2182,6 @@ Carlton Residences HOA
                 return View("Expense", listVm);
             }
 
-            // Auto-fill system fields
             vm.Created_At = DateTime.Now;
             vm.Expense_Year = (short)vm.Expense_Date.Year;
             vm.Expense_Month = (byte)vm.Expense_Date.Month;
@@ -2337,7 +2229,6 @@ Carlton Residences HOA
             {
                 rowNumber++;
 
-                // VALIDATION 
                 if (string.IsNullOrWhiteSpace(e.Voucher_No) ||
                     string.IsNullOrWhiteSpace(e.Expense_Type) ||
                     !e.Expense_Month.HasValue ||
@@ -2352,7 +2243,6 @@ Carlton Residences HOA
                     continue;
                 }
 
-                // Prevent duplicate voucher number
                 bool voucherExists = await _context.Expense
                     .AnyAsync(x => x.Voucher_No == e.Voucher_No);
 
@@ -2399,9 +2289,6 @@ Carlton Residences HOA
             return RedirectToAction("Expense");
         }
 
-
-
-        // ================= UPDATE TARGET =================
         [HttpPost]
         public IActionResult UpdateTarget(int month, int year, decimal targetAmount)
         {
@@ -2410,7 +2297,6 @@ Carlton Residences HOA
 
             if (existingTarget != null)
             {
-                // ✅ UPDATE
                 existingTarget.Target_Amount = targetAmount;
                 existingTarget.created_at = DateTime.Now;
 
@@ -2418,7 +2304,6 @@ Carlton Residences HOA
             }
             else
             {
-                // ✅ INSERT (first time only)
                 var target = new CollectionTarget
                 {
                     Month = month,
@@ -2435,10 +2320,6 @@ Carlton Residences HOA
             return RedirectToAction(nameof(FinancialReport), new { month, year });
         }
 
-
-
-
-        // ================= GENERATE PDF =================
         private async Task<FileResult> GeneratePdfFromUrl(string url, string fileName)
         {
             var browserFetcher = new BrowserFetcher();
@@ -2507,10 +2388,6 @@ Carlton Residences HOA
 
             return await GeneratePdfFromUrl(url, $"YearlyReport_{year}.pdf");
         }
-
-
-
-        // OTP, Logs, Account Mgmt
 
         [HttpPost]
         public async Task<IActionResult> AdminSendSetupOtp(string Email)
@@ -2703,7 +2580,6 @@ Carlton Residences HOA
         [HttpGet] public async Task<IActionResult> Profile() { var id = HttpContext.Session.GetInt32("AdminId"); return id == null ? RedirectToAction("Login") : View(await _context.Admin.FindAsync(id)); }
         [HttpPost] public async Task<IActionResult> ChangeAdminPassword(string CurrentPassword, string NewPassword, string ConfirmPassword) { var a = await _context.Admin.FindAsync(HttpContext.Session.GetInt32("AdminId")); if (a.Password == CurrentPassword && NewPassword == ConfirmPassword) { a.Password = NewPassword; await _context.SaveChangesAsync(); TempData["ProfileSuccess"] = "Updated"; } return RedirectToAction("Profile"); }
 
-        // HELPER: Send Email
         private async Task<bool> SendEmailInternal(string to, string subject, string body)
         {
             try
@@ -2738,8 +2614,6 @@ Carlton Residences HOA
             }
         }
 
-
-        // iTextSharp PDF GENERATION 
         public async Task<IActionResult> GeneratePaymentPDF(int id, int? payMonth, int? payYear)
         {
             var resident = await _context.ResidentInfo
@@ -2783,8 +2657,6 @@ Carlton Residences HOA
                 logo.ScaleToFit(60f, 60f);  
                 logo.Alignment = Element.ALIGN_LEFT;
 
-
-                // HEADER
                 PdfPTable header = new PdfPTable(2) { WidthPercentage = 100 };
                 header.SetWidths(new float[] { 60f, 40f });
 
@@ -2799,14 +2671,12 @@ Carlton Residences HOA
                 right.WidthPercentage = 100;
                 right.DefaultCell.Border = Rectangle.NO_BORDER;
 
-                // LOGO CELL
                 PdfPCell logoCell = new PdfPCell(logo);
                 logoCell.Border = Rectangle.NO_BORDER;
                 logoCell.VerticalAlignment = Element.ALIGN_TOP;
                 logoCell.HorizontalAlignment = Element.ALIGN_LEFT;
                 right.AddCell(logoCell);
 
-                // ADDRESS CELL
                 PdfPTable address = new PdfPTable(1);
                 address.DefaultCell.Border = Rectangle.NO_BORDER;
                 address.AddCell(new Phrase("Carlton Residence Home Owner's Association", sectionFont));
@@ -2824,7 +2694,6 @@ Carlton Residences HOA
                 doc.Add(header);
                 doc.Add(new Paragraph("\n"));
 
-                // RESIDENT INFO
                 PdfPTable info = new PdfPTable(1) { WidthPercentage = 100 };
                 info.DefaultCell.Border = Rectangle.NO_BORDER;
                 info.AddCell(new Phrase($"Resident Name: {resident.FullName}", normalFont));
@@ -2834,7 +2703,6 @@ Carlton Residences HOA
                 doc.Add(info);
                 doc.Add(new Paragraph("\n"));
 
-                // TABLE
                 PdfPTable table = new PdfPTable(8);
                 table.WidthPercentage = 100;
                 table.SetWidths(new float[] { 10f, 15f, 10f, 12f, 12f, 10f, 14f, 10f });
@@ -2863,7 +2731,6 @@ Carlton Residences HOA
                 }
                 doc.Add(table);
 
-                // TOTAL RECEIVED
                 doc.Add(new Paragraph("\n"));
                 PdfPTable total = new PdfPTable(1) { WidthPercentage = 100 };
 
@@ -2878,7 +2745,6 @@ Carlton Residences HOA
                 total.AddCell(tcell);
                 doc.Add(total);
 
-                // FOOTER
                 doc.Add(new Paragraph("\n\n"));
                 PdfPTable footer = new PdfPTable(2);
                 footer.WidthPercentage = 100;
@@ -2935,7 +2801,6 @@ Carlton Residences HOA
                 logo.ScaleToFit(60f, 60f);
                 logo.Alignment = Element.ALIGN_LEFT;
 
-                // HEADER
                 PdfPTable header = new PdfPTable(2) { WidthPercentage = 100 };
                 header.SetWidths(new float[] { 60f, 40f });
 
@@ -2950,14 +2815,12 @@ Carlton Residences HOA
                 right.WidthPercentage = 100;
                 right.DefaultCell.Border = Rectangle.NO_BORDER;
 
-                // LOGO CELL
                 PdfPCell logoCell = new PdfPCell(logo);
                 logoCell.Border = Rectangle.NO_BORDER;
                 logoCell.VerticalAlignment = Element.ALIGN_TOP;
                 logoCell.HorizontalAlignment = Element.ALIGN_LEFT;
                 right.AddCell(logoCell);
 
-                // ADDRESS CELL
                 PdfPTable address = new PdfPTable(1);
                 address.DefaultCell.Border = Rectangle.NO_BORDER;
                 address.AddCell(new Phrase("Carlton Residence Home Owner's Association", sectionFont));
@@ -2975,7 +2838,6 @@ Carlton Residences HOA
                 doc.Add(header);
                 doc.Add(new Paragraph("\n"));
 
-                // RESIDENT INFO
                 PdfPTable info = new PdfPTable(1) { WidthPercentage = 100 };
                 info.DefaultCell.Border = Rectangle.NO_BORDER;
                 info.AddCell(new Phrase($"Resident Name: {resident.FullName}", normalFont));
@@ -2985,7 +2847,6 @@ Carlton Residences HOA
                 doc.Add(info);
                 doc.Add(new Paragraph("\n"));
 
-                // TABLE
                 PdfPTable table = new PdfPTable(8);
                 table.WidthPercentage = 100;
                 table.SetWidths(new float[] { 12f, 15f, 15f, 20f, 12f, 10f, 10f, 10f });
@@ -3032,7 +2893,6 @@ Carlton Residences HOA
                 total.AddCell(tcell);
                 doc.Add(total);
 
-                // FOOTER
                 doc.Add(new Paragraph("\n\n"));
                 PdfPTable footer = new PdfPTable(2);
                 footer.WidthPercentage = 100;
@@ -3086,7 +2946,6 @@ Carlton Residences HOA
                 logo.ScaleToFit(60f, 60f);
                 logo.Alignment = Element.ALIGN_LEFT;
 
-                // HEADER
                 PdfPTable header = new PdfPTable(2) { WidthPercentage = 100 };
                 header.SetWidths(new float[] { 60f, 40f });
 
@@ -3101,14 +2960,12 @@ Carlton Residences HOA
                 right.WidthPercentage = 100;
                 right.DefaultCell.Border = Rectangle.NO_BORDER;
 
-                // LOGO CELL
                 PdfPCell logoCell = new PdfPCell(logo);
                 logoCell.Border = Rectangle.NO_BORDER;
                 logoCell.VerticalAlignment = Element.ALIGN_TOP;
                 logoCell.HorizontalAlignment = Element.ALIGN_LEFT;
                 right.AddCell(logoCell);
 
-                // ADDRESS CELL
                 PdfPTable address = new PdfPTable(1);
                 address.DefaultCell.Border = Rectangle.NO_BORDER;
                 address.AddCell(new Phrase("Carlton Residence Home Owner's Association", sectionFont));
@@ -3126,7 +2983,6 @@ Carlton Residences HOA
                 doc.Add(header);
                 doc.Add(new Paragraph("\n"));
 
-                // RESIDENT INFO
                 PdfPTable info = new PdfPTable(1) { WidthPercentage = 100 };
                 info.DefaultCell.Border = Rectangle.NO_BORDER;
                 info.AddCell(new Phrase($"Resident Name: {resident.FullName}", normalFont));
@@ -3136,7 +2992,6 @@ Carlton Residences HOA
                 doc.Add(info);
                 doc.Add(new Paragraph("\n"));
 
-                // TABLE
                 PdfPTable table = new PdfPTable(8);
                 table.WidthPercentage = 100;
                 table.SetWidths(new float[] { 12f, 15f, 12f, 20f, 10f, 8f, 8f, 15f });
@@ -3174,7 +3029,6 @@ Carlton Residences HOA
                 }
                 doc.Add(table);
 
-                // TOTAL
                 doc.Add(new Paragraph("\n"));
                 PdfPTable total = new PdfPTable(1) { WidthPercentage = 100 };
 
@@ -3189,7 +3043,6 @@ Carlton Residences HOA
                 total.AddCell(tcell);
                 doc.Add(total);
 
-                // FOOTER
                 doc.Add(new Paragraph("\n\n"));
                 PdfPTable footer = new PdfPTable(2);
                 footer.WidthPercentage = 100;
@@ -3231,13 +3084,12 @@ Carlton Residences HOA
                 var tableHeader = FontFactory.GetFont(FontFactory.TIMES_BOLD, 10);
                 var tableText = FontFactory.GetFont(FontFactory.TIMES, 10);
 
-                // LOGO
+
                 var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "NewFolder", "carlton-logo.jpg");
                 Image logo = Image.GetInstance(logoPath);
                 logo.ScaleToFit(60f, 60f);
                 logo.Alignment = Element.ALIGN_LEFT;
 
-                // HEADER
                 PdfPTable header = new PdfPTable(2) { WidthPercentage = 100 };
                 header.SetWidths(new float[] { 60f, 40f });
 
@@ -3266,7 +3118,6 @@ Carlton Residences HOA
                 doc.Add(header);
                 doc.Add(new Paragraph("\n"));
 
-                // TABLE
                 PdfPTable table = new PdfPTable(6);
                 table.WidthPercentage = 100;
                 table.SetWidths(new float[] { 15f, 25f, 10f, 10f, 15f, 15f });
@@ -3307,7 +3158,7 @@ Carlton Residences HOA
 
                 doc.Add(table);
 
-                // TOTAL
+             
                 doc.Add(new Paragraph("\n"));
                 PdfPTable total = new PdfPTable(1) { WidthPercentage = 100 };
                 PdfPCell tcell = new PdfPCell(
@@ -3319,7 +3170,6 @@ Carlton Residences HOA
                 total.AddCell(tcell);
                 doc.Add(total);
 
-                // FOOTER
                 doc.Add(new Paragraph("\n\n"));
                 PdfPTable footer = new PdfPTable(2) { WidthPercentage = 100 };
                 footer.AddCell(new PdfPCell(

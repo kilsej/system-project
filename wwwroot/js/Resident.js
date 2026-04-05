@@ -132,12 +132,6 @@ function confirmAddResident() {
     return confirm("Are you sure you want to add this resident?");
 }
 
-
-
-
-// ======================== AUTO DATE & ADMIN NAME ========================
-
-
 function loadInvoiceHeader() {
     const dateInput = document.getElementById("invDate");
     const adminInput = document.getElementById("invIssuedBy");
@@ -151,8 +145,6 @@ function loadInvoiceHeader() {
     }
 }
 
-
-// ======================== UPDATE MONTH LABELS WHEN YEAR CHANGES ========================
 document.addEventListener("DOMContentLoaded", function () {
 
     const yearSelect = document.getElementById("invYear");
@@ -165,7 +157,6 @@ document.addEventListener("DOMContentLoaded", function () {
         "July", "August", "September", "October", "November", "December"
     ];
 
-    // Load years into dropdown (2000 → currentYear, but default = currentYear)
     const currentYear = new Date().getFullYear();
 
     for (let y = 2000; y <= currentYear; y++) {
@@ -186,14 +177,11 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Initialize labels with the current year
     updateMonthLabels();
 
-    // Update months when dropdown changes
     yearSelect.addEventListener("change", updateMonthLabels);
 });
 
-// ======================== VALIDATE INVOICE FORM ========================
 // Validate invoice form BEFORE submit
 function validateInvoiceForm() {
     const block = document.getElementById("invBlock");
@@ -203,7 +191,6 @@ function validateInvoiceForm() {
     const months = document.querySelectorAll("input[name='Months']:checked");
     const rate = document.getElementById("invRate");
 
-    // Require block + lot to match a resident
     if (
         !block.value.trim() ||
         !lot.value.trim() ||
@@ -215,26 +202,21 @@ function validateInvoiceForm() {
     }
 
 
-    // Months required
+  
     if (months.length === 0) {
         alert("⚠ Please select at least ONE billing month.");
         return false;
     }
 
-    // Rate required
     if (!rate.value || parseFloat(rate.value) <= 0) {
         alert("⚠ Please enter a valid monthly rate (greater than 0).");
         rate.focus();
         return false;
     }
 
-    // CONFIRMATION BEFORE SUBMIT
     return confirm("Are you sure you want to submit this invoice?");
 }
 
-// ========================= ADD PAYMENT LOGIC ===============================
-
-// Auto-fill today's date + admin name
 document.addEventListener("DOMContentLoaded", function () {
     const today = new Date().toISOString().split("T")[0];
 
@@ -245,14 +227,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (adminField) adminField.value = document.getElementById("adminName")?.value || "";
 });
 
-// Listen for block/lot changes
 ["payBlock", "payLot"].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener("blur", loadPaymentData);
 });
 
-
-// ====================== VALIDATION ======================
 function validatePaymentForm() {
 
     const block = document.getElementById("payBlock").value.trim();

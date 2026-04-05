@@ -7,7 +7,6 @@ public class ResidentAccount
     public string Password { get; set; }
     public string Status { get; set; }
 
-    // ✅ NEW: Tracks number of logins for OTP logic
     public int LoginCount { get; set; }
     public int FailedLoginAttempts { get; set; }
     public DateTime? LockoutEnd { get; set; }

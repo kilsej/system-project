@@ -28,12 +28,12 @@
             height: 100vh;
         }
 
-        /* SIDEBAR */
+   
         .sidebar {
             width: 250px;
-            min-width: 250px; /* Match the width to prevent snapping */
-            flex-shrink: 0; /* THIS IS THE KEY: Prevents the sidebar from being squished */
-            height: 100vh; /* Use viewport height to keep it pinned */
+            min-width: 250px; 
+            flex-shrink: 0; 
+            height: 100vh; 
             position: sticky;
             top: 0;
             background: #fff;
@@ -42,7 +42,7 @@
             padding: 30px 20px;
             border-right: 1px solid #eee;
             z-index: 10;
-            overflow-y: auto; /* Allow the sidebar itself to scroll if items are too many */
+            overflow-y: auto; 
         }
 
 
@@ -85,7 +85,7 @@
                 box-shadow: 0 4px 10px rgba(243, 111, 33, 0.3);
             }
 
-            /* ADMIN MANAGEMENT BUTTON STYLE */
+            
             .nav-item.admin-btn {
                 color: #f36f21;
                 border: 1px dashed #f36f21;
@@ -113,7 +113,6 @@
                     border-color: #f36f21;
                 }
 
-        /* CONTENT */
         .main-content {
             flex-grow: 1;
             padding: 2rem;
@@ -398,11 +397,11 @@
 
             var userType = '@Context.Session.GetString("UserType")';
 
-            // Redirect them to their specific logout page!
+      
             if (userType === 'Resident') {
-                window.location.href = '/Resident/Logout'; // Kicks residents here
+                window.location.href = '/Resident/Logout'; 
             } else {
-                window.location.href = '/Admin/Logout';    // Kicks admins here
+                window.location.href = '/Admin/Logout';    
             }
         }
 
@@ -506,7 +505,7 @@
                     $("#perm_manage_exp").prop('checked', response.canManageExpenses);
                     $("#perm_edit_exp").prop('checked', response.canEditExpense);
 
-                    //sync UI after checking boxes
+                  
                     syncImportPermissions();
 
                     $("#adminForm").attr("action", "@Url.Action("UpdateSubAdmin", "Admin")");
@@ -538,13 +537,13 @@
             $("#pageSubtitle").text(now.toLocaleString('en-US', options));
         }
 
-        // 2. DOCUMENT READY (For Event Listeners)
+      
         $(document).ready(function() {
-            // Clock
+           
             updatePageSubtitle();
             setInterval(updatePageSubtitle, 1000);
 
-            // Sidebar Button - Single Definition
+            
             $(document).on("click", "#sidebarAdminBtn", function(e) {
                 e.preventDefault();
                 var myModal = new bootstrap.Modal(document.getElementById('createAdminModal'));
@@ -553,12 +552,12 @@
                 showListScreen();
             });
 
-            // Toggle Listener for Checkboxes
+           
             $(document).on('change', '#perm_add_res, #perm_add_inv, #perm_add_pay', function() {
                 syncImportPermissions();
             });
 
-            // Sidebar Mobile Toggle
+      
             $("#sidebarToggle").click(function() {
                 $(".sidebar").toggleClass("show");
             });
@@ -571,10 +570,10 @@
                 adminForm.addEventListener("submit", function (e) {
                     const actionUrl = this.getAttribute("action");
 
-                    // Only trigger the popup if the action is creating a new admin
+              
                     if (actionUrl && actionUrl.includes("CreateSubAdmin")) {
                         if (!confirm("Are you sure you want to create this new sub-admin account?")) {
-                            e.preventDefault(); // Stops the form from submitting if they click Cancel
+                            e.preventDefault();
                         }
                     }
                 });

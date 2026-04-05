@@ -2,7 +2,6 @@
 
 @{
     ViewData["PageTitle"] = "Activity Logs";
-    // This tells the page to use the global _Layout.cshtml file
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <head>
@@ -32,7 +31,7 @@
             overflow: hidden;
         }
 
-        /* SIDEBAR */
+ 
         .sidebar {
             width: 250px;
             min-width: 250px;
@@ -83,7 +82,7 @@
                 box-shadow: 0 4px 10px rgba(243, 111, 33, 0.3);
             }
 
-            /* --- LOGOUT BUTTON STYLES --- */
+         
             .nav-item.logout {
                 margin-top: auto;
                 margin-bottom: 40px;
@@ -99,7 +98,7 @@
                     border-color: #f36f21;
                 }
 
-        /* CONTENT */
+    
         .main-content {
             flex-grow: 1;
             padding: 40px;
@@ -156,7 +155,7 @@
             border-radius: 50%;
         }
 
-        /* CONTROLS & BUTTONS */
+     
         .search-input {
             background-color: #e9ecef;
             border: none;
@@ -191,7 +190,7 @@
                 text-decoration: none;
             }
 
-        /* TABLE */
+   
         .table-container {
             background: white;
             border-radius: 10px;
@@ -281,7 +280,7 @@
                 text-decoration: underline;
             }
 
-        /* MODAL */
+   
         .modal-header {
             background-color: #fff;
             color: #333;
@@ -328,7 +327,6 @@
 </head>
 
 <style>
-    /* These styles are specific to the Logs Table, so we keep them here */
     .table-container {
         background: white;
         border-radius: 10px;

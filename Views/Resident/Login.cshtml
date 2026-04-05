@@ -1,6 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Login";
-    Layout = null; // Standalone page
+    Layout = null; 
 }
 
 <!DOCTYPE html>
@@ -30,7 +30,7 @@
             width: 100%;
         }
 
-        /* LEFT SIDE */
+        
         .left-panel {
             flex: 1;
             background: white;
@@ -38,10 +38,9 @@
             flex-direction: column;
             padding: 40px 80px;
             position: relative;
-            justify-content: center; /* Center form vertically */
+            justify-content: center; 
         }
 
-        /* Header at top left */
         .brand-header {
             position: absolute;
             top: 40px;
@@ -51,10 +50,10 @@
             color: #333;
         }
 
-        /* RIGHT SIDE - IMAGE */
+        
         .right-panel {
             flex: 1;
-            /* Using the path from your previous setup */
+         
             background-image: url('/NewFolder/carltonresidence.jpg');
             background-size: cover;
             background-position: center;
@@ -62,7 +61,7 @@
             position: relative;
         }
 
-            /* Optional: Orange overlay gradient on image bottom like the design */
+     
             .right-panel::after {
                 content: '';
                 position: absolute;
@@ -74,7 +73,7 @@
             }
 
 
-        /* Typography & Form Styles */
+        
         h1.welcome-title {
             font-weight: 800;
             color: #333;
@@ -99,10 +98,10 @@
             border: 1px solid #ddd;
             padding-left: 20px;
 
-            /* ADD THESE LINES TO FORCE WIDTH */
+           
             width: 100% !important; 
             max-width: 100% !important;
-            box-sizing: border-box; /* Ensures padding doesn't mess up width */
+            box-sizing: border-box; 
 }
         }
 
@@ -111,7 +110,7 @@
                 box-shadow: 0 0 0 0.2rem rgba(243, 111, 33, 0.25);
             }
 
-        /* Options Row (Remember Me / Forgot Pass) */
+ 
         .options-row {
             display: flex;
             justify-content: space-between;
