@@ -30,7 +30,6 @@
             overflow: hidden;
         }
 
-        /* SIDEBAR */
         .sidebar {
             width: 250px;
             min-width: 250px;
@@ -81,7 +80,6 @@
                 box-shadow: 0 4px 10px rgba(243, 111, 33, 0.3);
             }
 
-            /* --- LOGOUT BUTTON STYLES --- */
             .nav-item.logout {
                 margin-top: auto;
                 margin-bottom: 40px;
@@ -97,7 +95,6 @@
                     border-color: #f36f21;
                 }
 
-        /* CONTENT */
         .main-content {
             flex-grow: 1;
             padding: 40px;
@@ -154,7 +151,6 @@
             border-radius: 50%;
         }
 
-        /* CONTROLS & BUTTONS */
         .search-input {
             background-color: #e9ecef;
             border: none;
@@ -189,7 +185,7 @@
                 text-decoration: none;
             }
 
-        /* TABLE */
+
         .table-container {
             background: white;
             border-radius: 10px;
@@ -326,7 +322,6 @@
 </head>
 
 
-<!-- FILTERS -->
 <form method="get" class="row g-3 mb-3 align-items-end">
 
     <div class="col-md-3">
@@ -366,7 +361,6 @@
 
 </form>
 
-<!-- TABLE -->
 <div class="table-container table-responsive" style="max-height: 460px; overflow-y: auto;">
     <table class="table text-nowrap">
 
@@ -402,7 +396,6 @@
     </table>
 </div>
 
-<!-- TOTAL -->
 <div class="text-end fw-bold mt-2">
     Payments Received:
     PHP @Model.Sum(p => p.Total_Amount).ToString("N2")

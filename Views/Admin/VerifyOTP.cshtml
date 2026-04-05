@@ -20,7 +20,7 @@
             height: 100%;
             margin: 0;
             font-family: 'Nunito', sans-serif;
-            overflow: hidden; /* Prevents scrollbars */
+            overflow: hidden; 
         }
 
         .split-container {
@@ -29,28 +29,24 @@
             width: 100%;
         }
 
-        /* LEFT SIDE - FORM */
         .left-panel {
             flex: 1;
             background: white;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 40px 80px; /* Adjust padding for different screen sizes */
+            padding: 40px 80px; 
             position: relative;
         }
 
-        /* RIGHT SIDE - IMAGE */
         .right-panel {
             flex: 1;
-            /* Make sure this path is correct based on where you put the image */
             background-image: url('/NewFolder/carltonresidence.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
         }
 
-        /* Back Link */
         .back-link {
             position: absolute;
             top: 40px;
@@ -72,7 +68,7 @@
                 margin-right: 8px;
             }
 
-        /* Typography */
+    
         h1 {
             font-weight: 800;
             color: #333;
@@ -84,14 +80,13 @@
             margin-bottom: 40px;
         }
 
-        /* OTP Inputs Container */
+
         .otp-input-group {
             display: flex;
             gap: 15px;
             margin-bottom: 30px;
         }
 
-        /* Individual OTP Box */
         .otp-box {
             width: 60px;
             height: 60px;
@@ -100,7 +95,7 @@
             font-weight: bold;
             border: 1px solid #ddd;
             border-radius: 8px;
-            background-color: #f8f9fa; /* Light gray background */
+            background-color: #f8f9fa;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             outline: none;
             transition: all 0.2s;
@@ -112,9 +107,8 @@
                 box-shadow: 0 0 0 4px rgba(243, 111, 33, 0.2);
             }
 
-        /* Confirm Button */
         .btn-confirm {
-            background-color: #f36f21; /* Specific Orange Color */
+            background-color: #f36f21;
             color: white;
             font-weight: 600;
             padding: 12px;
@@ -134,7 +128,7 @@
         /* Mobile Responsiveness */
         @@media (max-width: 768px) {
             .right-panel {
-                display: none; /* Hide image on mobile */
+                display: none;
             }
 
             .left-panel {
@@ -189,7 +183,6 @@
     </div>
 
     <script>
-        // 1. Move focus to next box automatically
         function moveToNext(element, index) {
             if (element.value.length === 1) {
                 const boxes = document.querySelectorAll('.otp-box');
@@ -199,7 +192,6 @@
             }
         }
 
-        // 2. Handle Backspace (Move to previous box)
         function handleBackspace(event, index) {
             if (event.key === "Backspace") {
                 const boxes = document.querySelectorAll('.otp-box');
@@ -209,7 +201,6 @@
             }
         }
 
-        // 3. Combine the 4 boxes into the hidden input before submitting
         function combineCode() {
             let code = "";
             const boxes = document.querySelectorAll('.otp-box');
